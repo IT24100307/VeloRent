@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Two-Factor Authentication | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/auth-styles.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Security Verification</h1>
+        <p>Check your authenticator app</p>
+      </div>
+
+      <div id="message-container" class="message"></div>
+
+      <div class="auth-form">
+        <p style="text-align: center; margin-bottom: 20px">
+          Please enter the 6-digit verification code from your authenticator app
+          to complete login.
+        </p>
+
+        <form id="verify-2fa-form" class="auth-form">
+          <div class="form-group">
+            <label for="code">Verification Code</label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              required
+              pattern="[0-9]{6}"
+              maxlength="6"
+              placeholder="Enter 6-digit code"
+              autofocus
+            />
+          </div>
+
+          <input type="hidden" id="email" name="email" />
+
+          <button type="submit" class="btn">Verify</button>
+        </form>
+      </div>
+
+      <div class="auth-links">
+        <a href="/login">Cancel and return to login</a>
+      </div>
+    </div>
+
+    <script src="/js/auth-common.js"></script>
+    <script src="/js/verify-2fa.js"></script>
+  </body>
+</html>

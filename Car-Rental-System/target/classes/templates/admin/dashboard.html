@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/auth-styles.css" />
+    <style>
+      .admin-header {
+        background-color: #1a237e;
+        color: white;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+      }
+      .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .role-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #1a237e;
+        color: white;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-header">
+      <h1>Admin Dashboard</h1>
+      <p>Management Interface</p>
+    </div>
+
+    <div class="admin-container">
+      <div id="message-container" class="message"></div>
+
+      <div class="user-info">
+        <h2>Welcome, <span id="user-name">Admin User</span></h2>
+        <p>
+          Role: <span id="user-role" class="role-badge">Administrator</span>
+        </p>
+      </div>
+
+      <div class="admin-panel">
+        <h3>Administration Panel</h3>
+        <p>
+          This is the administrative interface for Car Rental System management.
+        </p>
+        <p>Note: The actual admin functionality will be implemented later.</p>
+      </div>
+
+      <div class="auth-links" style="margin-top: 30px">
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get user info from localStorage
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("userRole");
+
+        // Update UI
+        if (role) {
+          document.getElementById("user-role").textContent = role.replace(
+            "ROLE_",
+            ""
+          );
+        }
+
+        // Handle logout
+        document
+          .getElementById("logout-link")
+          .addEventListener("click", (e) => {
+            e.preventDefault();
+            localStorage.removeItem("token");
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("userEmail");
+            window.location.href =
+              "/login?message=" +
+              encodeURIComponent("You have been logged out.") +
+              "&type=info";
+          });
+      });
+    </script>
+  </body>
+</html>
