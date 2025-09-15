@@ -30,6 +30,33 @@
           <input type="text" id="lastName" name="lastName" required />
         </div>
 
+        <!-- Customer fields moved here -->
+        <div id="customerDetailsSection">
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <input type="tel" id="contactNumber" name="contactNumber" />
+          </div>
+
+          <div class="form-group">
+            <label for="addressStreet">Street Address</label>
+            <input type="text" id="addressStreet" name="addressStreet" />
+          </div>
+
+          <div class="form-group">
+            <label for="addressCity">City</label>
+            <input type="text" id="addressCity" name="addressCity" />
+          </div>
+
+          <div class="form-group">
+            <label for="addressPostalCode">Postal Code</label>
+            <input
+              type="text"
+              id="addressPostalCode"
+              name="addressPostalCode"
+            />
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="email">Email</label>
           <input type="email" id="email" name="email" required />
@@ -61,14 +88,13 @@
           </select>
         </div>
 
-        <div
-          class="form-group"
-          id="registrationCodeGroup"
-          style="display: none"
-        >
-          <label for="registrationCode">Registration Code</label>
-          <input type="text" id="registrationCode" name="registrationCode" />
-          <small>Required for administrator accounts</small>
+        <!-- Staff details section (without title) -->
+        <div id="staffDetailsSection" style="display: none">
+          <div class="form-group">
+            <label for="staffIdCode">Staff ID Code</label>
+            <input type="text" id="staffIdCode" name="staffIdCode" />
+            <small>Required for administrator accounts</small>
+          </div>
         </div>
 
         <button type="submit" class="btn">Create Account</button>

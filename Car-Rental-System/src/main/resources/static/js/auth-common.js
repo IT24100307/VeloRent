@@ -53,6 +53,16 @@ function setButtonLoading(button, isLoading) {
 }
 
 /**
+ * Validates an email address format
+ * @param {string} email - The email address to validate
+ * @returns {boolean} - Whether the email is valid
+ */
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
  * Makes an API call to the backend
  * @param {string} endpoint - The API endpoint to call
  * @param {string} method - The HTTP method to use

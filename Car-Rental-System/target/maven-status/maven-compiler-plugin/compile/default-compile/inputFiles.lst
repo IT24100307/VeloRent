@@ -9,9 +9,13 @@ C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\S
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\dto\LoginDto.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\dto\RegisterDto.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\dto\ResetPasswordDto.java
+C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\entity\Customer.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\entity\Role.java
+C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\entity\Staff.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\entity\User.java
+C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\repository\CustomerRepository.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\repository\RoleRepository.java
+C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\repository\StaffRepository.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\repository\UserRepository.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\service\AuthService.java
 C:\Users\chand\Desktop\Login\Car-Rental-System\src\main\java\Group2\Car\Rental\System\service\JwtService.java

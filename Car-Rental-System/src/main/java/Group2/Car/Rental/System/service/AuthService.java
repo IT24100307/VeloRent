@@ -3,14 +3,19 @@ package Group2.Car.Rental.System.service;
 import Group2.Car.Rental.System.dto.LoginDto;
 import Group2.Car.Rental.System.dto.RegisterDto;
 import Group2.Car.Rental.System.dto.ResetPasswordDto;
+import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Role;
+import Group2.Car.Rental.System.entity.Staff;
 import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.repository.CustomerRepository;
 import Group2.Car.Rental.System.repository.RoleRepository;
+import Group2.Car.Rental.System.repository.StaffRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +26,8 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final CustomerRepository customerRepository;
+    private final StaffRepository staffRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -28,22 +35,27 @@ public class AuthService {
 
     private final Map<String, String> otpStore = new HashMap<>();
 
-    public AuthService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager, JwtService jwtService,
-            TwoFactorAuthService twoFactorAuthService) {
+    public AuthService(UserRepository userRepository, RoleRepository roleRepository,
+            CustomerRepository customerRepository, StaffRepository staffRepository,
+            PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+            JwtService jwtService, TwoFactorAuthService twoFactorAuthService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.customerRepository = customerRepository;
+        this.staffRepository = staffRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.twoFactorAuthService = twoFactorAuthService;
     }
 
+    @Transactional
     public void register(RegisterDto registerDto) {
         if (userRepository.findByEmail(registerDto.getEmail()).isPresent()) {
             throw new RuntimeException("Error: Email is already in use!");
         }
 
+        // Create and set up the User entity
         User user = new User();
         user.setFirstName(registerDto.getFirstName());
         user.setLastName(registerDto.getLastName());
@@ -84,7 +96,34 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Error: Selected role not found."));
         user.setRole(selectedRole);
 
-        userRepository.save(user);
+        // Handle profile creation based on role
+        if ("ROLE_CUSTOMER".equals(roleName)) {
+            // Create Customer entity
+            Customer customer = new Customer();
+            customer.setContactNumber(registerDto.getContactNumber());
+            customer.setAddressStreet(registerDto.getAddressStreet());
+            customer.setAddressCity(registerDto.getAddressCity());
+            customer.setAddressPostalCode(registerDto.getAddressPostalCode());
+
+            // Set up bidirectional relationship
+            customer.setUser(user);
+            user.setCustomer(customer);
+
+            // Save the User entity with its associated Customer
+            userRepository.save(user);
+        } else {
+            // Create Staff entity for admin roles
+            Staff staff = new Staff();
+            staff.setStaffIdCode(registerDto.getStaffIdCode());
+            staff.setHireDate(new java.util.Date()); // Set current date as hire date
+
+            // Set up bidirectional relationship
+            staff.setUser(user);
+            user.setStaff(staff);
+
+            // Save the User entity with its associated Staff
+            userRepository.save(user);
+        }
     }
 
     public Map<String, String> login(LoginDto loginDto) {

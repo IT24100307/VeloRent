@@ -3,22 +3,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     const roleNameSelect = document.getElementById('roleName');
-    const registrationCodeGroup = document.getElementById('registrationCodeGroup');
+    const customerDetailsSection = document.getElementById('customerDetailsSection');
+    const staffDetailsSection = document.getElementById('staffDetailsSection');
     
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegistration);
     }
     
-    if (roleNameSelect && registrationCodeGroup) {
-        // Show/hide registration code field based on selected role
+    if (roleNameSelect) {
+        // Show/hide appropriate details section based on selected role
         roleNameSelect.addEventListener('change', () => {
             const selectedRole = roleNameSelect.value;
             if (selectedRole === 'ROLE_CUSTOMER') {
-                registrationCodeGroup.style.display = 'none';
+                customerDetailsSection.style.display = 'block';
+                staffDetailsSection.style.display = 'none';
             } else {
-                registrationCodeGroup.style.display = 'block';
+                customerDetailsSection.style.display = 'none';
+                staffDetailsSection.style.display = 'block';
             }
         });
+        
+        // Trigger the change event to set the initial state
+        roleNameSelect.dispatchEvent(new Event('change'));
     }
 });
 
@@ -26,6 +32,50 @@ document.addEventListener('DOMContentLoaded', () => {
  * Handles the registration form submission
  * @param {Event} event - The form submission event
  */
+/**
+ * Validates the registration form
+ * @param {HTMLFormElement} form - The form to validate
+ * @returns {boolean} - Whether the form is valid
+ */
+function validateForm(form) {
+    const email = form.email.value.trim();
+    const password = form.password.value;
+    const passwordConfirm = form.passwordConfirm.value;
+    const roleName = form.roleName.value;
+    
+    // Email validation
+    if (!isValidEmail(email)) {
+        showMessage('Please enter a valid email address', 'error');
+        return false;
+    }
+    
+    // Password validation
+    if (password.length < 8) {
+        showMessage('Password must be at least 8 characters long', 'error');
+        return false;
+    }
+    
+    // Password confirmation
+    if (password !== passwordConfirm) {
+        showMessage('Passwords do not match', 'error');
+        return false;
+    }
+    
+    // Role-specific validation
+    if (roleName === 'ROLE_CUSTOMER') {
+        // Validate customer fields (making them optional for now)
+        // You can make them required if needed
+    } else {
+        // Staff ID code is required for admin roles (it now serves as registration code too)
+        if (!form.staffIdCode.value.trim()) {
+            showMessage('Staff ID Code is required for administrator accounts', 'error');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 async function handleRegistration(event) {
     event.preventDefault();
     
@@ -48,7 +98,6 @@ async function handleRegistration(event) {
     const password = form.password.value;
     const passwordConfirm = form.passwordConfirm.value;
     const roleName = form.roleName.value;
-    const registrationCode = form.registrationCode.value;
     
     // Confirm passwords match
     if (password !== passwordConfirm) {
@@ -60,15 +109,31 @@ async function handleRegistration(event) {
     setButtonLoading(submitButton, true);
     
     try {
-        // Call the registration API
-        const response = await callApi('/api/auth/register', 'POST', {
+        // Build the request data based on the selected role
+        const requestData = {
             firstName,
             lastName,
             email,
             password,
-            roleName,
-            registrationCode: roleName !== 'ROLE_CUSTOMER' ? registrationCode : undefined
-        });
+            roleName
+        };
+        
+        // Add role-specific fields
+        if (roleName === 'ROLE_CUSTOMER') {
+            // Add customer details
+            requestData.contactNumber = form.contactNumber.value.trim();
+            requestData.addressStreet = form.addressStreet.value.trim();
+            requestData.addressCity = form.addressCity.value.trim();
+            requestData.addressPostalCode = form.addressPostalCode.value.trim();
+        } else {
+            // Add staff details and use staff ID code as registration code
+            const staffIdCode = form.staffIdCode.value.trim();
+            requestData.registrationCode = staffIdCode;
+            requestData.staffIdCode = staffIdCode;
+        }
+        
+        // Call the registration API
+        const response = await callApi('/api/auth/register', 'POST', requestData);
         
         // Handle the response
         if (response.data.success) {
