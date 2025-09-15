@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/auth-styles.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Join our car rental service today</p>
+      </div>
+
+      <div id="message-container" class="message"></div>
+
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" required />
+        </div>
+
+        <!-- Customer fields moved here -->
+        <div id="customerDetailsSection">
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <input type="tel" id="contactNumber" name="contactNumber" />
+          </div>
+
+          <div class="form-group">
+            <label for="addressStreet">Street Address</label>
+            <input type="text" id="addressStreet" name="addressStreet" />
+          </div>
+
+          <div class="form-group">
+            <label for="addressCity">City</label>
+            <input type="text" id="addressCity" name="addressCity" />
+          </div>
+
+          <div class="form-group">
+            <label for="addressPostalCode">Postal Code</label>
+            <input
+              type="text"
+              id="addressPostalCode"
+              name="addressPostalCode"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+          <small>Password must be at least 8 characters</small>
+        </div>
+
+        <div class="form-group">
+          <label for="passwordConfirm">Confirm Password</label>
+          <input
+            type="password"
+            id="passwordConfirm"
+            name="passwordConfirm"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="roleName">Register as:</label>
+          <select id="roleName" name="roleName">
+            <option value="ROLE_CUSTOMER" selected>Customer</option>
+            <option value="ROLE_FLEET_MANAGER">Fleet Manager</option>
+            <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
+            <option value="ROLE_OWNER">Owner</option>
+          </select>
+        </div>
+
+        <!-- Staff details section (without title) -->
+        <div id="staffDetailsSection" style="display: none">
+          <div class="form-group">
+            <label for="staffIdCode">Staff ID Code</label>
+            <input type="text" id="staffIdCode" name="staffIdCode" />
+            <small>Required for administrator accounts</small>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Create Account</button>
+      </form>
+
+      <div class="auth-links">
+        <a href="/login">Already have an account? Login here</a>
+      </div>
+    </div>
+
+    <script src="/js/auth-common.js"></script>
+    <script src="/js/register.js"></script>
+  </body>
+</html>

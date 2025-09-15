@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #2ecc71;
+        --text-color: #333;
+        --light-text: #666;
+        --background-color: #f8f9fa;
+        --card-background: #fff;
+        --border-color: #e1e1e1;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .nav-links a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      main {
+        margin-top: 30px;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .dashboard-title {
+        font-size: 24px;
+        color: var(--primary-color);
+      }
+
+      .dashboard-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        text-decoration: none;
+      }
+
+      .btn:hover {
+        background-color: #34495e;
+      }
+
+      .btn-accent {
+        background-color: var(--accent-color);
+      }
+
+      .btn-accent:hover {
+        background-color: #27ae60;
+      }
+
+      .dashboard-content {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+      }
+
+      .welcome-message {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+
+      .message {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .message.error {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .message.success {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      footer {
+        margin-top: 50px;
+        text-align: center;
+        color: var(--light-text);
+        font-size: 14px;
+        padding: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <div class="logo">Car Rental System</div>
+          <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/security-settings">Security</a>
+            <a href="#" id="logout-btn">Logout</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      <main>
+        <div id="message-container"></div>
+
+        <div class="dashboard-header">
+          <h1 class="dashboard-title">Dashboard</h1>
+          <div class="dashboard-actions">
+            <a href="#" class="btn btn-accent">Rent a Car</a>
+          </div>
+        </div>
+
+        <div class="dashboard-content">
+          <p class="welcome-message">
+            Welcome to the Car Rental System, <span id="user-name">User</span>!
+            <br />
+            <span
+              id="user-role"
+              style="font-size: 14px; color: var(--light-text)"
+              >Your role: Customer</span
+            >
+          </p>
+
+          <p>
+            This is a placeholder dashboard. In a complete application, you
+            would see:
+          </p>
+          <ul>
+            <li>Your current and past rentals</li>
+            <li>Available cars for rent</li>
+            <li>Special offers and discounts</li>
+            <li>Account settings and preferences</li>
+          </ul>
+        </div>
+      </main>
+
+      <footer>
+        <p>&copy; 2025 Car Rental System. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Check if user is logged in
+        const token = localStorage.getItem("token");
+        const userRole = localStorage.getItem("userRole");
+
+        if (!token) {
+          window.location.href =
+            "/login?message=" +
+            encodeURIComponent("Please log in to access the dashboard") +
+            "&type=error";
+          return;
+        }
+
+        // Update user role display
+        const userRoleElement = document.getElementById("user-role");
+        if (userRoleElement && userRole) {
+          userRoleElement.textContent =
+            "Your role: " + userRole.replace("ROLE_", "");
+        }
+
+        // Check for query parameter messages
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get("message");
+        const type = urlParams.get("type") || "info";
+
+        if (message) {
+          const messageContainer = document.getElementById("message-container");
+          messageContainer.textContent = message;
+          messageContainer.className = `message ${type}`;
+
+          // Remove the query parameters from the URL
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
+        }
+
+        // Setup logout button
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            // Clear authentication data
+            localStorage.removeItem("token");
+
+            // Redirect to login
+            window.location.href =
+              "/login?message=" +
+              encodeURIComponent("You have been logged out") +
+              "&type=success";
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two-Factor Authentication Setup | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/auth-styles.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Security Settings</h1>
+        <p>Set up Two-Factor Authentication</p>
+      </div>
+
+      <div id="message-container" class="message"></div>
+
+      <div id="setup-container">
+        <p>
+          Enhance your account security by setting up two-factor authentication
+          (2FA).
+        </p>
+
+        <button id="enable-2fa-btn" class="btn">
+          Enable Two-Factor Authentication
+        </button>
+      </div>
+
+      <div id="qr-container" style="display: none">
+        <div class="qr-code-container">
+          <p>Scan this QR code with your authenticator app</p>
+          <div
+            id="qr-image-container"
+            style="
+              min-height: 200px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <img
+              id="qr-code"
+              src=""
+              alt="QR Code"
+              style="max-width: 200px; max-height: 200px"
+            />
+            <div id="qr-loading" style="display: none">Loading QR code...</div>
+            <div id="qr-error" style="display: none; color: red">
+              Error loading QR code. Please try again.
+            </div>
+          </div>
+
+          <div class="auth-divider">
+            <span>OR</span>
+          </div>
+
+          <p>Enter this code manually in your authenticator app:</p>
+          <div id="secret-key" class="secret-key"></div>
+        </div>
+
+        <p>
+          After scanning the QR code or entering the secret key, enter the
+          6-digit code from your authenticator app below:
+        </p>
+
+        <form id="verify-2fa-form" class="auth-form">
+          <div class="form-group">
+            <label for="code">Verification Code</label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              required
+              pattern="[0-9]{6}"
+              maxlength="6"
+              placeholder="Enter 6-digit code"
+            />
+          </div>
+
+          <button type="submit" class="btn">Verify & Enable</button>
+        </form>
+      </div>
+
+      <div class="auth-links">
+        <a href="/dashboard">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <script src="/js/auth-common.js"></script>
+    <script src="/js/2fa-setup.js"></script>
+  </body>
+</html>
