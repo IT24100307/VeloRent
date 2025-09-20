@@ -78,13 +78,13 @@ async function handleLogin(event) {
                         localStorage.setItem('userRole', response.data.role);
                     }
                     
-                    // Get the redirect URL from the response or use default
-                    const redirectUrl = response.data.redirect || '/dashboard';
-                    
+                    // Always redirect to /dashboard for all roles
+                    const redirectUrl = '/dashboard';
+
                     console.log('Role:', response.data.role);
                     console.log('Redirecting to:', redirectUrl);
                     
-                    // Redirect based on role after a short delay
+                    // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = redirectUrl;
                     }, 1000);

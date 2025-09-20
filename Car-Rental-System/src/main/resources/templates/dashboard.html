@@ -169,6 +169,13 @@
           <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
             <a href="/security-settings">Security</a>
+            <a
+              href="/admin/dashboard"
+              id="admin-dashboard-btn"
+              style="display: none; background-color: #e74c3c; font-weight: bold;"
+            >
+              Admin Dashboard
+            </a>
             <a href="#" id="logout-btn">Logout</a>
           </div>
         </nav>
@@ -260,8 +267,10 @@
           logoutBtn.addEventListener("click", (e) => {
             e.preventDefault();
 
-            // Clear authentication data
+            // Clear all authentication data
             localStorage.removeItem("token");
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("userEmail");
 
             // Redirect to login
             window.location.href =
@@ -269,6 +278,16 @@
               encodeURIComponent("You have been logged out") +
               "&type=success";
           });
+        }
+
+        // Show admin dashboard link for admin users
+        const adminDashboardBtn = document.getElementById("admin-dashboard-btn");
+        if (adminDashboardBtn && userRole) {
+          const adminRoles = ["SYSTEM_ADMIN", "OWNER", "FLEETMANAGER"];
+          // Check if userRole contains any of the admin role strings
+          if (adminRoles.some(role => userRole.includes(role))) {
+            adminDashboardBtn.style.display = "inline-block";
+          }
         }
       });
     </script>
