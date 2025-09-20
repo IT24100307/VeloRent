@@ -63,7 +63,7 @@ function isValidEmail(email) {
 }
 
 /**
- * Makes an API call to the backend
+ * Makes an API call to the backend with improved error handling and timeout
  * @param {string} endpoint - The API endpoint to call
  * @param {string} method - The HTTP method to use
  * @param {object} data - The data to send in the request body
@@ -93,8 +93,25 @@ async function callApi(endpoint, method, data = null) {
             console.log('No auth token available for API call to:', endpoint);
         }
 
+        // Create an AbortController for timeout handling
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        options.signal = controller.signal;
+
+        console.log(`Making ${method} request to ${endpoint} with data:`, data);
+
         const response = await fetch(endpoint, options);
+
+        // Clear the timeout since the request completed
+        clearTimeout(timeoutId);
+
+        // If the response is not ok, throw an error with the status
+        if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+
         const result = await response.json();
+        console.log(`Received response from ${endpoint}:`, result);
 
         return {
             status: response.status,
@@ -102,9 +119,27 @@ async function callApi(endpoint, method, data = null) {
         };
     } catch (error) {
         console.error('API call failed:', error);
+
+        // Specific error handling based on the type of error
+        let errorMessage = 'Network error. Please try again.';
+        let errorStatus = 500;
+
+        if (error.name === 'AbortError') {
+            errorMessage = 'Request timed out. Server might be overloaded. Please try again later.';
+        } else if (error.message.includes('status: 401')) {
+            errorMessage = 'Authentication failed. Please log in again.';
+            errorStatus = 401;
+        } else if (error.message.includes('status: 403')) {
+            errorMessage = 'You do not have permission to perform this action.';
+            errorStatus = 403;
+        } else if (error.message.includes('status: 404')) {
+            errorMessage = 'The requested resource was not found.';
+            errorStatus = 404;
+        }
+
         return {
-            status: 500,
-            data: { message: 'Network error. Please try again.', success: false }
+            status: errorStatus,
+            data: { message: errorMessage, success: false }
         };
     }
 }
