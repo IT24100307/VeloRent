@@ -36,7 +36,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection for stateless APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
-                        .requestMatchers("/api/admin/**").authenticated() // Secured admin endpoints
+                        .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
+                        .requestMatchers("/api/admin/**").permitAll() // Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard",
