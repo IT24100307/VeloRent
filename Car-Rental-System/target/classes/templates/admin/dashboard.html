@@ -8,87 +8,464 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/css/auth-styles.css" />
     <style>
-      .admin-header {
-        background-color: #1a237e;
-        color: white;
-        padding: 10px 20px;
-        margin-bottom: 20px;
+      :root {
+        --primary-color: #1a237e;
+        --secondary-color: #3498db;
+        --accent-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --text-color: #333;
+        --light-text: #666;
+        --background-color: #f8f9fa;
+        --card-background: #fff;
+        --border-color: #e1e1e1;
       }
-      .admin-container {
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
       }
-      .role-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        background-color: #1a237e;
+
+      header {
+        background-color: var(--primary-color);
         color: white;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
         border-radius: 4px;
-        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      .nav-links a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      main {
+        margin-top: 30px;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .dashboard-title {
+        font-size: 24px;
+        color: var(--primary-color);
+      }
+
+      .dashboard-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn:hover {
+        background-color: #0d1b69;
+      }
+
+      .btn-secondary {
+        background-color: var(--secondary-color);
+      }
+
+      .btn-secondary:hover {
+        background-color: #2980b9;
+      }
+
+      .btn-danger {
+        background-color: var(--danger-color);
+      }
+
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+
+      .customer-list {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .customer-list table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .customer-list th,
+      .customer-list td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .customer-list th {
+        background-color: #f1f5f9;
+        font-weight: 500;
+      }
+
+      .customer-list tr:hover {
+        background-color: #f9f9f9;
+        cursor: pointer;
+      }
+
+      .action-cell {
+        width: 100px;
+      }
+
+      .customer-details {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+        display: none;
+      }
+
+      .customer-details h3 {
+        margin-bottom: 15px;
+        color: var(--primary-color);
+      }
+
+      .customer-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+
+      .info-item {
+        margin-bottom: 10px;
+      }
+
+      .info-label {
+        font-weight: 500;
+        color: var(--light-text);
+        font-size: 0.9rem;
+      }
+
+      .info-value {
+        font-size: 1.1rem;
+      }
+
+      .back-btn {
         margin-right: 10px;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: var(--card-background);
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 400px;
+        max-width: 90%;
+      }
+
+      .modal-title {
+        margin-bottom: 15px;
+        color: var(--primary-color);
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
       }
     </style>
   </head>
   <body>
-    <div class="admin-header">
-      <h1>Admin Dashboard</h1>
-      <p>Management Interface</p>
-    </div>
+    <header>
+      <nav class="container">
+        <div class="logo">VeloRent Admin</div>
+        <div class="nav-links">
+          <a href="#">Dashboard</a>
+          <a href="#">Vehicles</a>
+          <a href="#">Reservations</a>
+          <a href="#">Reports</a>
+          <a href="/logout">Logout</a>
+        </div>
+      </nav>
+    </header>
 
-    <div class="admin-container">
-      <div id="message-container" class="message"></div>
-
-      <div class="user-info">
-        <h2>Welcome, <span id="user-name">Admin User</span></h2>
-        <p>
-          Role: <span id="user-role" class="role-badge">Administrator</span>
-        </p>
+    <main class="container">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Admin Dashboard</h1>
+        <div class="dashboard-actions">
+          <a href="/dashboard" class="btn back-btn">Back to Dashboard</a>
+          <button class="btn btn-secondary" id="refreshBtn">Refresh Data</button>
+        </div>
       </div>
 
-      <div class="admin-panel">
-        <h3>Administration Panel</h3>
-        <p>
-          This is the administrative interface for Car Rental System management.
-        </p>
-        <p>Note: The actual admin functionality will be implemented later.</p>
-      </div>
+      <section class="customer-list">
+        <h2 style="padding: 15px">Customer List</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th class="action-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="customerTableBody">
+            <!-- Customer data will be loaded here -->
+          </tbody>
+        </table>
+      </section>
 
-      <div class="auth-links" style="margin-top: 30px">
-        <a href="#" id="logout-link">Logout</a>
+      <section class="customer-details" id="customerDetails">
+        <h3>Customer Details</h3>
+        <div class="customer-info">
+          <div class="info-item">
+            <div class="info-label">First Name</div>
+            <div class="info-value" id="firstName"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Name</div>
+            <div class="info-value" id="lastName"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value" id="email"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Contact Number</div>
+            <div class="info-value" id="contactNumber"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Street Address</div>
+            <div class="info-value" id="street"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">City</div>
+            <div class="info-value" id="city"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Postal Code</div>
+            <div class="info-value" id="postalCode"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Delete Confirmation Modal -->
+      <div id="deleteModal" class="modal">
+        <div class="modal-content">
+          <h3 class="modal-title">Confirm Delete</h3>
+          <p>Are you sure you want to delete this customer account? This action cannot be undone.</p>
+          <div class="modal-actions">
+            <button id="cancelDeleteBtn" class="btn">Cancel</button>
+            <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Get user info from localStorage
-        const token = localStorage.getItem("token");
-        const role = localStorage.getItem("userRole");
+      document.addEventListener('DOMContentLoaded', function() {
+        loadCustomers();
 
-        // Update UI
-        if (role) {
-          document.getElementById("user-role").textContent = role.replace(
-            "ROLE_",
-            ""
-          );
-        }
+        // Add event listener for refresh button
+        document.getElementById('refreshBtn').addEventListener('click', loadCustomers);
 
-        // Handle logout
-        document
-          .getElementById("logout-link")
-          .addEventListener("click", (e) => {
-            e.preventDefault();
-            localStorage.removeItem("token");
-            localStorage.removeItem("userRole");
-            localStorage.removeItem("userEmail");
-            window.location.href =
-              "/login?message=" +
-              encodeURIComponent("You have been logged out.") +
-              "&type=info";
-          });
+        // Modal event listeners
+        document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+          document.getElementById('deleteModal').style.display = 'none';
+        });
       });
+
+      function loadCustomers() {
+        fetch('/api/admin/customers', {
+          credentials: 'include' // Include credentials (cookies) with the request
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load customers');
+            }
+            return response.json();
+          })
+          .then(customers => {
+            const tableBody = document.getElementById('customerTableBody');
+            tableBody.innerHTML = '';
+
+            customers.forEach(customer => {
+              const row = document.createElement('tr');
+
+              // Create cells for customer info
+              const idCell = document.createElement('td');
+              idCell.textContent = customer.id;
+
+              const nameCell = document.createElement('td');
+              nameCell.textContent = `${customer.firstName} ${customer.lastName}`;
+              nameCell.classList.add('customer-name');
+
+              const emailCell = document.createElement('td');
+              emailCell.textContent = customer.email;
+
+              const actionCell = document.createElement('td');
+              actionCell.classList.add('action-cell');
+
+              // Create delete button
+              const deleteButton = document.createElement('button');
+              deleteButton.textContent = 'Delete';
+              deleteButton.classList.add('btn', 'btn-danger');
+              deleteButton.onclick = function(e) {
+                e.stopPropagation(); // Prevent row click event
+                showDeleteConfirmation(customer.id);
+              };
+
+              actionCell.appendChild(deleteButton);
+
+              // Add cells to row
+              row.appendChild(idCell);
+              row.appendChild(nameCell);
+              row.appendChild(emailCell);
+              row.appendChild(actionCell);
+
+              // Add click event to show customer details (exclude action cell)
+              nameCell.addEventListener('click', () => showCustomerDetails(customer.id));
+              idCell.addEventListener('click', () => showCustomerDetails(customer.id));
+              emailCell.addEventListener('click', () => showCustomerDetails(customer.id));
+
+              tableBody.appendChild(row);
+            });
+          })
+          .catch(error => {
+            console.error('Error loading customers:', error);
+            alert('Failed to load customer data. Please try again later.');
+          });
+      }
+
+      function showCustomerDetails(customerId) {
+        fetch(`/api/admin/customers/${customerId}`, {
+          credentials: 'include' // Include credentials (cookies) with the request
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load customer details');
+            }
+            return response.json();
+          })
+          .then(customer => {
+            // Populate customer details
+            document.getElementById('firstName').textContent = customer.firstName || 'N/A';
+            document.getElementById('lastName').textContent = customer.lastName || 'N/A';
+            document.getElementById('email').textContent = customer.email || 'N/A';
+            document.getElementById('contactNumber').textContent = customer.contactNumber || 'N/A';
+            document.getElementById('street').textContent = customer.addressStreet || 'N/A';
+            document.getElementById('city').textContent = customer.addressCity || 'N/A';
+            document.getElementById('postalCode').textContent = customer.addressPostalCode || 'N/A';
+
+            // Show the details section
+            document.getElementById('customerDetails').style.display = 'block';
+          })
+          .catch(error => {
+            console.error('Error loading customer details:', error);
+            alert('Failed to load customer details. Please try again later.');
+          });
+      }
+
+      function showDeleteConfirmation(customerId) {
+        // Store the customer ID in the confirm button's data attribute
+        document.getElementById('confirmDeleteBtn').setAttribute('data-customer-id', customerId);
+
+        // Display the modal
+        document.getElementById('deleteModal').style.display = 'block';
+
+        // Set up the confirm delete button
+        document.getElementById('confirmDeleteBtn').onclick = function() {
+          deleteCustomer(customerId);
+        };
+      }
+
+      function deleteCustomer(customerId) {
+        fetch(`/api/admin/customers/${customerId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete customer');
+          }
+          // Hide the modal
+          document.getElementById('deleteModal').style.display = 'none';
+
+          // Reload customer list
+          loadCustomers();
+
+          // Hide customer details if currently shown
+          document.getElementById('customerDetails').style.display = 'none';
+
+          // Show success message
+          alert('Customer deleted successfully');
+        })
+        .catch(error => {
+          console.error('Error deleting customer:', error);
+          alert('Failed to delete customer. Please try again later.');
+
+          // Hide the modal
+          document.getElementById('deleteModal').style.display = 'none';
+        });
+      }
     </script>
   </body>
 </html>
