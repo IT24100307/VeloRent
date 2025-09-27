@@ -26,6 +26,15 @@ public class Staff {
     @Column(name = "hire_date")
     private Date hireDate;
 
+    @Column(name = "department")
+    private String department;
+
+    @Column(name = "position")
+    private String position;
+
+    @Column(name = "employee_id")
+    private String employeeId;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id")

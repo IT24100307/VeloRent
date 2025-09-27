@@ -1,14 +1,19 @@
 package Group2.Car.Rental.System.controller;
 
 import Group2.Car.Rental.System.dto.CustomerDTO;
+import Group2.Car.Rental.System.dto.UserDTO;
 import Group2.Car.Rental.System.entity.Customer;
+import Group2.Car.Rental.System.entity.Role;
 import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.repository.RoleRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -22,6 +27,9 @@ public class AdminApiController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping("/customers")
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
@@ -45,17 +53,77 @@ public class AdminApiController {
         return ResponseEntity.ok(customerDTOs);
     }
 
-    @GetMapping("/customers/{id}")
-    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
-        logger.info("Fetching customer with ID: {}", id);
-        Optional<User> userOptional = userRepository.findById(id);
+    @GetMapping("/users/fleet-managers")
+    public ResponseEntity<List<UserDTO>> getAllFleetManagers() {
+        logger.info("Fetching all fleet managers");
+        Optional<Role> roleOptional = roleRepository.findByName("ROLE_FLEET_MANAGER");
 
-        if (userOptional.isPresent() && userOptional.get().getCustomer() != null) {
-            logger.info("Customer found with ID: {}", id);
-            return ResponseEntity.ok(convertToDTO(userOptional.get()));
+        if (!roleOptional.isPresent()) {
+            logger.warn("Fleet Manager role not found");
+            return ResponseEntity.ok(List.of());
         }
 
-        logger.warn("Customer not found with ID: {}", id);
+        List<User> fleetManagers = userRepository.findByRoleId(roleOptional.get().getId());
+        logger.info("Found {} fleet managers", fleetManagers.size());
+
+        List<UserDTO> userDTOs = fleetManagers.stream()
+                .map(this::convertToUserDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDTOs);
+    }
+
+    @GetMapping("/users/system-admins")
+    public ResponseEntity<List<UserDTO>> getAllSystemAdmins() {
+        logger.info("Fetching all system admins");
+        Optional<Role> roleOptional = roleRepository.findByName("ROLE_SYSTEM_ADMIN");
+
+        if (!roleOptional.isPresent()) {
+            logger.warn("System Admin role not found");
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<User> systemAdmins = userRepository.findByRoleId(roleOptional.get().getId());
+        logger.info("Found {} system admins", systemAdmins.size());
+
+        List<UserDTO> userDTOs = systemAdmins.stream()
+                .map(this::convertToUserDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDTOs);
+    }
+
+    @GetMapping("/users/owners")
+    public ResponseEntity<List<UserDTO>> getAllOwners() {
+        logger.info("Fetching all owners");
+        Optional<Role> roleOptional = roleRepository.findByName("ROLE_OWNER");
+
+        if (!roleOptional.isPresent()) {
+            logger.warn("Owner role not found");
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<User> owners = userRepository.findByRoleId(roleOptional.get().getId());
+        logger.info("Found {} owners", owners.size());
+
+        List<UserDTO> userDTOs = owners.stream()
+                .map(this::convertToUserDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDTOs);
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        logger.info("Fetching user with ID: {}", id);
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            logger.info("User found with ID: {}", id);
+            return ResponseEntity.ok(convertToUserDTO(userOptional.get()));
+        }
+
+        logger.warn("User not found with ID: {}", id);
         return ResponseEntity.notFound().build();
     }
 
@@ -119,6 +187,20 @@ public class AdminApiController {
         }
     }
 
+    @GetMapping("/customers/{id}")
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
+        logger.info("Fetching customer with ID: {}", id);
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent() && userOptional.get().getCustomer() != null) {
+            logger.info("Customer found with ID: {}", id);
+            return ResponseEntity.ok(convertToDTO(userOptional.get()));
+        }
+
+        logger.warn("Customer not found with ID: {}", id);
+        return ResponseEntity.notFound().build();
+    }
+
     private CustomerDTO convertToDTO(User user) {
         Customer customer = user.getCustomer();
 
@@ -137,5 +219,66 @@ public class AdminApiController {
         }
 
         return builder.build();
+    }
+
+    // Method to convert User to UserDTO
+    private UserDTO convertToUserDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole().getName());
+
+        // Get staff information if available
+        if (user.getStaff() != null) {
+            dto.setStaffIdCode(user.getStaff().getStaffIdCode());
+            dto.setHireDate(user.getStaff().getHireDate());
+        }
+
+        return dto;
+    }
+
+    @PutMapping("/users/{id}/role")
+    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @RequestBody Map<String, Integer> payload) {
+        Integer roleId = payload.get("roleId");
+        logger.info("Updating role for user ID: {} to role ID: {}", id, roleId);
+
+        if (roleId == null) {
+            return ResponseEntity.badRequest().body("Role ID is required");
+        }
+
+        Optional<User> userOptional = userRepository.findById(id);
+        Optional<Role> roleOptional = roleRepository.findById(roleId);
+
+        if (userOptional.isPresent() && roleOptional.isPresent()) {
+            User user = userOptional.get();
+            Role newRole = roleOptional.get();
+
+            // Update user's role
+            user.setRole(newRole);
+            userRepository.save(user);
+
+            logger.info("Role updated successfully for user ID: {}", id);
+            return ResponseEntity.ok(convertToUserDTO(user));
+        }
+
+        logger.warn("Failed to update role. User or role not found.");
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<Map<String, Object>>> getAllRoles() {
+        List<Role> roles = roleRepository.findAll();
+        List<Map<String, Object>> roleList = roles.stream()
+            .map(role -> {
+                Map<String, Object> roleMap = new HashMap<>();
+                roleMap.put("id", role.getId());
+                roleMap.put("name", role.getName());
+                return roleMap;
+            })
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(roleList);
     }
 }
