@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, Long> {
+    // Check if a staff member exists with the given staffIdCode
+    boolean existsByStaffIdCode(String staffIdCode);
 }

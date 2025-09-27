@@ -256,6 +256,92 @@
         border-color: var(--secondary-color);
         outline: none;
       }
+
+      .user-section {
+        margin-bottom: 30px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+        color: var(--primary-color);
+        margin: 0;
+        padding: 15px;
+      }
+
+      .user-list {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .user-list table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .user-list th,
+      .user-list td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .user-list th {
+        background-color: #f1f5f9;
+        font-weight: 500;
+      }
+
+      .user-list tr:hover {
+        background-color: #f9f9f9;
+        cursor: pointer;
+      }
+
+      .tab-container {
+        margin-bottom: 20px;
+      }
+
+      .tab-buttons {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .tab-button {
+        background: none;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        font-weight: 500;
+      }
+
+      .tab-button:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+
+      .tab-button.active {
+        border-bottom: 3px solid var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -281,22 +367,100 @@
         </div>
       </div>
 
-      <section class="customer-list">
-        <h2 style="padding: 15px">Customer List</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th class="action-cell">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="customerTableBody">
-            <!-- Customer data will be loaded here -->
-          </tbody>
-        </table>
-      </section>
+      <div class="tab-container">
+        <div class="tab-buttons">
+          <button class="tab-button active" data-tab="customers">Customers</button>
+          <button class="tab-button" data-tab="fleet-managers">Fleet Managers</button>
+          <button class="tab-button" data-tab="system-admins">System Administrators</button>
+          <button class="tab-button" data-tab="owners">Owners</button>
+        </div>
+
+        <div class="tab-content active" id="customers-tab">
+          <section class="user-list customer-list">
+            <div class="section-header">
+              <h2 class="section-title">Customer List</h2>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th class="action-cell">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customerTableBody">
+                <!-- Customer data will be loaded here -->
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <div class="tab-content" id="fleet-managers-tab">
+          <section class="user-list">
+            <div class="section-header">
+              <h2 class="section-title">Fleet Manager List</h2>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th class="action-cell">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="fleetManagerTableBody">
+                <!-- Fleet manager data will be loaded here -->
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <div class="tab-content" id="system-admins-tab">
+          <section class="user-list">
+            <div class="section-header">
+              <h2 class="section-title">System Administrator List</h2>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Position</th>
+                  <th class="action-cell">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="systemAdminTableBody">
+                <!-- System admin data will be loaded here -->
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <div class="tab-content" id="owners-tab">
+          <section class="user-list">
+            <div class="section-header">
+              <h2 class="section-title">Owner List</h2>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th class="action-cell">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ownerTableBody">
+                <!-- Owner data will be loaded here -->
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </div>
 
       <section class="customer-details" id="customerDetails">
         <h3>Customer Details</h3>
@@ -328,6 +492,41 @@
           <div class="info-item">
             <div class="info-label">Postal Code</div>
             <div class="info-value" id="postalCode"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- User Details Section -->
+      <section class="customer-details" id="userDetails" style="display: none;">
+        <h3>User Details</h3>
+        <div class="customer-info">
+          <div class="info-item">
+            <div class="info-label">First Name</div>
+            <div class="info-value" id="userFirstName"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Name</div>
+            <div class="info-value" id="userLastName"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value" id="userEmail"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Role</div>
+            <div class="info-value" id="userRole"></div>
+          </div>
+          <div class="info-item" id="departmentItem" style="display: none;">
+            <div class="info-label">Department</div>
+            <div class="info-value" id="userDepartment"></div>
+          </div>
+          <div class="info-item" id="positionItem" style="display: none;">
+            <div class="info-label">Position</div>
+            <div class="info-value" id="userPosition"></div>
+          </div>
+          <div class="info-item" id="employeeIdItem" style="display: none;">
+            <div class="info-label">Employee ID</div>
+            <div class="info-value" id="userEmployeeId"></div>
           </div>
         </div>
       </section>
@@ -386,14 +585,41 @@
           </form>
         </div>
       </div>
+
+      <!-- Change Role Modal -->
+      <div id="changeRoleModal" class="modal">
+        <div class="modal-content">
+          <h3 class="modal-title">Change User Role</h3>
+          <p>Select a new role for <span id="changeRoleUserName">this user</span>:</p>
+          <div class="form-group">
+            <label for="roleSelect">Role</label>
+            <select id="roleSelect" class="form-control">
+              <!-- Roles will be loaded dynamically -->
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button id="cancelChangeRoleBtn" class="btn">Cancel</button>
+            <button id="confirmChangeRoleBtn" class="btn btn-secondary">Change Role</button>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         loadCustomers();
+        loadFleetManagers();
+        loadSystemAdmins();
+        loadOwners();
+        loadRoles(); // Load available roles for the role changing feature
 
         // Add event listener for refresh button
-        document.getElementById('refreshBtn').addEventListener('click', loadCustomers);
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+          loadCustomers();
+          loadFleetManagers();
+          loadSystemAdmins();
+          loadOwners();
+        });
 
         // Modal event listeners
         document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
@@ -403,7 +629,173 @@
         document.getElementById('cancelEditBtn').addEventListener('click', function() {
           document.getElementById('editModal').style.display = 'none';
         });
+
+        document.getElementById('cancelChangeRoleBtn').addEventListener('click', function() {
+          document.getElementById('changeRoleModal').style.display = 'none';
+        });
+
+        document.getElementById('confirmChangeRoleBtn').addEventListener('click', function() {
+          const userId = this.getAttribute('data-user-id');
+          const roleId = document.getElementById('roleSelect').value;
+          if (userId && roleId) {
+            changeUserRole(userId, roleId);
+          }
+        });
+
+        // Tab switching functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+          button.addEventListener('click', function() {
+            // Remove active class from all buttons and tab contents
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Show the corresponding tab content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId + '-tab').classList.add('active');
+
+            // Hide any open details panels
+            document.getElementById('customerDetails').style.display = 'none';
+            document.getElementById('userDetails').style.display = 'none';
+          });
+        });
       });
+
+      // Global variable to store all roles
+      let availableRoles = [];
+
+      function loadRoles() {
+        fetch('/api/admin/roles', {
+          credentials: 'include'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load roles');
+          }
+          return response.json();
+        })
+        .then(roles => {
+          availableRoles = roles;
+        })
+        .catch(error => {
+          console.error('Error loading roles:', error);
+        });
+      }
+
+      function createActionButtons(user) {
+        const actionCell = document.createElement('td');
+        actionCell.classList.add('action-cell');
+
+        // Create details button
+        const detailsButton = document.createElement('button');
+        detailsButton.textContent = 'Details';
+        detailsButton.classList.add('btn', 'btn-secondary');
+        detailsButton.style.marginRight = '5px';
+        detailsButton.onclick = function(e) {
+          e.stopPropagation(); // Prevent row click event
+          showUserDetails(user.id);
+        };
+
+        // Create change role button
+        const changeRoleButton = document.createElement('button');
+        changeRoleButton.textContent = 'Change Role';
+        changeRoleButton.classList.add('btn');
+        changeRoleButton.style.marginRight = '5px';
+        changeRoleButton.onclick = function(e) {
+          e.stopPropagation(); // Prevent row click event
+          showChangeRoleModal(user.id, `${user.firstName} ${user.lastName}`, user.role);
+        };
+
+        actionCell.appendChild(detailsButton);
+        actionCell.appendChild(changeRoleButton);
+
+        return actionCell;
+      }
+
+      function showChangeRoleModal(userId, userName, currentRole) {
+        // Set user name in the modal
+        document.getElementById('changeRoleUserName').textContent = userName;
+
+        // Populate role dropdown
+        const roleSelect = document.getElementById('roleSelect');
+        roleSelect.innerHTML = '';
+
+        if (availableRoles.length === 0) {
+          // If roles haven't been loaded yet, load them now
+          fetch('/api/admin/roles', {
+            credentials: 'include'
+          })
+          .then(response => response.json())
+          .then(roles => {
+            availableRoles = roles;
+            populateRoleDropdown(roleSelect, currentRole);
+          });
+        } else {
+          populateRoleDropdown(roleSelect, currentRole);
+        }
+
+        // Set user ID on the confirm button
+        document.getElementById('confirmChangeRoleBtn').setAttribute('data-user-id', userId);
+
+        // Show the modal
+        document.getElementById('changeRoleModal').style.display = 'block';
+      }
+
+      function populateRoleDropdown(selectElement, currentRole) {
+        availableRoles.forEach(role => {
+          const option = document.createElement('option');
+          option.value = role.id;
+          option.textContent = role.name.replace('ROLE_', '');
+
+          // Select the current role
+          if (role.name === currentRole) {
+            option.selected = true;
+          }
+
+          selectElement.appendChild(option);
+        });
+      }
+
+      function changeUserRole(userId, roleId) {
+        fetch(`/api/admin/users/${userId}/role`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ roleId: parseInt(roleId) })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update user role');
+          }
+          return response.json();
+        })
+        .then(updatedUser => {
+          // Hide the modal
+          document.getElementById('changeRoleModal').style.display = 'none';
+
+          // Reload all user lists to reflect the change
+          loadCustomers();
+          loadFleetManagers();
+          loadSystemAdmins();
+          loadOwners();
+
+          // Show success message
+          alert('User role updated successfully');
+
+          // Update user details if currently shown
+          if (document.getElementById('userDetails').style.display === 'block') {
+            showUserDetails(userId);
+          }
+        })
+        .catch(error => {
+          console.error('Error updating user role:', error);
+          alert('Failed to update user role. Please try again later.');
+        });
+      }
 
       function loadCustomers() {
         fetch('/api/admin/customers', {
@@ -475,6 +867,213 @@
           .catch(error => {
             console.error('Error loading customers:', error);
             alert('Failed to load customer data. Please try again later.');
+          });
+      }
+
+      function loadFleetManagers() {
+        fetch('/api/admin/users/fleet-managers', {
+          credentials: 'include' // Include credentials (cookies) with the request
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load fleet managers');
+            }
+            return response.json();
+          })
+          .then(fleetManagers => {
+            const tableBody = document.getElementById('fleetManagerTableBody');
+            tableBody.innerHTML = '';
+
+            fleetManagers.forEach(user => {
+              const row = document.createElement('tr');
+
+              // Create cells for user info
+              const idCell = document.createElement('td');
+              idCell.textContent = user.id;
+
+              const nameCell = document.createElement('td');
+              nameCell.textContent = `${user.firstName} ${user.lastName}`;
+
+              const emailCell = document.createElement('td');
+              emailCell.textContent = user.email;
+
+              const deptCell = document.createElement('td');
+              deptCell.textContent = user.staffIdCode || 'N/A';
+
+              // Create action buttons
+              const actionCell = createActionButtons(user);
+
+              // Add cells to row
+              row.appendChild(idCell);
+              row.appendChild(nameCell);
+              row.appendChild(emailCell);
+              row.appendChild(deptCell);
+              row.appendChild(actionCell);
+
+              // Add click event to show user details
+              row.addEventListener('click', () => showUserDetails(user.id));
+
+              tableBody.appendChild(row);
+            });
+          })
+          .catch(error => {
+            console.error('Error loading fleet managers:', error);
+            alert('Failed to load fleet manager data. Please try again later.');
+          });
+      }
+
+      function loadSystemAdmins() {
+        fetch('/api/admin/users/system-admins', {
+          credentials: 'include' // Include credentials (cookies) with the request
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load system admins');
+            }
+            return response.json();
+          })
+          .then(systemAdmins => {
+            const tableBody = document.getElementById('systemAdminTableBody');
+            tableBody.innerHTML = '';
+
+            systemAdmins.forEach(user => {
+              const row = document.createElement('tr');
+
+              // Create cells for user info
+              const idCell = document.createElement('td');
+              idCell.textContent = user.id;
+
+              const nameCell = document.createElement('td');
+              nameCell.textContent = `${user.firstName} ${user.lastName}`;
+
+              const emailCell = document.createElement('td');
+              emailCell.textContent = user.email;
+
+              const positionCell = document.createElement('td');
+              positionCell.textContent = user.staffIdCode || 'N/A';
+
+              // Create action buttons
+              const actionCell = createActionButtons(user);
+
+              // Add cells to row
+              row.appendChild(idCell);
+              row.appendChild(nameCell);
+              row.appendChild(emailCell);
+              row.appendChild(positionCell);
+              row.appendChild(actionCell);
+
+              // Add click event to show user details
+              row.addEventListener('click', () => showUserDetails(user.id));
+
+              tableBody.appendChild(row);
+            });
+          })
+          .catch(error => {
+            console.error('Error loading system admins:', error);
+            alert('Failed to load system admin data. Please try again later.');
+          });
+      }
+
+      function loadOwners() {
+        fetch('/api/admin/users/owners', {
+          credentials: 'include' // Include credentials (cookies) with the request
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load owners');
+            }
+            return response.json();
+          })
+          .then(owners => {
+            const tableBody = document.getElementById('ownerTableBody');
+            tableBody.innerHTML = '';
+
+            owners.forEach(user => {
+              const row = document.createElement('tr');
+
+              // Create cells for user info
+              const idCell = document.createElement('td');
+              idCell.textContent = user.id;
+
+              const nameCell = document.createElement('td');
+              nameCell.textContent = `${user.firstName} ${user.lastName}`;
+
+              const emailCell = document.createElement('td');
+              emailCell.textContent = user.email;
+
+              // Create action buttons
+              const actionCell = createActionButtons(user);
+
+              // Add cells to row
+              row.appendChild(idCell);
+              row.appendChild(nameCell);
+              row.appendChild(emailCell);
+              row.appendChild(actionCell);
+
+              // Add click event to show user details
+              row.addEventListener('click', () => showUserDetails(user.id));
+
+              tableBody.appendChild(row);
+            });
+          })
+          .catch(error => {
+            console.error('Error loading owners:', error);
+            alert('Failed to load owner data. Please try again later.');
+          });
+      }
+
+      function showUserDetails(userId) {
+        fetch(`/api/admin/users/${userId}`, {
+          credentials: 'include'
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load user details');
+            }
+            return response.json();
+          })
+          .then(user => {
+            // Hide customer details if showing
+            document.getElementById('customerDetails').style.display = 'none';
+
+            // Populate user details
+            document.getElementById('userFirstName').textContent = user.firstName || 'N/A';
+            document.getElementById('userLastName').textContent = user.lastName || 'N/A';
+            document.getElementById('userEmail').textContent = user.email || 'N/A';
+            document.getElementById('userRole').textContent = user.role || 'N/A';
+
+            // Handle staff-specific fields
+            const departmentItem = document.getElementById('departmentItem');
+            const positionItem = document.getElementById('positionItem');
+            const employeeIdItem = document.getElementById('employeeIdItem');
+
+            if (user.department) {
+              document.getElementById('userDepartment').textContent = user.department;
+              departmentItem.style.display = 'block';
+            } else {
+              departmentItem.style.display = 'none';
+            }
+
+            if (user.position) {
+              document.getElementById('userPosition').textContent = user.position;
+              positionItem.style.display = 'block';
+            } else {
+              positionItem.style.display = 'none';
+            }
+
+            if (user.employeeId) {
+              document.getElementById('userEmployeeId').textContent = user.employeeId;
+              employeeIdItem.style.display = 'block';
+            } else {
+              employeeIdItem.style.display = 'none';
+            }
+
+            // Show the details section
+            document.getElementById('userDetails').style.display = 'block';
+          })
+          .catch(error => {
+            console.error('Error loading user details:', error);
+            alert('Failed to load user details. Please try again later.');
           });
       }
 
@@ -638,4 +1237,3 @@
     </script>
   </body>
 </html>
-

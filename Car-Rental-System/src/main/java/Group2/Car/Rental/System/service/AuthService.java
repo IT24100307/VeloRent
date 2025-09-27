@@ -114,7 +114,38 @@ public class AuthService {
         } else {
             // Create Staff entity for admin roles
             Staff staff = new Staff();
-            staff.setStaffIdCode(registerDto.getStaffIdCode());
+
+            // Generate a unique staff ID code based on role and current timestamp
+            String rolePrefix;
+            switch (roleName) {
+                case "ROLE_FLEET_MANAGER":
+                    rolePrefix = "FM";
+                    break;
+                case "ROLE_SYSTEM_ADMIN":
+                    rolePrefix = "SA";
+                    break;
+                case "ROLE_OWNER":
+                    rolePrefix = "OW";
+                    break;
+                default:
+                    rolePrefix = "ST";
+            }
+
+            // Use a timestamp and random number to ensure uniqueness
+            String uniqueStaffId = rolePrefix + "-" + System.currentTimeMillis() + "-" + (new Random().nextInt(1000));
+
+            // If staff ID code was provided, use it if it's unique, otherwise fall back to the generated one
+            if (registerDto.getStaffIdCode() != null && !registerDto.getStaffIdCode().isEmpty()) {
+                String requestedCode = registerDto.getStaffIdCode();
+                if (!staffRepository.existsByStaffIdCode(requestedCode)) {
+                    staff.setStaffIdCode(requestedCode);
+                } else {
+                    staff.setStaffIdCode(uniqueStaffId);
+                }
+            } else {
+                staff.setStaffIdCode(uniqueStaffId);
+            }
+
             staff.setHireDate(new java.util.Date()); // Set current date as hire date
 
             // Set up bidirectional relationship
