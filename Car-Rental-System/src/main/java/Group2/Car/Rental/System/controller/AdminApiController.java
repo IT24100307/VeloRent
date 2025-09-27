@@ -75,6 +75,50 @@ public class AdminApiController {
         return ResponseEntity.notFound().build();
     }
 
+    @PutMapping("/customers/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+        logger.info("Request to update customer with ID: {}", id);
+        try {
+            // Find the user
+            Optional<User> userOptional = userRepository.findById(id);
+            if (!userOptional.isPresent()) {
+                logger.warn("Customer not found with ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+
+            User user = userOptional.get();
+
+            // Update user information
+            user.setFirstName(customerDTO.getFirstName());
+            user.setLastName(customerDTO.getLastName());
+            user.setEmail(customerDTO.getEmail());
+
+            // Get or create customer information
+            Customer customer = user.getCustomer();
+            if (customer == null) {
+                customer = new Customer();
+                customer.setUserId(user.getId());
+                customer.setUser(user);
+                user.setCustomer(customer);
+            }
+
+            // Update customer details
+            customer.setContactNumber(customerDTO.getContactNumber());
+            customer.setAddressStreet(customerDTO.getAddressStreet());
+            customer.setAddressCity(customerDTO.getAddressCity());
+            customer.setAddressPostalCode(customerDTO.getAddressPostalCode());
+
+            // Save updated user (cascade should save customer too)
+            User savedUser = userRepository.save(user);
+
+            logger.info("Customer updated successfully: {}", id);
+            return ResponseEntity.ok(convertToDTO(savedUser));
+        } catch (Exception e) {
+            logger.error("Error updating customer with ID: {}", id, e);
+            return ResponseEntity.badRequest().body("Failed to update customer: " + e.getMessage());
+        }
+    }
+
     private CustomerDTO convertToDTO(User user) {
         Customer customer = user.getCustomer();
 

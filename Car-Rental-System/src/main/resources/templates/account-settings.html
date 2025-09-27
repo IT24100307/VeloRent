@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Settings | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #2ecc71;
+        --text-color: #333;
+        --light-text: #666;
+        --background-color: #f8f9fa;
+        --card-background: #fff;
+        --border-color: #e1e1e1;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .nav-links a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Profile dropdown styles */
+      .profile-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .profile-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--secondary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: var(--card-background);
+        min-width: 220px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        z-index: 1;
+      }
+
+      .dropdown-content a {
+        color: var(--text-color);
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .dropdown-content a:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-content a:hover {
+        background-color: var(--background-color);
+      }
+
+      .profile-dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .profile-info {
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+      }
+
+      .profile-info .user-email {
+        font-size: 13px;
+        color: var(--light-text);
+        margin-top: 5px;
+      }
+
+      main {
+        margin-top: 30px;
+      }
+
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .page-title {
+        font-size: 24px;
+        color: var(--primary-color);
+      }
+
+      .content-card {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+
+      .btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #34495e;
+      }
+
+      .btn-primary {
+        background-color: var(--secondary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: #2980b9;
+      }
+
+      .btn-danger {
+        background-color: #e74c3c;
+      }
+
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+
+      .alert {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .alert-success {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      .alert-danger {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      footer {
+        margin-top: 50px;
+        text-align: center;
+        color: var(--light-text);
+        font-size: 14px;
+        padding: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <div class="logo">Car Rental System</div>
+          <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/security-settings">Security</a>
+            <a
+              href="/admin/dashboard"
+              id="admin-dashboard-btn"
+              style="display: none; background-color: #e74c3c; font-weight: bold;"
+            >
+              Admin Dashboard
+            </a>
+            <a href="#" id="logout-btn">Logout</a>
+            <!-- Profile dropdown -->
+            <div class="profile-dropdown">
+              <div class="profile-icon" id="profile-icon">
+                <span id="user-initials">U</span>
+              </div>
+              <div class="dropdown-content">
+                <div class="profile-info">
+                  <div id="user-name-dropdown">User Name</div>
+                  <div class="user-email" id="user-email-dropdown">
+                    user@example.com
+                  </div>
+                </div>
+                <a href="/account-settings">Account Settings</a>
+                <a href="/rental-history">Rental History</a>
+                <a href="/logout" id="logout-btn-dropdown">Logout</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      <main>
+        <div id="alert-container"></div>
+
+        <div class="page-header">
+          <h1 class="page-title">Account Settings</h1>
+          <a href="/dashboard" class="btn">Back to Dashboard</a>
+        </div>
+
+        <div class="content-card">
+          <h2 class="section-title">Personal Information</h2>
+          <form id="profile-form">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                class="form-control"
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                class="form-control"
+                placeholder="Enter your last name"
+              />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                class="form-control"
+                placeholder="Enter your phone number"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+
+        <div class="content-card">
+          <h2 class="section-title">Address Information</h2>
+          <form id="address-form">
+            <div class="form-group">
+              <label for="address">Street Address</label>
+              <input
+                type="text"
+                id="address"
+                class="form-control"
+                placeholder="Enter your street address"
+              />
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input
+                type="text"
+                id="city"
+                class="form-control"
+                placeholder="Enter your city"
+              />
+            </div>
+            <div class="form-group">
+              <label for="state">State/Province</label>
+              <input
+                type="text"
+                id="state"
+                class="form-control"
+                placeholder="Enter your state or province"
+              />
+            </div>
+            <div class="form-group">
+              <label for="postalCode">Postal/Zip Code</label>
+              <input
+                type="text"
+                id="postalCode"
+                class="form-control"
+                placeholder="Enter your postal/zip code"
+              />
+            </div>
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input
+                type="text"
+                id="country"
+                class="form-control"
+                placeholder="Enter your country"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+      </main>
+
+      <footer>
+        <p>&copy; 2025 Car Rental System. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Check if user is logged in
+        const token = localStorage.getItem("token");
+        const userRole = localStorage.getItem("userRole");
+
+        if (!token) {
+          window.location.href =
+            "/login?message=" +
+            encodeURIComponent("Please log in to access account settings") +
+            "&type=error";
+          return;
+        }
+
+        // Show admin dashboard link for admin users
+        const adminDashboardBtn = document.getElementById("admin-dashboard-btn");
+        if (adminDashboardBtn && userRole) {
+          const adminRoles = ["SYSTEM_ADMIN", "OWNER", "FLEETMANAGER"];
+          if (adminRoles.some(role => userRole.includes(role))) {
+            adminDashboardBtn.style.display = "inline-block";
+          }
+        }
+
+        // Fetch user data from the server
+        function fetchUserData() {
+          fetch('/api/account/profile', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch profile data');
+            }
+            return response.json();
+          })
+          .then(userData => {
+            // Update profile dropdown
+            document.getElementById("user-name-dropdown").textContent =
+              `${userData.firstName} ${userData.lastName}`;
+            document.getElementById("user-email-dropdown").textContent = userData.email;
+
+            // Set user initials in profile icon
+            const userInitials = `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase();
+            document.getElementById("user-initials").textContent = userInitials;
+
+            // Populate profile form
+            document.getElementById("firstName").value = userData.firstName || '';
+            document.getElementById("lastName").value = userData.lastName || '';
+            document.getElementById("email").value = userData.email || '';
+            document.getElementById("phone").value = userData.phone || '';
+
+            // Populate address form
+            document.getElementById("address").value = userData.addressStreet || '';
+            document.getElementById("city").value = userData.addressCity || '';
+            document.getElementById("postalCode").value = userData.addressPostalCode || '';
+            document.getElementById("country").value = userData.country || '';
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+            showAlert("Failed to load your profile information. Please try again later.", "danger");
+          });
+        }
+
+        // Initialize page
+        fetchUserData();
+
+        // Handle profile form submission
+        const profileForm = document.getElementById("profile-form");
+        profileForm.addEventListener("submit", function(e) {
+          e.preventDefault();
+
+          // Get form data
+          const formData = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            addressStreet: document.getElementById("address").value,
+            addressCity: document.getElementById("city").value,
+            addressPostalCode: document.getElementById("postalCode").value,
+            country: document.getElementById("country").value
+          };
+
+          // Send data to server
+          fetch('/api/account/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to update profile data');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Update display name and email in dropdown
+            document.getElementById("user-name-dropdown").textContent =
+              `${data.firstName} ${data.lastName}`;
+            document.getElementById("user-email-dropdown").textContent = data.email;
+
+            // Update initials
+            const userInitials = `${data.firstName.charAt(0)}${data.lastName.charAt(0)}`.toUpperCase();
+            document.getElementById("user-initials").textContent = userInitials;
+
+            // Store updated email in localStorage for other pages
+            localStorage.setItem("userEmail", data.email);
+
+            // Show success message
+            showAlert("Personal information updated successfully!", "success");
+          })
+          .catch(error => {
+            console.error('Error updating profile:', error);
+            showAlert("Failed to update your profile. Please try again later.", "danger");
+          });
+        });
+
+        // Handle address form submission
+        const addressForm = document.getElementById("address-form");
+        addressForm.addEventListener("submit", function(e) {
+          e.preventDefault();
+
+          // Get form data from profile form (to include all required fields)
+          const formData = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            // Get address form data
+            addressStreet: document.getElementById("address").value,
+            addressCity: document.getElementById("city").value,
+            addressPostalCode: document.getElementById("postalCode").value,
+            country: document.getElementById("country").value
+          };
+
+          // Send data to server
+          fetch('/api/account/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to update address data');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Show success message
+            showAlert("Address information updated successfully!", "success");
+          })
+          .catch(error => {
+            console.error('Error updating address:', error);
+            showAlert("Failed to update your address. Please try again later.", "danger");
+          });
+        });
+
+        // Setup logout button
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", handleLogout);
+        }
+
+        // Setup logout button in dropdown
+        const logoutBtnDropdown = document.getElementById("logout-btn-dropdown");
+        if (logoutBtnDropdown) {
+          logoutBtnDropdown.addEventListener("click", handleLogout);
+        }
+
+        function handleLogout(e) {
+          e.preventDefault();
+
+          // Clear all authentication data
+          localStorage.removeItem("token");
+          localStorage.removeItem("userRole");
+          localStorage.removeItem("userEmail");
+
+          // Redirect to login
+          window.location.href =
+            "/login?message=" +
+            encodeURIComponent("You have been logged out") +
+            "&type=success";
+        }
+
+        // Function to show alerts
+        function showAlert(message, type) {
+          const alertContainer = document.getElementById("alert-container");
+          alertContainer.innerHTML = `
+            <div class="alert alert-${type}">
+              ${message}
+            </div>
+          `;
+
+          // Auto-hide the alert after 5 seconds
+          setTimeout(() => {
+            alertContainer.innerHTML = "";
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>
