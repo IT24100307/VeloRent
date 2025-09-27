@@ -41,7 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard",
-                                "/admin/fleet-dashboard", "/admin/system-dashboard", "/admin/owner-dashboard")
+                                "/admin/fleet-dashboard", "/admin/system-dashboard", "/admin/owner-dashboard",
+                                "/account-settings")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )
