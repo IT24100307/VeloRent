@@ -206,16 +206,11 @@
       <table id="offersTable" class="table table-striped" style="width:100%">
         <thead>
         <tr>
-          <th>Vehicle Reg</th>
-          <th>Discount</th>
+          <th>Name</th>
+          <th>Discount (%)</th>
           <th>Start Date</th>
           <th>End Date</th>
           <th>Active</th>
-          <th>Deleted</th>
-          <th>Created At</th>
-          <th>Created By</th>
-          <th>Edited At</th>
-          <th>Edited By</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -235,17 +230,14 @@
             <div class="modal-body">
               <form id="offerForm" novalidate>
                 <div class="mb-3">
-                  <label for="vehicleReg" class="form-label">Vehicle Registration</label>
-                  <select class="form-select" id="vehicleReg" required>
-                    <option value="">Select Vehicle</option>
-                    <!-- Populated via API -->
-                  </select>
-                  <div class="invalid-feedback">Please select a vehicle.</div>
+                  <label for="offerName" class="form-label">Offer Name</label>
+                  <input type="text" class="form-control" id="offerName" required>
+                  <div class="invalid-feedback">Please enter an offer name.</div>
                 </div>
                 <div class="mb-3">
-                  <label for="discountAmount" class="form-label">Discount Amount</label>
+                  <label for="discountAmount" class="form-label">Discount Percentage (%)</label>
                   <input type="number" class="form-control" id="discountAmount" step="0.01" min="0" required>
-                  <div class="invalid-feedback">Please enter a valid discount (integer or up to two decimal places).</div>
+                  <div class="invalid-feedback">Please enter a valid discount percentage (integer or up to two decimal places).</div>
                 </div>
                 <div class="mb-3">
                   <label for="startDate" class="form-label">Start Date</label>
@@ -285,7 +277,7 @@
             dataSrc: ''
           },
           columns: [
-            { data: 'registrationNumber' },
+            { data: 'name' },
             { data: 'discount' },
             { data: 'startDate' },
             { data: 'endDate' },
@@ -296,22 +288,12 @@
               }
             },
             {
-              data: 'isDeleted',
-              render: function(data) {
-                return data ? 'Yes' : 'No';
-              }
-            },
-            { data: 'formatedCreatedAt' },
-            { data: 'createdByUsername' },
-            { data: 'formatedEditedAt' },
-            { data: 'editedByUsername' },
-            {
               data: null,
               render: function(data, type, row) {
                 return `
-                                <button class="btn btn-sm btn-primary" onclick="editOffer(${row.id})">Edit</button>
-                                <button class="btn btn-sm btn-success" onclick="toggleActive(${row.id}, ${!row.isActive})">${row.isActive ? 'Deactivate' : 'Activate'}</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteOffer(${row.id})">Delete</button>
+                                <button class="btn btn-sm btn-primary" onclick="editOffer(${row.offerId})">Edit</button>
+                                <button class="btn btn-sm btn-success" onclick="toggleActive(${row.offerId}, ${!row.isActive})">${row.isActive ? 'Deactivate' : 'Activate'}</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteOffer(${row.offerId})">Delete</button>
                             `;
               }
             }
@@ -330,20 +312,11 @@
             'csvHtml5',
           ]
         });
-
-        // table.rows.add(sampleData).draw();
-        $.get('/api/admin/offer/vehicles', function(vehicles) {
-          const select = $('#vehicleReg');
-          select.empty();
-          select.append('<option value="">Select Vehicle</option>');
-          vehicles.forEach(vehicle => {
-            select.append(`<option value="${vehicle.vehicleId}">${vehicle.registrationNumber}</option>`);
-          });
-        });
       });
+
       function validateForm(isEditMode) {
         const form = document.getElementById('offerForm');
-        const vehicleReg = $('#vehicleReg').val();
+        const offerName = $('#offerName').val();
         const discount = $('#discountAmount').val();
         const startDate = $('#startDate').val();
         const endDate = $('#endDate').val();
@@ -353,9 +326,12 @@
         let isValid = true;
         form.classList.add('was-validated');
 
-        // Validate vehicle registration
-        if (!vehicleReg) {
+        // Validate offer name
+        if (!offerName || offerName.trim() === '') {
+          $('#offerName').addClass('is-invalid');
           isValid = false;
+        } else {
+          $('#offerName').removeClass('is-invalid');
         }
 
         // Validate discount (integer or up to two decimal places)
@@ -401,13 +377,14 @@
 
         return isValid;
       }
+
       function resetModal() {
         $('#offerModalLabel').text('Add Offer');
         $('#offerForm')[0].reset();
-        $('#vehicleReg').prop('disabled', false);
         $('#offerModal .modal-footer .btn-primary').text('Add Offer').attr('onclick', 'saveOffer()');
         $('#offerModal').removeData('id');
       }
+
       function getInt(val,errorVal){
         try{
           return Integer.parseInt(val);
@@ -416,14 +393,15 @@
           return errorVal;
         }
       }
+
       function saveOffer() {
         const isEditMode = !!$('#offerModal').data('id');
         if (!validateForm(isEditMode)) {
           return;
         }
         const offer = {
-          vehicleId: $('#vehicleReg').val(),
-          discount: parseFloat($('#discountAmount').val()),
+          name: $('#offerName').val(),
+          discount: $('#discountAmount').val(),
           startDate: $('#startDate').val(),
           endDate: $('#endDate').val()
         };
@@ -449,7 +427,7 @@
       function editOffer(id) {
         $.get(`/api/admin/offer/${id}`, function(rowData) {
           $('#offerModalLabel').text('Edit Offer');
-          $('#vehicleReg').val(rowData.vehicleId).prop('disabled', true);
+          $('#offerName').val(rowData.name);
           $('#discountAmount').val(rowData.discount);
           $('#startDate').val(rowData.startDate);
           $('#endDate').val(rowData.endDate);

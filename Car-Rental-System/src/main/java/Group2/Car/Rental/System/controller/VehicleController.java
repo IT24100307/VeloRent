@@ -26,6 +26,12 @@ public class VehicleController {
         return new ResponseEntity<>(vehicles, HttpStatus.OK);
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<List<Vehicle>> getAvailableVehicles() {
+        List<Vehicle> availableVehicles = vehicleService.getAvailableVehicles();
+        return new ResponseEntity<>(availableVehicles, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Integer id) {
         return vehicleService.getVehicleById(id)

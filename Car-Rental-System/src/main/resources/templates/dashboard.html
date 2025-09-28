@@ -761,7 +761,13 @@
               <div class="vehicle-info">
                 <div class="vehicle-make-model">${vehicle.make || 'N/A'} ${vehicle.model || 'N/A'}</div>
                 <div class="vehicle-year">${vehicle.year || 'N/A'}</div>
-                <div class="vehicle-price">Rs. ${vehicle.rentalRatePerDay || '0.00'}/day</div>
+                <div class="vehicle-price">
+                  ${vehicle.has_discount ?
+                    `<span style="text-decoration: line-through;">Rs. ${vehicle.rentalRatePerDay || '0.00'}/day</span>
+                     <span style="color: #e74c3c; font-weight: bold;">Rs. ${vehicle.discountedRatePerDay || '0.00'}/day</span>`
+                    :
+                    `Rs. ${vehicle.rentalRatePerDay || '0.00'}/day`}
+                </div>
                 <div class="vehicle-status">${vehicle.status || 'Unknown'}</div>
                 <a href="#" class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})">View Details</a>
               </div>
@@ -809,7 +815,17 @@
           document.getElementById("modal-vehicle-model").textContent = vehicle.model || 'N/A';
           document.getElementById("modal-vehicle-year").textContent = vehicle.year || 'N/A';
           document.getElementById("modal-vehicle-registration").textContent = vehicle.registrationNumber || 'N/A';
-          document.getElementById("modal-vehicle-rate").textContent = `Rs. ${vehicle.rentalRatePerDay}/day`;
+
+          // Update modal to show discounted price if available
+          if (vehicle.has_discount) {
+            document.getElementById("modal-vehicle-rate").innerHTML = `
+              <span style="text-decoration: line-through;">Rs. ${vehicle.rentalRatePerDay}/day</span>
+              <span style="color: #e74c3c; font-weight: bold;">Rs. ${vehicle.discountedRatePerDay}/day</span>
+            `;
+          } else {
+            document.getElementById("modal-vehicle-rate").textContent = `Rs. ${vehicle.rentalRatePerDay}/day`;
+          }
+
           document.getElementById("modal-vehicle-status").textContent = vehicle.status || 'Unknown';
 
           // Show the modal

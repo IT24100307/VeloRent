@@ -42,8 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
-                                "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard","/admin/offers",
-                                "/admin/fleet-dashboard", "/admin/system-dashboard", "/admin/owner-dashboard",
+                                "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
+                                "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
                                 "/fleet-manager/dashboard", "/account-settings")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests

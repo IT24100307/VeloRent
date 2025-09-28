@@ -980,7 +980,13 @@
                     <td>${vehicle.model || ''}</td>
                     <td>${vehicle.year || ''}</td>
                     <td>${vehicle.registrationNumber || ''}</td>
-                    <td>Rs. ${vehicle.rentalRatePerDay || '0.00'}</td>
+                    <td>
+                        ${vehicle.hasDiscount ?
+                            `<span style="text-decoration: line-through;">Rs. ${vehicle.rentalRatePerDay || '0.00'}</span><br>
+                             <span style="color: #e74c3c; font-weight: bold;">Rs. ${vehicle.discountedRatePerDay || '0.00'}</span>`
+                            :
+                            `Rs. ${vehicle.rentalRatePerDay || '0.00'}`}
+                    </td>
                     <td><span class="status-badge ${statusClass}">${vehicle.status || 'Unknown'}</span></td>
                     <td class="action-buttons">
                         <button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>
@@ -1052,7 +1058,13 @@
                     <td>${vehicle.model || ''}</td>
                     <td>${vehicle.year || ''}</td>
                     <td>${vehicle.registrationNumber || ''}</td>
-                    <td>Rs. ${vehicle.rentalRatePerDay || '0.00'}</td>
+                    <td>
+                        ${vehicle.hasDiscount ?
+                            `<span style="text-decoration: line-through;">Rs. ${vehicle.rentalRatePerDay || '0.00'}</span><br>
+                             <span style="color: #e74c3c; font-weight: bold;">Rs. ${vehicle.discountedRatePerDay || '0.00'}</span>`
+                            :
+                            `Rs. ${vehicle.rentalRatePerDay || '0.00'}`}
+                    </td>
                     <td><span class="status-badge ${statusClass}">${vehicle.status || 'Unknown'}</span></td>
                     <td class="action-buttons">
                         <button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>
