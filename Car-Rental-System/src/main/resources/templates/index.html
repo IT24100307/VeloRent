@@ -3,11 +3,541 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Car Rental System</title>
+    <title>VeloRent - Car Rental Service</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- Custom CSS -->
+    <style>
+      :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4cc9f0;
+        --light-bg: #f8f9fa;
+        --dark-bg: #212529;
+        --text-light: #f8f9fa;
+        --text-dark: #212529;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-bg);
+      }
+
+      .navbar {
+        background-color: var(--primary-color);
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white !important;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        color: white !important;
+      }
+
+      .auth-buttons .btn {
+        margin-left: 10px;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-light {
+        border: 2px solid white;
+      }
+
+      .btn-outline-light:hover {
+        background-color: white;
+        color: var(--primary-color) !important;
+      }
+
+      .btn-light {
+        background-color: white;
+        color: var(--primary-color) !important;
+        border: 2px solid white;
+      }
+
+      .btn-light:hover {
+        background-color: rgba(255,255,255,0.9);
+        color: var(--secondary-color) !important;
+      }
+
+      .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 120px 0;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 10px 25px;
+        font-weight: 600;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+      }
+
+      .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 60px 0 30px;
+        color: var(--dark-bg);
+      }
+
+      .vehicle-card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 25px;
+      }
+
+      .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .vehicle-img {
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .vehicle-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .vehicle-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #29cc97;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      .filter-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .filter-title {
+        font-weight: bold;
+        color: var(--dark-bg);
+        margin-bottom: 15px;
+      }
+
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+      }
+
+      .footer {
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+        padding: 50px 0 20px;
+        margin-top: 60px;
+      }
+
+      .footer-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .footer-links a {
+        color: #adb5bd;
+        display: block;
+        margin-bottom: 10px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .footer-links a:hover {
+        color: white;
+      }
+
+      .social-icons a {
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 15px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Welcome to Car Rental System</h1>
-    <p>This is a test page to ensure templates are working correctly.</p>
-    <p><a href="/login">Go to Login</a></p>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <i class="fas fa-car-side mr-2"></i> VeloRent
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#vehicles">Vehicles</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a>
+            </li>
+          </ul>
+          <div class="auth-buttons">
+            <a href="/login" class="btn btn-outline-light">Login</a>
+            <a href="/register" class="btn btn-light">Register</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1 class="hero-title">Find Your Perfect Ride</h1>
+        <p class="hero-subtitle">Explore our fleet of premium vehicles for your next adventure</p>
+        <a href="#vehicles" class="btn btn-primary btn-lg">
+          <i class="fas fa-search mr-2"></i> Browse Vehicles
+        </a>
+      </div>
+    </section>
+
+    <!-- Filter Section -->
+    <div class="container mt-5">
+      <div class="filter-section">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label class="filter-title">Make</label>
+              <select class="form-control" id="make-filter">
+                <option value="">All Makes</option>
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label class="filter-title">Model</label>
+              <select class="form-control" id="model-filter">
+                <option value="">All Models</option>
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label class="filter-title">Year</label>
+              <select class="form-control" id="year-filter">
+                <option value="">All Years</option>
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label class="filter-title">Price Range</label>
+              <select class="form-control" id="price-filter">
+                <option value="">Any Price</option>
+                <option value="0-5000">Under Rs 5,000/day</option>
+                <option value="5000-10000">Rs 5,000 - Rs 10,000/day</option>
+                <option value="10000-20000">Rs 10,000 - Rs 20,000/day</option>
+                <option value="20000+">Rs 20,000+/day</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicles Section -->
+    <section id="vehicles">
+      <div class="container">
+        <h2 class="section-title">Available Vehicles</h2>
+
+        <!-- Loading Spinner (shown initially) -->
+        <div id="loading-spinner" class="loading-spinner">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+
+        <!-- Error Message (hidden initially) -->
+        <div id="error-message" class="alert alert-danger text-center" style="display: none;">
+          Unable to load vehicles. Please try again later.
+        </div>
+
+        <!-- Vehicles Grid -->
+        <div class="row" id="vehicles-container">
+          <!-- Vehicle cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <h5 class="footer-title">VeloRent</h5>
+            <p>Your trusted partner for all your vehicle rental needs. Quality vehicles at affordable prices.</p>
+            <div class="social-icons mt-3">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <h5 class="footer-title">Quick Links</h5>
+            <div class="footer-links">
+              <a href="#">About Us</a>
+              <a href="#">Services</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Privacy Policy</a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <h5 class="footer-title">Support</h5>
+            <div class="footer-links">
+              <a href="#">FAQ</a>
+              <a href="#">Help Center</a>
+              <a href="#">Contact Us</a>
+              <a href="#">Careers</a>
+            </div>
+          </div>
+          <div class="col-md-2 mb-4">
+            <h5 class="footer-title">Contact</h5>
+            <address>
+              <p><i class="fas fa-map-marker-alt mr-2"></i> No32 Main St Melsiripura</p>
+              <p><i class="fas fa-phone mr-2"></i> (123) 456-7890</p>
+              <p><i class="fas fa-envelope mr-2"></i> 2025_Y2_S1_KUR_02@gmail.com</p>
+            </address>
+          </div>
+        </div>
+        <hr class="mt-4 mb-4" style="background-color: #6c757d;">
+        <p class="text-center">&copy; 2025 VeloRent. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+    <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const vehiclesContainer = document.getElementById('vehicles-container');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const errorMessage = document.getElementById('error-message');
+        const makeFilter = document.getElementById('make-filter');
+        const modelFilter = document.getElementById('model-filter');
+        const yearFilter = document.getElementById('year-filter');
+        const priceFilter = document.getElementById('price-filter');
+
+        // Available makes, models and years for filtering
+        let availableMakes = new Set();
+        let availableModels = new Set();
+        let availableYears = new Set();
+
+        // Store all vehicles
+        let allVehicles = [];
+
+        // Fetch available vehicles
+        fetch('/api/vehicles/available')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch vehicles');
+            }
+            return response.json();
+          })
+          .then(vehicles => {
+            // Hide loading spinner
+            loadingSpinner.style.display = 'none';
+
+            // Store all vehicles
+            allVehicles = vehicles;
+
+            // Populate filters
+            vehicles.forEach(vehicle => {
+              availableMakes.add(vehicle.make);
+              availableModels.add(vehicle.model);
+              availableYears.add(vehicle.year);
+            });
+
+            // Populate make filter options
+            Array.from(availableMakes).sort().forEach(make => {
+              const option = document.createElement('option');
+              option.value = make;
+              option.textContent = make;
+              makeFilter.appendChild(option);
+            });
+
+            // Populate model filter options
+            Array.from(availableModels).sort().forEach(model => {
+              const option = document.createElement('option');
+              option.value = model;
+              option.textContent = model;
+              modelFilter.appendChild(option);
+            });
+
+            // Populate year filter options
+            Array.from(availableYears).sort((a, b) => b - a).forEach(year => {
+              const option = document.createElement('option');
+              option.value = year;
+              option.textContent = year;
+              yearFilter.appendChild(option);
+            });
+
+            // Display vehicles
+            displayVehicles(vehicles);
+
+            // Add event listeners to filters
+            makeFilter.addEventListener('change', applyFilters);
+            modelFilter.addEventListener('change', applyFilters);
+            yearFilter.addEventListener('change', applyFilters);
+            priceFilter.addEventListener('change', applyFilters);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            loadingSpinner.style.display = 'none';
+            errorMessage.style.display = 'block';
+          });
+
+        // Function to display vehicles
+        function displayVehicles(vehicles) {
+          // Clear container
+          vehiclesContainer.innerHTML = '';
+
+          if (vehicles.length === 0) {
+            vehiclesContainer.innerHTML = '<div class="col-12 text-center"><p>No vehicles match your criteria. Please try different filters.</p></div>';
+            return;
+          }
+
+          // Loop through vehicles and create cards
+          vehicles.forEach(vehicle => {
+            const vehicleCard = document.createElement('div');
+            vehicleCard.className = 'col-md-4 mb-4';
+
+            // Default image if none provided
+            const imageUrl = vehicle.imageUrl || 'https://via.placeholder.com/300x200?text=Vehicle+Image';
+
+            vehicleCard.innerHTML = `
+              <div class="card vehicle-card">
+                <div class="position-relative">
+                  <img src="${imageUrl}" class="card-img-top vehicle-img" alt="${vehicle.make} ${vehicle.model}">
+                  <span class="vehicle-status">${vehicle.status}</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">${vehicle.year} ${vehicle.make} ${vehicle.model}</h5>
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="vehicle-price">Rs ${vehicle.rentalRatePerDay}/day</span>
+                    <small class="text-muted">Reg: ${vehicle.registrationNumber}</small>
+                  </div>
+                  <hr>
+                  <div class="d-flex justify-content-between">
+                    <a href="/login" class="btn btn-primary">Rent Now</a>
+                    <button class="btn btn-outline-secondary" onclick="showVehicleDetails(${vehicle.vehicleId})">
+                      <i class="fas fa-info-circle"></i> Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            vehiclesContainer.appendChild(vehicleCard);
+          });
+        }
+
+        // Function to apply filters
+        function applyFilters() {
+          const selectedMake = makeFilter.value;
+          const selectedModel = modelFilter.value;
+          const selectedYear = yearFilter.value;
+          const selectedPrice = priceFilter.value;
+
+          // Filter vehicles based on selected criteria
+          let filteredVehicles = allVehicles;
+
+          if (selectedMake) {
+            filteredVehicles = filteredVehicles.filter(vehicle => vehicle.make === selectedMake);
+          }
+
+          if (selectedModel) {
+            filteredVehicles = filteredVehicles.filter(vehicle => vehicle.model === selectedModel);
+          }
+
+          if (selectedYear) {
+            filteredVehicles = filteredVehicles.filter(vehicle => vehicle.year == selectedYear);
+          }
+
+          if (selectedPrice) {
+            const [min, max] = selectedPrice.split('-');
+            if (max === '+') {
+              filteredVehicles = filteredVehicles.filter(vehicle => parseFloat(vehicle.rentalRatePerDay) >= parseFloat(min));
+            } else if (max) {
+              filteredVehicles = filteredVehicles.filter(vehicle =>
+                parseFloat(vehicle.rentalRatePerDay) >= parseFloat(min) &&
+                parseFloat(vehicle.rentalRatePerDay) <= parseFloat(max)
+              );
+            }
+          }
+
+          // Display filtered vehicles
+          displayVehicles(filteredVehicles);
+        }
+
+        // Make function available globally
+        window.showVehicleDetails = function(vehicleId) {
+          // Redirect to login for now, can be enhanced to show modal with details
+          window.location.href = `/login?vehicleId=${vehicleId}`;
+        };
+      });
+    </script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 package Group2.Car.Rental.System.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -30,6 +31,12 @@ public class Vehicle {
 
     @Column(name = "rental_rate_per_day", nullable = false)
     private BigDecimal rentalRatePerDay;
+
+    @Transient
+    private BigDecimal discountedRatePerDay;
+
+    @Transient
+    private BigDecimal discountPercentage;
 
     @Column(name = "status")
     private String status = "Available";
@@ -129,4 +136,28 @@ public class Vehicle {
                 '}';
     }
 
+    // Apply discount to this vehicle
+    public void applyDiscount(BigDecimal discountPercentage) {
+        if (discountPercentage == null || discountPercentage.compareTo(BigDecimal.ZERO) <= 0) {
+            this.discountedRatePerDay = this.rentalRatePerDay;
+            this.discountPercentage = BigDecimal.ZERO;
+            return;
+        }
+
+        this.discountPercentage = discountPercentage;
+
+        // Calculate discounted rate: original rate * (1 - discount/100)
+        BigDecimal discountFactor = BigDecimal.ONE.subtract(
+            discountPercentage.divide(new BigDecimal("100"), 4, BigDecimal.ROUND_HALF_UP)
+        );
+
+        this.discountedRatePerDay = this.rentalRatePerDay.multiply(discountFactor)
+            .setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    // Check if this vehicle has an active discount
+    @JsonProperty("has_discount")
+    public boolean hasDiscount() {
+        return discountPercentage != null && discountPercentage.compareTo(BigDecimal.ZERO) > 0;
+    }
 }

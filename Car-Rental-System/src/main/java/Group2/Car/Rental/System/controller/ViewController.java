@@ -64,4 +64,19 @@ public class ViewController {
     public String adminOffer() {
         return "admin/offer";
     }
+
+    @GetMapping("/admin/system-dashboard")
+    public String systemAdminDashboard() {
+        return "admin/dashboard"; // Using the existing dashboard template or create a specific one if needed
+    }
+
+    @GetMapping("/admin/owner-dashboard")
+    public String ownerDashboard() {
+        return "admin/dashboard"; // Using the existing dashboard template or create a specific one if needed
+    }
+
+    @GetMapping("/admin/fleet-dashboard")
+    public String fleetDashboard() {
+        return "admin/dashboard"; // Using the existing dashboard template or create a specific one if needed
+    }
 }
