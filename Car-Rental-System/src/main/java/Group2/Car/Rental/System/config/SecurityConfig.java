@@ -37,7 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
-                        .requestMatchers("/api/admin/**").permitAll() // Temporarily allow access to admin endpoints for debugging
+                        .requestMatchers("/api/admin/**").permitAll()
+                        .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",

@@ -206,11 +206,16 @@
       <table id="offersTable" class="table table-striped" style="width:100%">
         <thead>
         <tr>
-          <th>Vehicle Registration</th>
-          <th>Discount Amount</th>
+          <th>Vehicle Reg</th>
+          <th>Discount</th>
           <th>Start Date</th>
           <th>End Date</th>
           <th>Active</th>
+          <th>Deleted</th>
+          <th>Created At</th>
+          <th>Created By</th>
+          <th>Edited At</th>
+          <th>Edited By</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -228,27 +233,29 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form id="offerForm">
+              <form id="offerForm" novalidate>
                 <div class="mb-3">
                   <label for="vehicleReg" class="form-label">Vehicle Registration</label>
                   <select class="form-select" id="vehicleReg" required>
                     <option value="">Select Vehicle</option>
-                    <option value="ABC123">ABC123</option>
-                    <option value="XYZ789">XYZ789</option>
-                    <option value="DEF456">DEF456</option>
+                    <!-- Populated via API -->
                   </select>
+                  <div class="invalid-feedback">Please select a vehicle.</div>
                 </div>
                 <div class="mb-3">
                   <label for="discountAmount" class="form-label">Discount Amount</label>
-                  <input type="number" class="form-control" id="discountAmount" required>
+                  <input type="number" class="form-control" id="discountAmount" step="0.01" min="0" required>
+                  <div class="invalid-feedback">Please enter a valid discount (integer or up to two decimal places).</div>
                 </div>
                 <div class="mb-3">
                   <label for="startDate" class="form-label">Start Date</label>
                   <input type="text" class="form-control datepicker" id="startDate" required>
+                  <div class="invalid-feedback" id="startDateFeedback">Please enter a valid start date.</div>
                 </div>
                 <div class="mb-3">
                   <label for="endDate" class="form-label">End Date</label>
                   <input type="text" class="form-control datepicker" id="endDate" required>
+                  <div class="invalid-feedback" id="endDateFeedback">Please enter a valid end date.</div>
                 </div>
               </form>
             </div>
@@ -273,27 +280,37 @@
 
         // Initialize DataTable
         let table = $('#offersTable').DataTable({
-          data: [],
-          language: {
-            emptyTable: "No Offers Available"
+          ajax: {
+            url: '/api/admin/offer',
+            dataSrc: ''
           },
           columns: [
-            { data: 'vehicleReg' },
-            { data: 'discountAmount' },
+            { data: 'registrationNumber' },
+            { data: 'discount' },
             { data: 'startDate' },
             { data: 'endDate' },
             {
-              data: 'active',
+              data: 'isActive',
               render: function(data) {
                 return data ? 'Yes' : 'No';
               }
             },
             {
+              data: 'isDeleted',
+              render: function(data) {
+                return data ? 'Yes' : 'No';
+              }
+            },
+            { data: 'formatedCreatedAt' },
+            { data: 'createdByUsername' },
+            { data: 'formatedEditedAt' },
+            { data: 'editedByUsername' },
+            {
               data: null,
               render: function(data, type, row) {
                 return `
                                 <button class="btn btn-sm btn-primary" onclick="editOffer(${row.id})">Edit</button>
-                                <button class="btn btn-sm btn-success" onclick="toggleActive(${row.id}, ${!row.active})">${row.active ? 'Deactivate' : 'Activate'}</button>
+                                <button class="btn btn-sm btn-success" onclick="toggleActive(${row.id}, ${!row.isActive})">${row.isActive ? 'Deactivate' : 'Activate'}</button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteOffer(${row.id})">Delete</button>
                             `;
               }
@@ -301,7 +318,7 @@
           ],
           dom: 'Bfrtip',
           language: {
-            emptyTable: "No Appointments Available"
+            emptyTable: "No Offers Available"
           },
           buttons: [
             {
@@ -314,86 +331,166 @@
           ]
         });
 
-        // Sample data (replace with API call in production)
-        const sampleData = [
-          { id: 1, vehicleReg: 'ABC123', discountAmount: 10, startDate: '2025-10-01', endDate: '2025-10-15', active: true },
-          { id: 2, vehicleReg: 'XYZ789', discountAmount: 15, startDate: '2025-10-05', endDate: '2025-10-20', active: false }
-        ];
-        table.rows.add(sampleData).draw();
+        // table.rows.add(sampleData).draw();
+        $.get('/api/admin/offer/vehicles', function(vehicles) {
+          const select = $('#vehicleReg');
+          select.empty();
+          select.append('<option value="">Select Vehicle</option>');
+          vehicles.forEach(vehicle => {
+            select.append(`<option value="${vehicle.vehicleId}">${vehicle.registrationNumber}</option>`);
+          });
+        });
       });
+      function validateForm(isEditMode) {
+        const form = document.getElementById('offerForm');
+        const vehicleReg = $('#vehicleReg').val();
+        const discount = $('#discountAmount').val();
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize to start of day
 
+        let isValid = true;
+        form.classList.add('was-validated');
+
+        // Validate vehicle registration
+        if (!vehicleReg) {
+          isValid = false;
+        }
+
+        // Validate discount (integer or up to two decimal places)
+        const discountRegex = /^\d+(\.\d{1,2})?$/;
+        if (!discount || !discountRegex.test(discount) || parseFloat(discount) <= 0) {
+          $('#discountAmount').addClass('is-invalid');
+          isValid = false;
+        } else {
+          $('#discountAmount').removeClass('is-invalid');
+        }
+
+        // Validate dates
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+
+        if (!startDate || isNaN(startDateObj)) {
+          $('#startDate').addClass('is-invalid');
+          $('#startDateFeedback').text('Please enter a valid start date.');
+          isValid = false;
+        } else if (!isEditMode && startDateObj <= today) {
+          $('#startDate').addClass('is-invalid');
+          $('#startDateFeedback').text('Start date must be after today.');
+          isValid = false;
+        } else {
+          $('#startDate').removeClass('is-invalid');
+        }
+
+        if (!endDate || isNaN(endDateObj)) {
+          $('#endDate').addClass('is-invalid');
+          $('#endDateFeedback').text('Please enter a valid end date.');
+          isValid = false;
+        } else if (endDateObj <= today) {
+          $('#endDate').addClass('is-invalid');
+          $('#endDateFeedback').text('End date must be after today.');
+          isValid = false;
+        } else if (endDateObj <= startDateObj) {
+          $('#endDate').addClass('is-invalid');
+          $('#endDateFeedback').text('End date must be after start date.');
+          isValid = false;
+        } else {
+          $('#endDate').removeClass('is-invalid');
+        }
+
+        return isValid;
+      }
       function resetModal() {
         $('#offerModalLabel').text('Add Offer');
         $('#offerForm')[0].reset();
         $('#vehicleReg').prop('disabled', false);
         $('#offerModal .modal-footer .btn-primary').text('Add Offer').attr('onclick', 'saveOffer()');
+        $('#offerModal').removeData('id');
       }
-
+      function getInt(val,errorVal){
+        try{
+          return Integer.parseInt(val);
+        }catch (e){
+          console.warn(e);
+          return errorVal;
+        }
+      }
       function saveOffer() {
+        const isEditMode = !!$('#offerModal').data('id');
+        if (!validateForm(isEditMode)) {
+          return;
+        }
         const offer = {
-          id: $('#offerModal').data('id') || Date.now(), // Use existing ID for edit, or new ID for add
-          vehicleReg: $('#vehicleReg').val(),
-          discountAmount: parseFloat($('#discountAmount').val()),
+          vehicleId: $('#vehicleReg').val(),
+          discount: parseFloat($('#discountAmount').val()),
           startDate: $('#startDate').val(),
-          endDate: $('#endDate').val(),
-          active: true
+          endDate: $('#endDate').val()
         };
 
-        const table = $('#offersTable').DataTable();
-        if ($('#offerModal').data('id')) {
-          // Update existing row
-          table.rows().every(function() {
-            if (this.data().id === offer.id) {
-              this.data(offer).draw();
-            }
-          });
-        } else {
-          // Add new row
-          table.row.add(offer).draw();
-        }
+        const url = $('#offerModal').data('id') ? `/api/admin/offer/${$('#offerModal').data('id')}` : '/api/admin/offer';
+        const method = $('#offerModal').data('id') ? 'PUT' : 'POST';
 
-        $('#offerModal').modal('hide');
+        $.ajax({
+          url: url,
+          type: method,
+          contentType: 'application/json',
+          data: JSON.stringify(offer),
+          success: function() {
+            $('#offersTable').DataTable().ajax.reload();
+            $('#offerModal').modal('hide');
+          },
+          error: function() {
+            alert('Error saving offer');
+          }
+        });
       }
 
       function editOffer(id) {
-        const table = $('#offersTable').DataTable();
-        const rowData = table.rows().data().toArray().find(row => row.id === id);
-
-        $('#offerModalLabel').text('Edit Offer');
-        $('#vehicleReg').val(rowData.vehicleReg).prop('disabled', true);
-        $('#discountAmount').val(rowData.discountAmount);
-        $('#startDate').val(rowData.startDate);
-        $('#endDate').val(rowData.endDate);
-        $('#offerModal').data('id', id);
-        $('#offerModal .modal-footer .btn-primary').text('Update Offer').attr('onclick', 'saveOffer()');
-        $('#offerModal').modal('show');
+        $.get(`/api/admin/offer/${id}`, function(rowData) {
+          $('#offerModalLabel').text('Edit Offer');
+          $('#vehicleReg').val(rowData.vehicleId).prop('disabled', true);
+          $('#discountAmount').val(rowData.discount);
+          $('#startDate').val(rowData.startDate);
+          $('#endDate').val(rowData.endDate);
+          $('#offerModal').data('id', id);
+          $('#offerModal .modal-footer .btn-primary').text('Update Offer').attr('onclick', 'saveOffer()');
+          $('#offerModal').modal('show');
+        });
       }
 
-      function toggleActive(id, active) {
-        const table = $('#offersTable').DataTable();
-        table.rows().every(function() {
-          if (this.data().id === id) {
-            const data = this.data();
-            data.active = active;
-            this.data(data).draw();
+      function toggleActive(id, isActive) {
+        $.ajax({
+          url: `/api/admin/offer/${id}/active`,
+          type: 'PATCH',
+          contentType: 'application/json',
+          data: JSON.stringify(isActive),
+          success: function() {
+            $('#offersTable').DataTable().ajax.reload();
+          },
+          error: function() {
+            alert('Error toggling active status');
           }
         });
       }
 
       function deleteOffer(id) {
         if (confirm('Are you sure you want to delete this offer?')) {
-          const table = $('#offersTable').DataTable();
-          table.rows().every(function() {
-            if (this.data().id === id) {
-              this.remove().draw();
+          $.ajax({
+            url: `/api/admin/offer/${id}`,
+            type: 'DELETE',
+            success: function() {
+              $('#offersTable').DataTable().ajax.reload();
+            },
+            error: function() {
+              alert('Error deleting offer');
             }
           });
         }
       }
 
       function refreshTable() {
-        // In production, this would fetch new data from an API
-        alert('Table refreshed! (Placeholder for API call)');
+        $('#offersTable').DataTable().ajax.reload();
       }
     </script>
 

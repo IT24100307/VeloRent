@@ -1,10 +1,14 @@
 package Group2.Car.Rental.System.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.math.BigDecimal;
+
 
 @Entity
 @Table(name = "vehicles")
+@Data
 public class Vehicle {
 
     @Id
@@ -124,4 +128,5 @@ public class Vehicle {
                 ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
+
 }
