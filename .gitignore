@@ -6,3 +6,4 @@ Car-Rental-System/*.iws
 Car-Rental-System/*.iml
 Car-Rental-System/*.ipr
 
+/Car-Rental-System/target
