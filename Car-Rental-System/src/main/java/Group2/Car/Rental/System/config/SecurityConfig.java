@@ -38,11 +38,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
                         .requestMatchers("/api/admin/**").permitAll() // Temporarily allow access to admin endpoints for debugging
+                        .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard",
                                 "/admin/fleet-dashboard", "/admin/system-dashboard", "/admin/owner-dashboard",
-                                "/account-settings")
+                                "/fleet-manager/dashboard", "/account-settings")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )

@@ -34,3 +34,4 @@ CREATE TABLE IF NOT EXISTS staff (
     hire_date DATE,
     CONSTRAINT FK_staff_users FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
