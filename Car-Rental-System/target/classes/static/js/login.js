@@ -78,12 +78,27 @@ async function handleLogin(event) {
                         localStorage.setItem('userRole', response.data.role);
                     }
                     
-                    // Always redirect to /dashboard for all roles
-                    const redirectUrl = '/dashboard';
+                    // Determine redirect URL based on user role
+                    let redirectUrl = '/dashboard'; // Default dashboard
+
+                    // Check user role and redirect accordingly
+                    if (response.data.role) {
+                        const role = response.data.role;
+                        if (role.includes('FLEET_MANAGER')) {
+                            redirectUrl = '/fleet-manager/dashboard';
+                        } else if (role.includes('ADMIN') || role.includes('OWNER')) {
+                            redirectUrl = '/admin/dashboard';
+                        }
+                    }
 
                     console.log('Role:', response.data.role);
                     console.log('Redirecting to:', redirectUrl);
                     
+                    // Set user name in localStorage if available
+                    if (response.data.userName) {
+                        localStorage.setItem('userName', response.data.userName);
+                    }
+
                     // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = redirectUrl;

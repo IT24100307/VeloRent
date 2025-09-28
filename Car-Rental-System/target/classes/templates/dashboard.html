@@ -18,6 +18,7 @@
         --background-color: #f8f9fa;
         --card-background: #fff;
         --border-color: #e1e1e1;
+        --danger-color: #e74c3c;
       }
 
       * {
@@ -184,6 +185,14 @@
         background-color: #27ae60;
       }
 
+      .btn-danger {
+        background-color: var(--danger-color);
+      }
+
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+
       .dashboard-content {
         background-color: var(--card-background);
         border-radius: 8px;
@@ -222,6 +231,205 @@
         font-size: 14px;
         padding: 20px;
         border-top: 1px solid var(--border-color);
+      }
+
+      /* Vehicle Management Styles */
+      #fleet-manager-content {
+        display: none;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      th {
+        background-color: var(--background-color);
+        font-weight: 500;
+        color: var(--primary-color);
+      }
+
+      tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .search-bar {
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+      }
+
+      .form-control:focus {
+        border-color: var(--secondary-color);
+        outline: none;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: var(--card-background);
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      .close {
+        color: var(--light-text);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover {
+        color: var(--text-color);
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: var(--light-text);
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .loading {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      #regular-dashboard-content {
+        display: block;
+      }
+
+      /* Vehicles grid styles */
+      .vehicles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .vehicle-card {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 15px;
+        text-align: center;
+        transition: transform 0.3s;
+      }
+
+      .vehicle-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .vehicle-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+
+      .vehicle-info {
+        font-size: 14px;
+        color: var(--text-color);
+      }
+
+      .vehicle-info .vehicle-make-model {
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .vehicle-info .vehicle-year {
+        color: var(--light-text);
+        font-size: 12px;
+      }
+
+      .vehicle-price {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+
+      .vehicle-status {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .view-details-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        text-decoration: none;
+      }
+
+      .view-details-btn:hover {
+        background-color: #34495e;
       }
     </style>
   </head>
@@ -270,11 +478,20 @@
         <div class="dashboard-header">
           <h1 class="dashboard-title">Dashboard</h1>
           <div class="dashboard-actions">
-            <a href="#" class="btn btn-accent">Rent a Car</a>
+            <a href="#" class="btn btn-accent" id="rent-car-btn">Rent a Car</a>
+            <!-- Add vehicle button - hidden by default, shown for fleet managers -->
+            <button
+              id="add-vehicle-btn"
+              class="btn btn-accent"
+              style="display: none;"
+            >
+              Add New Vehicle
+            </button>
           </div>
         </div>
 
-        <div class="dashboard-content">
+        <!-- Regular dashboard content -->
+        <div class="dashboard-content" id="regular-dashboard-content">
           <p class="welcome-message">
             Welcome to the Car Rental System, <span id="user-name">User</span>!
             <br />
@@ -285,18 +502,72 @@
             >
           </p>
 
-          <p>
-            This is a placeholder dashboard. In a complete application, you
-            would see:
-          </p>
-          <ul>
-            <li>Your current and past rentals</li>
-            <li>Available cars for rent</li>
-            <li>Special offers and discounts</li>
-            <li>Account settings and preferences</li>
-          </ul>
+          <!-- Available Vehicles Section -->
+          <div class="vehicles-section">
+            <h3 style="margin: 20px 0 10px 0; color: var(--primary-color);">Available Vehicles</h3>
+            <div class="search-bar" style="margin-bottom: 15px;">
+              <input type="text" id="vehicle-search" class="form-control" placeholder="Search vehicles...">
+            </div>
+            <div id="loading-vehicles" class="loading">Loading vehicles...</div>
+            <div id="vehicles-container" style="display: none;">
+              <div id="vehicles-grid" class="vehicles-grid">
+                <!-- Vehicle cards will be populated dynamically -->
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+
+      <!-- Vehicle Details Modal -->
+      <div id="vehicle-details-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+          <div class="modal-header">
+            <h2 class="modal-title"><i class="fa fa-car"></i> <span id="modal-vehicle-title">Vehicle Details</span></h2>
+            <span class="close" onclick="closeVehicleDetailsModal()">&times;</span>
+          </div>
+          <div id="vehicle-details-content">
+            <!-- Vehicle details will be populated dynamically -->
+            <div class="vehicle-details-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+              <div class="vehicle-details-image" style="flex: 1; min-width: 300px;">
+                <img id="modal-vehicle-image" src="" alt="Vehicle Image" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+              </div>
+              <div class="vehicle-details-info" style="flex: 1; min-width: 300px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Brand</th>
+                    <td id="modal-vehicle-make" style="padding: 8px;"></td>
+                  </tr>
+                  <tr>
+                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Model</th>
+                    <td id="modal-vehicle-model" style="padding: 8px;"></td>
+                  </tr>
+                  <tr>
+                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Year</th>
+                    <td id="modal-vehicle-year" style="padding: 8px;"></td>
+                  </tr>
+                  <tr>
+                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Registration</th>
+                    <td id="modal-vehicle-registration" style="padding: 8px;"></td>
+                  </tr>
+                  <tr>
+                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Rental Rate</th>
+                    <td id="modal-vehicle-rate" style="padding: 8px;"></td>
+                  </tr>
+                  <tr>
+                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Status</th>
+                    <td id="modal-vehicle-status" style="padding: 8px;"></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+              <button type="button" class="btn" onclick="closeVehicleDetailsModal()">Close</button>
+              <button type="button" class="btn btn-accent" id="rent-vehicle-btn">Rent This Vehicle</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <footer>
         <p>&copy; 2025 Car Rental System. All rights reserved.</p>
@@ -352,6 +623,7 @@
             localStorage.removeItem("token");
             localStorage.removeItem("userRole");
             localStorage.removeItem("userEmail");
+            localStorage.removeItem("userName");
 
             // Redirect to login
             window.location.href =
@@ -366,7 +638,7 @@
         if (adminDashboardBtn && userRole) {
           const adminRoles = ["SYSTEM_ADMIN", "OWNER", "FLEETMANAGER"];
           // Check if userRole contains any of the admin role strings
-          if (adminRoles.some(role => userRole.includes(role))) {
+          if (adminRoles.some((role) => userRole.includes(role))) {
             adminDashboardBtn.style.display = "inline-block";
           }
         }
@@ -376,6 +648,7 @@
         const userEmail = localStorage.getItem("userEmail") || "user@example.com";
         document.getElementById("user-name-dropdown").textContent = userName;
         document.getElementById("user-email-dropdown").textContent = userEmail;
+        document.getElementById("user-name").textContent = userName;
 
         // Set user initials in profile icon
         const userInitials = userName
@@ -394,6 +667,158 @@
             logoutBtn.click();
           });
         }
+
+        // If fleet manager, redirect to the fleet manager dashboard
+        if (userRole && userRole.includes("FLEET_MANAGER")) {
+          window.location.href = "/fleet-manager/dashboard";
+        }
+
+        // Load available vehicles for customers
+        loadAvailableVehicles();
+
+        // Setup search functionality for vehicles
+        const vehicleSearch = document.getElementById("vehicle-search");
+        if (vehicleSearch) {
+          vehicleSearch.addEventListener("input", filterVehicles);
+        }
+
+        // Global vehicles array to hold all vehicles
+        let allVehicles = [];
+
+        function loadAvailableVehicles() {
+          const vehiclesContainer = document.getElementById("vehicles-container");
+          const loadingVehicles = document.getElementById("loading-vehicles");
+
+          // Show loading state
+          loadingVehicles.style.display = "flex";
+          vehiclesContainer.style.display = "none";
+
+          // Fetch vehicles from the API
+          fetch('/api/vehicles', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch vehicles');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Store vehicles in global array
+            allVehicles = Array.isArray(data) ? data : [];
+
+            // Only show available vehicles to customers
+            const availableVehicles = allVehicles.filter(v => v.status === "Available");
+
+            // Render the vehicles
+            renderVehicles(availableVehicles);
+
+            // Hide loading, show vehicles
+            loadingVehicles.style.display = "none";
+            vehiclesContainer.style.display = "block";
+          })
+          .catch(error => {
+            console.error('Error fetching vehicles:', error);
+            loadingVehicles.innerHTML = `
+              <div style="text-align: center;">
+                <i class="fa fa-exclamation-circle" style="color: var(--danger-color); font-size: 24px; margin-bottom: 10px;"></i>
+                <div>Failed to load vehicles. Please try again later.</div>
+              </div>
+            `;
+          });
+        }
+
+        function renderVehicles(vehiclesToRender) {
+          const vehiclesGrid = document.getElementById("vehicles-grid");
+          vehiclesGrid.innerHTML = ""; // Clear existing cards
+
+          if (vehiclesToRender.length === 0) {
+            vehiclesGrid.innerHTML = `
+              <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 16px; color: var(--light-text); margin-bottom: 10px;">No vehicles available at the moment.</div>
+                <a href="#" class="btn btn-accent" id="refresh-vehicles-btn">Refresh</a>
+              </div>
+            `;
+            return;
+          }
+
+          vehiclesToRender.forEach(vehicle => {
+            const card = document.createElement("div");
+            card.className = "vehicle-card";
+
+            // Create image element
+            let imageHtml = vehicle.imageUrl
+              ? `<img src="${vehicle.imageUrl}" alt="${vehicle.make} ${vehicle.model}" class="vehicle-image">`
+              : `<div style="width: 100%; height: 120px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa fa-car" style="font-size: 24px; color: #aaa;"></i></div>`;
+
+            card.innerHTML = `
+              ${imageHtml}
+              <div class="vehicle-info">
+                <div class="vehicle-make-model">${vehicle.make || 'N/A'} ${vehicle.model || 'N/A'}</div>
+                <div class="vehicle-year">${vehicle.year || 'N/A'}</div>
+                <div class="vehicle-price">Rs. ${vehicle.rentalRatePerDay || '0.00'}/day</div>
+                <div class="vehicle-status">${vehicle.status || 'Unknown'}</div>
+                <a href="#" class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})">View Details</a>
+              </div>
+            `;
+
+            vehiclesGrid.appendChild(card);
+          });
+        }
+
+        function filterVehicles() {
+          const searchTerm = document.getElementById("vehicle-search").value.toLowerCase();
+
+          if (!searchTerm) {
+            // If search is empty, only show available vehicles
+            const availableVehicles = allVehicles.filter(v => v.status === "Available");
+            renderVehicles(availableVehicles);
+            return;
+          }
+
+          // Filter available vehicles that match search term
+          const filteredVehicles = allVehicles.filter(vehicle =>
+            vehicle.status === "Available" && (
+              (vehicle.make && vehicle.make.toLowerCase().includes(searchTerm)) ||
+              (vehicle.model && vehicle.model.toLowerCase().includes(searchTerm)) ||
+              (vehicle.year && vehicle.year.toString().includes(searchTerm))
+            )
+          );
+
+          renderVehicles(filteredVehicles);
+        }
+
+        // Make this function available globally
+        window.viewVehicleDetails = function(vehicleId) {
+          const vehicle = allVehicles.find(v => v.vehicleId === vehicleId);
+
+          if (!vehicle) {
+            alert('Vehicle not found');
+            return;
+          }
+
+          // Populate modal with vehicle details
+          document.getElementById("modal-vehicle-title").textContent = `${vehicle.make} ${vehicle.model}`;
+          document.getElementById("modal-vehicle-image").src = vehicle.imageUrl || '';
+          document.getElementById("modal-vehicle-make").textContent = vehicle.make || 'N/A';
+          document.getElementById("modal-vehicle-model").textContent = vehicle.model || 'N/A';
+          document.getElementById("modal-vehicle-year").textContent = vehicle.year || 'N/A';
+          document.getElementById("modal-vehicle-registration").textContent = vehicle.registrationNumber || 'N/A';
+          document.getElementById("modal-vehicle-rate").textContent = `Rs. ${vehicle.rentalRatePerDay}/day`;
+          document.getElementById("modal-vehicle-status").textContent = vehicle.status || 'Unknown';
+
+          // Show the modal
+          document.getElementById("vehicle-details-modal").style.display = "block";
+        };
+
+        window.closeVehicleDetailsModal = function() {
+          document.getElementById("vehicle-details-modal").style.display = "none";
+        };
       });
     </script>
   </body>
