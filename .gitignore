@@ -1,9 +1,8 @@
-Car-Rental-System/target/
 
 ### IntelliJ IDEA ###
-Car-Rental-System/.idea
-Car-Rental-System/*.iws
-Car-Rental-System/*.iml
-Car-Rental-System/*.ipr
+/Car-Rental-System/.idea
+/Car-Rental-System/*.iws
+/Car-Rental-System/*.iml
+/Car-Rental-System/*.ipr
 
 /Car-Rental-System/target
