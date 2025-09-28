@@ -23,7 +23,7 @@ public class AdminController {
     }
 
     @GetMapping("/owner-dashboard")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     public ResponseEntity<String> getOwnerDashboard() {
         return ResponseEntity.ok("Welcome Owner!");
     }

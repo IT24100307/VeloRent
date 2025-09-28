@@ -59,4 +59,9 @@ public class ViewController {
     public String adminDashboard() {
         return "admin/dashboard";
     }
+
+    @GetMapping("/admin/offers")
+    public String adminOffer() {
+        return "admin/offer";
+    }
 }

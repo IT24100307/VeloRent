@@ -1,6 +1,7 @@
 package Group2.Car.Rental.System.entity;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
