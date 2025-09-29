@@ -12,12 +12,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FeedbackDTO {
     private Long id;
-    private String feedback;
-    private String reply;
     private int rating;
+    private String comments;
+    private String feedbackDate;
+    private String customerName;
+    private Long customerId;
     private boolean isResolved;
-    private String createdAt;
-    private String createdByName;
-    private String repliedAt;
-    private String repliedByName;
+    private String reply;
+    private String replyDate;
+    private String adminName;
+    private Long adminId;
 }

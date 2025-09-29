@@ -31,40 +31,40 @@ public class FeedbackService {
 
     public Page<FeedbackDTO> getAllFeedbacks(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return feedbackRepository.findByIsDeletedFalse(pageable).map(this::convertToDTO);
+        return feedbackRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     public List<FeedbackDTO> getAllFeedbacksForAdmin() {
-        return feedbackRepository.findByIsDeletedFalse().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return feedbackRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public FeedbackDTO getFeedbackById(Long id) {
         Optional<Feedback> feedback = feedbackRepository.findById(id);
-        if (feedback.isPresent() && !feedback.get().isDeleted()) {
+        if (feedback.isPresent()) {
             return convertToDTO(feedback.get());
         }
         return null;
     }
 
-    public FeedbackDTO createFeedback(String feedbackText,int rating) {
+    public FeedbackDTO createFeedback(String comments, int rating) {
         User currentUser = getCurrentUser();
         Feedback feedback = new Feedback();
-        feedback.setFeedback(feedbackText);
-        feedback.setCreatedAt(LocalDateTime.now());
+        feedback.setComments(comments);
+        feedback.setFeedbackDate(LocalDateTime.now());
         feedback.setRating(rating);
-        feedback.setCreatedBy(currentUser);
-        feedback.setResolved(false);
+        feedback.setCustomer(currentUser);
         feedbackRepository.save(feedback);
         return convertToDTO(feedback);
     }
 
-    public FeedbackDTO updateFeedback(Long id, String feedbackText,int rating) {
+    public FeedbackDTO updateFeedback(Long id, String comments, int rating) {
         User currentUser = getCurrentUser();
         Optional<Feedback> optionalFeedback = feedbackRepository.findById(id);
         if (optionalFeedback.isPresent()) {
             Feedback feedback = optionalFeedback.get();
-            if (feedback.getCreatedBy().getId().equals(currentUser.getId()) && !feedback.isDeleted()) {
-                feedback.setFeedback(feedbackText);
+            // Check if user owns the feedback AND there's no admin reply yet
+            if (feedback.getCustomer().getId().equals(currentUser.getId()) && feedback.getReply() == null) {
+                feedback.setComments(comments);
                 feedback.setRating(rating);
                 feedbackRepository.save(feedback);
                 return convertToDTO(feedback);
@@ -78,29 +78,27 @@ public class FeedbackService {
         Optional<Feedback> optionalFeedback = feedbackRepository.findById(id);
         if (optionalFeedback.isPresent()) {
             Feedback feedback = optionalFeedback.get();
-            if (feedback.getCreatedBy().getId().equals(currentUser.getId()) || isAdmin(currentUser)) {
-                feedback.setDeleted(true);
-                feedbackRepository.save(feedback);
+            if (feedback.getCustomer().getId().equals(currentUser.getId()) || isAdmin(currentUser)) {
+                feedbackRepository.delete(feedback);
             }
         }
     }
 
-    public FeedbackDTO addOrEditReply(Long id, String replyText) {
+    public FeedbackDTO replyToFeedback(Long id, String reply) {
         User currentUser = getCurrentUser();
         if (!isAdmin(currentUser)) {
-            return null;
+            return null; // Only admins can reply to feedback
         }
+
         Optional<Feedback> optionalFeedback = feedbackRepository.findById(id);
         if (optionalFeedback.isPresent()) {
             Feedback feedback = optionalFeedback.get();
-            if (!feedback.isDeleted()) {
-                feedback.setReply(replyText);
-                feedback.setRepliedAt(LocalDateTime.now());
-                feedback.setRepliedBy(currentUser);
-                feedback.setResolved(true);
-                feedbackRepository.save(feedback);
-                return convertToDTO(feedback);
-            }
+            feedback.setReply(reply);
+            feedback.setReplyDate(LocalDateTime.now());
+            feedback.setAdmin(currentUser);
+            feedback.setResolved(true);
+            feedbackRepository.save(feedback);
+            return convertToDTO(feedback);
         }
         return null;
     }
@@ -108,16 +106,24 @@ public class FeedbackService {
     private FeedbackDTO convertToDTO(Feedback feedback) {
         FeedbackDTO dto = new FeedbackDTO();
         dto.setId(feedback.getId());
-        dto.setFeedback(feedback.getFeedback());
-        dto.setReply(feedback.getReply());
         dto.setRating(feedback.getRating());
+        dto.setComments(feedback.getComments());
+        dto.setFeedbackDate(LocalDateToString(feedback.getFeedbackDate()));
+        dto.setCustomerId(feedback.getCustomer().getId());
+        dto.setCustomerName(feedback.getCustomer().getFirstName() + " " + feedback.getCustomer().getLastName());
         dto.setResolved(feedback.isResolved());
-        dto.setCreatedAt(LocalDateToString(feedback.getCreatedAt()));
-        dto.setCreatedByName(feedback.getCreatedBy().getFirstName() + " " + feedback.getCreatedBy().getLastName());
-        if (feedback.getRepliedBy() != null) {
-            dto.setRepliedAt(LocalDateToString(feedback.getRepliedAt()));
-            dto.setRepliedByName(feedback.getRepliedBy().getFirstName() + " " + feedback.getRepliedBy().getLastName());
+
+        // Add reply-related data if available
+        if (feedback.getReply() != null) {
+            dto.setReply(feedback.getReply());
+            dto.setReplyDate(LocalDateToString(feedback.getReplyDate()));
+
+            if (feedback.getAdmin() != null) {
+                dto.setAdminId(feedback.getAdmin().getId());
+                dto.setAdminName(feedback.getAdmin().getFirstName() + " " + feedback.getAdmin().getLastName());
+            }
         }
+
         return dto;
     }
 
@@ -131,10 +137,30 @@ public class FeedbackService {
     }
 
     private User getCurrentUser() {
-        //TODO: change this code to get curent user
-        return userRepository.findById(Long.valueOf("1")).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        // Get the current authentication from the security context
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String email = authentication.getName();
+
+            // Skip if it's the anonymous user
+            if ("anonymousUser".equals(email)) {
+                return userRepository.findById(1L)
+                    .orElseThrow(() -> new UsernameNotFoundException("Default user not found"));
+            }
+
+            // Try to find the user by email
+            var user = userRepository.findByEmail(email);
+            if (user.isPresent()) {
+                System.out.println("Found authenticated user: " + user.get().getFirstName() + " " + user.get().getLastName());
+                return user.get();
+            }
+        }
+
+        System.out.println("Falling back to default user");
+        // Fall back to default user if no authenticated user found
+        return userRepository.findById(1L)
+            .orElseThrow(() -> new UsernameNotFoundException("Default user not found"));
     }
 
     private boolean isAdmin(User user) {

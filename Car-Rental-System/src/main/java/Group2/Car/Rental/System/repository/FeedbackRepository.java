@@ -10,10 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
-    Page<Feedback> findByIsDeletedFalse(Pageable pageable);
-
-    List<Feedback> findByIsDeletedFalse();
-
-    @Query("SELECT f FROM Feedback f WHERE f.createdBy.id = ?1 AND f.isDeleted = false")
-    List<Feedback> findByCreatedByIdAndIsDeletedFalse(Long userId);
+    @Query("SELECT f FROM Feedback f WHERE f.customer.id = ?1")
+    List<Feedback> findByCustomerId(Long customerId);
 }
