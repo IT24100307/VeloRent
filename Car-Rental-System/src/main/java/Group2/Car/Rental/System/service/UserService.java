@@ -12,8 +12,23 @@ public class UserService {
     private UserRepository userRepository;
 
     public User getUserByEmail(String email) {
+        // Handle the "anonymousUser" special case used by Spring Security for unauthenticated users
+        if ("anonymousUser".equals(email)) {
+            return null;
+        }
+
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
+    /**
+     * Check if a user exists by email without throwing an exception
+     */
+    public boolean existsByEmail(String email) {
+        if ("anonymousUser".equals(email)) {
+            return false;
+        }
+        return userRepository.findByEmail(email).isPresent();
     }
 
     public User saveUser(User user) {

@@ -47,11 +47,6 @@ public class ViewController {
         return "security-settings";
     }
 
-    @GetMapping("/account-settings")
-    public String accountSettings() {
-        return "account-settings";
-    }
-
     @GetMapping("/dashboard")
     public String dashboard() {
         // This is a placeholder. In a real application, you would check if the user is
