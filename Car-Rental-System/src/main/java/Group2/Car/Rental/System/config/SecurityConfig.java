@@ -36,7 +36,7 @@ public class SecurityConfig {
                 // Disable CSRF protection for API endpoints
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
-                                                "/api/vehicles/**", "/profile/api/**"))
+                                                "/api/vehicles/**", "/api/profile/**", "/profile/api/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
