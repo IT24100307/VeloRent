@@ -440,6 +440,7 @@
           <div class="logo">Car Rental System</div>
           <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
+            <a href="/profile" id="profile-nav-link">Profile</a>
             <a href="/security-settings">Security</a>
             <a
               href="/admin/dashboard"
@@ -461,7 +462,7 @@
                     user@example.com
                   </div>
                 </div>
-                <a href="/account-settings">Account Settings</a>
+                <a href="/profile" id="profile-dropdown-link">My Profile</a>
                 <a href="/rental-history">Rental History</a>
                 <a href="/logout" id="logout-btn-dropdown">Logout</a>
               </div>
@@ -657,6 +658,16 @@
           .join("")
           .toUpperCase();
         document.getElementById("user-initials").textContent = userInitials;
+
+        // Update profile links to include user email
+        const profileNavLink = document.getElementById("profile-nav-link");
+        const profileDropdownLink = document.getElementById("profile-dropdown-link");
+        if (profileNavLink && userEmail) {
+          profileNavLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+        }
+        if (profileDropdownLink && userEmail) {
+          profileDropdownLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+        }
 
         // Setup logout button in dropdown
         const logoutBtnDropdown = document.getElementById("logout-btn-dropdown");

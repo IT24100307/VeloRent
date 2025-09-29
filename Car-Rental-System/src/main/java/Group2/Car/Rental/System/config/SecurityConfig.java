@@ -33,7 +33,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection for stateless APIs
+                // Disable CSRF protection for API endpoints
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
+                                                "/api/vehicles/**", "/profile/api/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
@@ -44,7 +47,7 @@ public class SecurityConfig {
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
-                                "/fleet-manager/dashboard", "/account-settings")
+                                "/fleet-manager/dashboard", "/profile", "/profile/**")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )
