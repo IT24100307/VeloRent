@@ -41,13 +41,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
                         .requestMatchers("/api/admin/**").permitAll()
+                        .requestMatchers("/api/admin/feedback/**").permitAll()// Temporarily allow access to admin endpoints for debugging
+                        .requestMatchers("/api/feedback/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
-                                "/fleet-manager/dashboard", "/profile", "/profile/**")
+                                "/fleet-manager/dashboard", "/feedback", "/admin/feedback","/profile", "/profile/**")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )
