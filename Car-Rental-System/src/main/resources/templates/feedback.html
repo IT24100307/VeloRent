@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VeloRent - Car Rental Service</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- Custom CSS -->
+    <style>
+      :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4cc9f0;
+        --light-bg: #f8f9fa;
+        --dark-bg: #212529;
+        --text-light: #f8f9fa;
+        --text-dark: #212529;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-bg);
+      }
+
+      .navbar {
+        background-color: var(--primary-color);
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white !important;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        color: white !important;
+      }
+
+      .auth-buttons .btn {
+        margin-left: 10px;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-light {
+        border: 2px solid white;
+      }
+
+      .btn-outline-light:hover {
+        background-color: white;
+        color: var(--primary-color) !important;
+      }
+
+      .btn-light {
+        background-color: white;
+        color: var(--primary-color) !important;
+        border: 2px solid white;
+      }
+
+      .btn-light:hover {
+        background-color: rgba(255,255,255,0.9);
+        color: var(--secondary-color) !important;
+      }
+
+      .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 120px 0;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 10px 25px;
+        font-weight: 600;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+      }
+
+      .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 60px 0 30px;
+        color: var(--dark-bg);
+      }
+
+      .vehicle-card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 25px;
+      }
+
+      .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .vehicle-img {
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .vehicle-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .vehicle-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #29cc97;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      .filter-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .filter-title {
+        font-weight: bold;
+        color: var(--dark-bg);
+        margin-bottom: 15px;
+      }
+
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+      }
+
+      .footer {
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+        padding: 50px 0 20px;
+        margin-top: 60px;
+      }
+
+      .footer-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .footer-links a {
+        color: #adb5bd;
+        display: block;
+        margin-bottom: 10px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .footer-links a:hover {
+        color: white;
+      }
+
+      .social-icons a {
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 15px;
+      }
+      .star-rating .fas.fa-star { color: #ffc107; }
+      .star-rating .far.fa-star { color: #ccc; }
+      .star-rating .fas.fa-star:hover, .star-rating .far.fa-star:hover { cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <i class="fas fa-car-side mr-2"></i> VeloRent
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#vehicles">Vehicles</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="feedback">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a>
+            </li>
+          </ul>
+          <div class="auth-buttons">
+            <a href="/login" class="btn btn-outline-light">Login</a>
+            <a href="/register" class="btn btn-light">Register</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1 class="hero-title">Your Feedback</h1>
+        <p class="hero-subtitle">Share Your thoughts with us</p>
+      </div>
+    </section>
+
+    <section id="feedbackSection">
+      <div class="container">
+
+
+
+        <!-- List of Feedbacks -->
+        <div th:each="feedback : ${feedbacks}">
+          <div class="card mt-3">
+            <div class="card-body">
+              <h5 class="card-title"><span th:text="${feedback.createdByName}"></span></h5>
+              <div class="star-rating">
+                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                        <i th:class="${i <= feedback.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                    </span>
+              </div>
+              <p class="card-text" th:text="${feedback.feedback}"></p>
+              <span th:text="${feedback.createdAt}" style="display: flex;justify-content: end;"></span>
+
+              <!-- Edit and Delete for own feedback -->
+<!--              <div th:if="${#authentication.principal.username == feedback.createdByName.replace(' ', '.') + '@example.com'}">-->
+<!--                <form th:action="@{/feedback/update/{id}(id=${feedback.id})}" method="post">-->
+<!--                  <textarea class="form-control" name="feedback" th:text="${feedback.feedback}"></textarea>-->
+<!--                  <div class="star-rating mt-2">-->
+<!--                    <i th:class="${1 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="1"></i>-->
+<!--                    <i th:class="${2 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="2"></i>-->
+<!--                    <i th:class="${3 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="3"></i>-->
+<!--                    <i th:class="${4 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="4"></i>-->
+<!--                    <i th:class="${5 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="5"></i>-->
+<!--                    <input type="hidden" name="rating" th:id="'edit-rating-' + ${feedback.id}" th:value="${feedback.rating}">-->
+<!--                  </div>-->
+<!--                  <button type="submit" class="btn btn-warning mt-2">Edit</button>-->
+<!--                </form>-->
+<!--                <form th:action="@{/feedback/delete/{id}(id=${feedback.id})}" method="post">-->
+<!--                  <button type="submit" class="btn btn-danger mt-2">Delete</button>-->
+<!--                </form>-->
+<!--              </div>-->
+
+              <!-- Reply if available -->
+              <div th:if="${feedback.reply != null}" class="alert alert-primary">
+                <h6>Reply by <span th:text="${feedback.repliedByName}"></span></h6>
+                <p th:text="${feedback.reply}"></p>
+                <span th:text="${feedback.repliedAt}" style="display: flex;justify-content: end;"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 1}" style="padding-top: 20px;">
+          <ul class="pagination">
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+              <a class="page-link" th:href="@{/feedback(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+          </ul>
+        </nav>
+        <!-- Add New Feedback Form -->
+        <form th:action="@{/api/feedback/add}" method="post" style="padding-top: 20px;" class="alert alert-secondary">
+          <div class="form-group">
+            <label>Add Your Rating:</label>
+            <div class="star-rating">
+              <i class="far fa-star" data-rating="1"></i>
+              <i class="far fa-star" data-rating="2"></i>
+              <i class="far fa-star" data-rating="3"></i>
+              <i class="far fa-star" data-rating="4"></i>
+              <i class="far fa-star" data-rating="5"></i>
+              <input type="hidden" name="rating" id="rating" value="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="feedback">Add Your Feedback:</label>
+            <textarea class="form-control" id="feedback" name="feedback" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Add Feedback</button>
+        </form>
+      </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <h5 class="footer-title">VeloRent</h5>
+            <p>Your trusted partner for all your vehicle rental needs. Quality vehicles at affordable prices.</p>
+            <div class="social-icons mt-3">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <h5 class="footer-title">Quick Links</h5>
+            <div class="footer-links">
+              <a href="#">About Us</a>
+              <a href="#">Services</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Privacy Policy</a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <h5 class="footer-title">Support</h5>
+            <div class="footer-links">
+              <a href="#">FAQ</a>
+              <a href="#">Help Center</a>
+              <a href="#">Contact Us</a>
+              <a href="#">Careers</a>
+            </div>
+          </div>
+          <div class="col-md-2 mb-4">
+            <h5 class="footer-title">Contact</h5>
+            <address>
+              <p><i class="fas fa-map-marker-alt mr-2"></i> No32 Main St Melsiripura</p>
+              <p><i class="fas fa-phone mr-2"></i> (123) 456-7890</p>
+              <p><i class="fas fa-envelope mr-2"></i> 2025_Y2_S1_KUR_02@gmail.com</p>
+            </address>
+          </div>
+        </div>
+        <hr class="mt-4 mb-4" style="background-color: #6c757d;">
+        <p class="text-center">&copy; 2025 VeloRent. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+    <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('.star-rating i').click(function() {
+          var rating = $(this).data('rating');
+          var parent = $(this).closest('.star-rating');
+          parent.find('i').each(function() {
+            if ($(this).data('rating') <= rating) {
+              $(this).removeClass('far').addClass('fas');
+            } else {
+              $(this).removeClass('fas').addClass('far');
+            }
+          });
+          parent.find('input[name="rating"]').val(rating);
+        });
+      });
+    </script>
+  </body>
+</html>

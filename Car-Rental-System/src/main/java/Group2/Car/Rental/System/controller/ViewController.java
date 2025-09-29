@@ -1,10 +1,21 @@
 package Group2.Car.Rental.System.controller;
 
+import Group2.Car.Rental.System.dto.FeedbackDTO;
+import Group2.Car.Rental.System.service.FeedbackService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class ViewController {
+
+    @Autowired
+    private FeedbackService feedbackService;
 
     @GetMapping("/login")
     public String login() {
@@ -78,5 +89,22 @@ public class ViewController {
     @GetMapping("/admin/fleet-dashboard")
     public String fleetDashboard() {
         return "admin/dashboard"; // Using the existing dashboard template or create a specific one if needed
+    }
+
+    @GetMapping("/feedback")
+    public String listFeedbacks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model) {
+        Page<FeedbackDTO> feedbackPage = feedbackService.getAllFeedbacks(page, size);
+        model.addAttribute("feedbacks", feedbackPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", feedbackPage.getTotalPages());
+        model.addAttribute("newFeedback", new FeedbackDTO());
+        return "feedback";
+    }
+
+    @GetMapping("/admin/feedback")
+    public String listAdminFeedbacks(Model model) {
+        List<FeedbackDTO> feedbacks = feedbackService.getAllFeedbacksForAdmin();
+        model.addAttribute("feedbacks", feedbacks);
+        return "admin/feedback";
     }
 }
