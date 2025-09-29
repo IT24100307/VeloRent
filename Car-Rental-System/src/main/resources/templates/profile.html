@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | VeloRent</title>
+
+    <!-- CSRF Token -->
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap/css/bootstrap.min.css}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" th:href="@{/css/fontawesome/css/all.min.css}">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" th:href="@{/css/auth-styles.css}">
+
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .view-mode-fields .form-control-plaintext {
+            padding-top: calc(.375rem + 1px);
+            padding-bottom: calc(.375rem + 1px);
+            margin-bottom: 0;
+            line-height: 1.5;
+            border: 0;
+        }
+
+        .password-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-edit {
+            background-color: #4e73df;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #f8f9fc;
+            color: #5a5c69;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h3>User Profile</h3>
+            <div class="btn-group">
+                <button id="editBtn" class="btn btn-edit">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button id="cancelBtn" class="btn btn-cancel d-none">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button id="saveBtn" class="btn btn-primary d-none">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+
+        <div class="alert alert-success d-none" id="successAlert" role="alert">
+            Profile updated successfully!
+        </div>
+
+        <div class="alert alert-danger d-none" id="errorAlert" role="alert">
+            An error occurred. Please try again.
+        </div>
+
+        <!-- Profile Form -->
+        <form id="profileForm">
+            <div class="row">
+                <!-- Basic User Information -->
+                <div class="col-md-6 mb-3">
+                    <label for="firstName">First Name</label>
+                    <input type="text" class="form-control view-mode-fields d-none" id="firstName" name="firstName" th:value="${profile.firstName}">
+                    <div class="form-control-plaintext view-mode" th:text="${profile.firstName}"></div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" class="form-control view-mode-fields d-none" id="lastName" name="lastName" th:value="${profile.lastName}">
+                    <div class="form-control-plaintext view-mode" th:text="${profile.lastName}"></div>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label for="email">Email Address</label>
+                    <input type="email" class="form-control-plaintext" id="email" name="email" th:value="${profile.email}" readonly>
+                </div>
+
+                <!-- Customer Specific Information -->
+                <div th:if="${isCustomer}" class="col-md-6 mb-3">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="text" class="form-control view-mode-fields d-none" id="contactNumber" name="contactNumber" th:value="${profile.contactNumber}">
+                    <div class="form-control-plaintext view-mode" th:text="${profile.contactNumber != null ? profile.contactNumber : 'Not provided'}"></div>
+                </div>
+
+                <div th:if="${isCustomer}" class="col-md-12 mb-3">
+                    <label for="addressStreet">Street Address</label>
+                    <input type="text" class="form-control view-mode-fields d-none" id="addressStreet" name="addressStreet" th:value="${profile.addressStreet}">
+                    <div class="form-control-plaintext view-mode" th:text="${profile.addressStreet != null ? profile.addressStreet : 'Not provided'}"></div>
+                </div>
+
+                <div th:if="${isCustomer}" class="col-md-6 mb-3">
+                    <label for="addressCity">City</label>
+                    <input type="text" class="form-control view-mode-fields d-none" id="addressCity" name="addressCity" th:value="${profile.addressCity}">
+                    <div class="form-control-plaintext view-mode" th:text="${profile.addressCity != null ? profile.addressCity : 'Not provided'}"></div>
+                </div>
+
+                <div th:if="${isCustomer}" class="col-md-6 mb-3">
+                    <label for="addressPostalCode">Postal Code</label>
+                    <input type="text" class="form-control view-mode-fields d-none" id="addressPostalCode" name="addressPostalCode" th:value="${profile.addressPostalCode}">
+                    <div class="form-control-plaintext view-mode" th:text="${profile.addressPostalCode != null ? profile.addressPostalCode : 'Not provided'}"></div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Password Change Section -->
+        <div class="password-section">
+            <h4>Change Password</h4>
+            <form id="passwordForm">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword">
+                        <div class="invalid-feedback">Current password is required</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword">
+                        <div class="invalid-feedback">Password must be at least 8 characters with letters, numbers and special characters</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                        <div class="invalid-feedback">Passwords don't match</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <button type="button" id="changePasswordBtn" class="btn btn-warning">
+                            <i class="fas fa-key"></i> Change Password
+                        </button>
+                        <div class="alert alert-success d-none mt-3" id="passwordSuccessAlert" role="alert">
+                            Password changed successfully!
+                        </div>
+                        <div class="alert alert-danger d-none mt-3" id="passwordErrorAlert" role="alert">
+                            Error changing password.
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="mt-4">
+            <a th:href="@{/dashboard}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+    <!-- Custom JavaScript -->
+    <script th:src="@{/js/profile.js}"></script>
+</body>
+</html>
