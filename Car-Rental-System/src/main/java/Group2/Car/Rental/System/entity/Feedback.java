@@ -15,20 +15,35 @@ import java.time.LocalDateTime;
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "feedback_id")
     private Long id;
-    private String feedback;
-    private String reply;
-    private boolean isResolved;
-    private LocalDateTime createdAt;
+
+    @Column(name = "rating")
     private int rating;
 
+    @Column(name = "comments")
+    private String comments;
+
+    @Column(name = "feedback_date")
+    private LocalDateTime feedbackDate;
+
     @ManyToOne
-    private User createdBy;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private User customer;
 
-    private LocalDateTime repliedAt;
-
-    @ManyToOne
-    private User repliedBy;
-
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    @Column(name = "is_resolved", nullable = false)
+    private boolean isResolved = false;
+
+    @Column(name = "reply")
+    private String reply;
+
+    @Column(name = "reply_date")
+    private LocalDateTime replyDate;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private User admin;
 }

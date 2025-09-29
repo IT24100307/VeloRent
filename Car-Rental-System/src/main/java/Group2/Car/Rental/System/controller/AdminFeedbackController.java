@@ -19,10 +19,9 @@ public class AdminFeedbackController {
     @Autowired
     private FeedbackService feedbackService;
 
-
     @PostMapping("/reply/{id}")
-    public String addOrEditReply(@PathVariable Long id, @RequestParam String reply) {
-        feedbackService.addOrEditReply(id, reply);
+    public String replyToFeedback(@PathVariable Long id, @RequestParam String reply) {
+        feedbackService.replyToFeedback(id, reply);
         return "redirect:/admin/feedback";
     }
 

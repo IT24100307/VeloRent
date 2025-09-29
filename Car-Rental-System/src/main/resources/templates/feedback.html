@@ -211,32 +211,6 @@
         <a class="navbar-brand" href="/">
           <i class="fas fa-car-side mr-2"></i> VeloRent
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#vehicles">Vehicles</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Services</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="feedback">About Us</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
-            </li>
-          </ul>
-          <div class="auth-buttons">
-            <a href="/login" class="btn btn-outline-light">Login</a>
-            <a href="/register" class="btn btn-light">Register</a>
-          </div>
-        </div>
       </div>
     </nav>
 
@@ -251,45 +225,50 @@
     <section id="feedbackSection">
       <div class="container">
 
-
-
         <!-- List of Feedbacks -->
         <div th:each="feedback : ${feedbacks}">
           <div class="card mt-3">
             <div class="card-body">
-              <h5 class="card-title"><span th:text="${feedback.createdByName}"></span></h5>
+              <h5 class="card-title"><span th:text="${feedback.customerName}"></span></h5>
               <div class="star-rating">
                     <span th:each="i : ${#numbers.sequence(1, 5)}">
                         <i th:class="${i <= feedback.rating} ? 'fas fa-star' : 'far fa-star'"></i>
                     </span>
               </div>
-              <p class="card-text" th:text="${feedback.feedback}"></p>
-              <span th:text="${feedback.createdAt}" style="display: flex;justify-content: end;"></span>
+              <p class="card-text" th:text="${feedback.comments}"></p>
+              <span th:text="${feedback.feedbackDate}" style="display: flex;justify-content: end;"></span>
 
-              <!-- Edit and Delete for own feedback -->
-<!--              <div th:if="${#authentication.principal.username == feedback.createdByName.replace(' ', '.') + '@example.com'}">-->
-<!--                <form th:action="@{/feedback/update/{id}(id=${feedback.id})}" method="post">-->
-<!--                  <textarea class="form-control" name="feedback" th:text="${feedback.feedback}"></textarea>-->
-<!--                  <div class="star-rating mt-2">-->
-<!--                    <i th:class="${1 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="1"></i>-->
-<!--                    <i th:class="${2 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="2"></i>-->
-<!--                    <i th:class="${3 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="3"></i>-->
-<!--                    <i th:class="${4 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="4"></i>-->
-<!--                    <i th:class="${5 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="5"></i>-->
-<!--                    <input type="hidden" name="rating" th:id="'edit-rating-' + ${feedback.id}" th:value="${feedback.rating}">-->
-<!--                  </div>-->
-<!--                  <button type="submit" class="btn btn-warning mt-2">Edit</button>-->
-<!--                </form>-->
-<!--                <form th:action="@{/feedback/delete/{id}(id=${feedback.id})}" method="post">-->
-<!--                  <button type="submit" class="btn btn-danger mt-2">Delete</button>-->
-<!--                </form>-->
-<!--              </div>-->
+              <!-- Admin Reply Section - Display if available -->
+              <div th:if="${feedback.reply != null}" class="mt-3 p-3 border-left border-primary bg-light rounded">
+                <h6 class="mb-2 text-primary"><i class="fas fa-reply"></i> Admin Response:</h6>
+                <p class="card-text" th:text="${feedback.reply}"></p>
+                <small class="text-muted d-block text-end" th:text="'Replied on: ' + ${feedback.replyDate}"></small>
+              </div>
 
-              <!-- Reply if available -->
-              <div th:if="${feedback.reply != null}" class="alert alert-primary">
-                <h6>Reply by <span th:text="${feedback.repliedByName}"></span></h6>
-                <p th:text="${feedback.reply}"></p>
-                <span th:text="${feedback.repliedAt}" style="display: flex;justify-content: end;"></span>
+              <!-- Edit and Delete for own feedback - only if no admin reply -->
+              <div th:if="${feedback.customerId == currentUserId && feedback.reply == null}">
+                <form th:action="@{/api/feedback/update/{id}(id=${feedback.id})}" method="post">
+                  <textarea class="form-control" name="feedback" th:text="${feedback.comments}"></textarea>
+                  <div class="star-rating mt-2">
+                    <i th:class="${1 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="1"></i>
+                    <i th:class="${2 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="2"></i>
+                    <i th:class="${3 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="3"></i>
+                    <i th:class="${4 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="4"></i>
+                    <i th:class="${5 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="5"></i>
+                    <input type="hidden" name="rating" th:id="'edit-rating-' + ${feedback.id}" th:value="${feedback.rating}">
+                  </div>
+                  <button type="submit" class="btn btn-warning mt-2">Edit</button>
+                </form>
+                <form th:action="@{/api/feedback/delete/{id}(id=${feedback.id})}" method="post">
+                  <button type="submit" class="btn btn-danger mt-2">Delete</button>
+                </form>
+              </div>
+
+              <!-- Show locked message if feedback has admin reply -->
+              <div th:if="${feedback.customerId == currentUserId && feedback.reply != null}" class="mt-3">
+                <div class="alert alert-info">
+                  <i class="fas fa-lock"></i> This feedback can no longer be edited because an admin has responded.
+                </div>
               </div>
             </div>
           </div>
@@ -303,6 +282,7 @@
             </li>
           </ul>
         </nav>
+
         <!-- Add New Feedback Form -->
         <form th:action="@{/api/feedback/add}" method="post" style="padding-top: 20px;" class="alert alert-secondary">
           <div class="form-group">
@@ -317,11 +297,18 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="feedback">Add Your Feedback:</label>
-            <textarea class="form-control" id="feedback" name="feedback" required></textarea>
+            <label for="comments">Add Your Feedback:</label>
+            <textarea class="form-control" id="comments" name="comments" required></textarea>
           </div>
           <button type="submit" class="btn btn-primary">Add Feedback</button>
         </form>
+
+        <!-- Back to Dashboard Button -->
+        <div class="text-center mt-4 mb-5">
+          <a href="/dashboard" class="btn btn-primary btn-lg">
+            <i class="fas fa-tachometer-alt mr-2"></i> Back to Dashboard
+          </a>
+        </div>
       </div>
 
     </section>
