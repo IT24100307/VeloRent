@@ -234,12 +234,31 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public String verify2FA(String email, String code) {
+    public Map<String, String> verify2FA(String email, String code) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         if (!twoFactorAuthService.isOtpValid(user.getSecret(), code)) {
             throw new RuntimeException("Invalid OTP code.");
         }
-        return jwtService.generateToken(user);
+
+        String token = jwtService.generateToken(user);
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+
+        // Add user role to the response
+        String roleName = user.getRole().getName();
+        response.put("role", roleName);
+
+        // Determine the redirect URL based on role
+        if (roleName.equals("ROLE_CUSTOMER")) {
+            response.put("redirect", "/dashboard");
+        } else if (roleName.equals("ROLE_FLEET_MANAGER")) {
+            response.put("redirect", "/fleet-manager/dashboard");
+        } else {
+            // For admin roles (ROLE_OWNER, ROLE_SYSTEM_ADMIN)
+            response.put("redirect", "/admin/dashboard");
+        }
+
+        return response;
     }
 
     public String extractEmailFromToken(String token) {

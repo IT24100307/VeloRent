@@ -1,7 +1,7 @@
 package Group2.Car.Rental.System.service;
 
 import Group2.Car.Rental.System.dto.ChangePasswordDto;
-import Group2.Car.Rental.System.dto.UserProfileDto;
+import Group2.Car.Rental.System.dto.UserProfileDTO;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.User;
 import Group2.Car.Rental.System.repository.CustomerRepository;
@@ -11,8 +11,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -57,9 +55,9 @@ public class UserService {
     /**
      * Get user profile information including Customer details if applicable
      */
-    public UserProfileDto getUserProfile(String email) {
+    public UserProfileDTO getUserProfile(String email) {
         User user = getUserByEmail(email);
-        UserProfileDto profileDto = new UserProfileDto();
+        UserProfileDTO profileDto = new UserProfileDTO();
 
         // Set basic user information
         profileDto.setFirstName(user.getFirstName());
@@ -82,7 +80,7 @@ public class UserService {
      * Update user profile information
      */
     @Transactional
-    public void updateUserProfile(String email, UserProfileDto profileDto) {
+    public void updateUserProfile(String email, UserProfileDTO profileDto) {
         try {
             User user = getUserByEmail(email);
             System.out.println("Updating profile for user: " + email);

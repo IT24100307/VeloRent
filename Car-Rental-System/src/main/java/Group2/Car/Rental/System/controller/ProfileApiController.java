@@ -1,7 +1,7 @@
 package Group2.Car.Rental.System.controller;
 
 import Group2.Car.Rental.System.dto.ChangePasswordDto;
-import Group2.Car.Rental.System.dto.UserProfileDto;
+import Group2.Car.Rental.System.dto.UserProfileDTO;
 import Group2.Car.Rental.System.service.ProfileService;
 import Group2.Car.Rental.System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class ProfileApiController {
             }
 
             // Use the new profileService to get user profile
-            UserProfileDto profileDto = profileService.getUserProfile(userEmail);
+            UserProfileDTO profileDto = profileService.getUserProfile(userEmail);
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
@@ -51,7 +51,7 @@ public class ProfileApiController {
     public ResponseEntity<?> updateUserProfile(
             Authentication authentication,
             @RequestParam(required = false) String email,
-            @RequestBody UserProfileDto profileDto) {
+            @RequestBody UserProfileDTO profileDto) {
         try {
             String userEmail = getUserEmail(authentication, email);
             if (userEmail == null) {

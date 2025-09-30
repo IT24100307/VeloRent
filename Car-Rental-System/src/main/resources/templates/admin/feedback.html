@@ -23,6 +23,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
+  <!-- Admin Feedback specific JavaScript -->
+  <script src="/js/admin-feedback.js"></script>
+
   <style>
     :root {
       --primary-color: #1a237e;
@@ -173,7 +176,7 @@
   </nav>
 </header>
 
-<main class="container content">
+<main class="container content" id="feedback-management-container">
   <div class="dashboard-header">
     <h1 class="dashboard-title">Feedback Dashboard</h1>
     <div class="dashboard-actions">
@@ -222,7 +225,7 @@
           </button>
 
           <div th:id="'replyForm' + ${feedback.id}" class="collapse mt-2">
-            <form th:action="@{/api/admin/feedback/reply/{id}(id=${feedback.id})}" method="post" class="mb-2">
+            <form th:action="@{/api/admin/feedback/reply/{id}(id=${feedback.id})}" method="post" class="mb-2 feedback-reply-form">
               <div class="form-group">
                 <textarea name="reply" class="form-control" rows="3" th:text="${feedback.reply}" placeholder="Enter your reply"></textarea>
               </div>
@@ -230,7 +233,7 @@
             </form>
           </div>
 
-          <form th:action="@{/api/admin/feedback/delete/{id}(id=${feedback.id})}" method="post">
+          <form th:action="@{/api/admin/feedback/delete/{id}(id=${feedback.id})}" method="post" class="feedback-delete-form">
             <button type="submit" class="btn btn-danger">Delete</button>
           </form>
         </div>
@@ -240,22 +243,10 @@
   </table>
 </main>
 <script>
+  // Any inline scripts specific to feedback page will only run here
   $(document).ready(function() {
-    $('#feedbackTable').DataTable({
-      dom: 'Bfrtip',
-      language: {
-        emptyTable: "No Feedback Available"
-      },
-      buttons: [
-        {
-          extend: 'colvis',
-          collectionLayout: 'fixed two-column'
-        },
-        'copyHtml5',
-        'excelHtml5',
-        'csvHtml5',
-      ]
-    });
+    // This script will only run on the feedback page
+    console.log("Feedback dashboard initialized");
   });
 </script>
 </body>

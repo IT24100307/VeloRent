@@ -1,6 +1,6 @@
 package Group2.Car.Rental.System.controller;
 
-import Group2.Car.Rental.System.dto.UserProfileDto;
+import Group2.Car.Rental.System.dto.UserProfileDTO;
 import Group2.Car.Rental.System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -43,7 +43,7 @@ public class ProfileController {
         }
 
         // Get profile data
-        UserProfileDto profile = userService.getUserProfile(userEmail);
+        UserProfileDTO profile = userService.getUserProfile(userEmail);
 
         model.addAttribute("profile", profile);
         model.addAttribute("isCustomer",
