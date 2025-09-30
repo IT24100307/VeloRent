@@ -137,8 +137,13 @@ public class AuthController {
         try {
             String email = payload.get("email");
             String code = payload.get("code");
-            String token = authService.verify2FA(email, code);
-            return ResponseEntity.ok(new AuthResponseDto("Login successful!", token, true));
+            Map<String, String> verificationResult = authService.verify2FA(email, code);
+
+            String token = verificationResult.get("token");
+            String role = verificationResult.get("role");
+            String redirect = verificationResult.get("redirect");
+
+            return ResponseEntity.ok(new AuthResponseDto("Login successful!", token, true, role, redirect));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new AuthResponseDto(e.getMessage(), null, false));
         }

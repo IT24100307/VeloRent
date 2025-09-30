@@ -24,6 +24,9 @@ public class Feedback {
     @Column(name = "comments")
     private String comments;
 
+    @Column(name = "customer_name")
+    private String customerName;
+
     @Column(name = "feedback_date")
     private LocalDateTime feedbackDate;
 
@@ -46,4 +49,8 @@ public class Feedback {
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private User admin;
+
+    public boolean setId() {
+        return false;
+    }
 }

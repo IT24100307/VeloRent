@@ -46,18 +46,19 @@ public class FeedbackService {
         return null;
     }
 
-    public FeedbackDTO createFeedback(String comments, int rating) {
+    public FeedbackDTO createFeedback(String comments, int rating, String customerName) {
         User currentUser = getCurrentUser();
         Feedback feedback = new Feedback();
         feedback.setComments(comments);
         feedback.setFeedbackDate(LocalDateTime.now());
         feedback.setRating(rating);
+        feedback.setCustomerName(customerName); // Set the customer name from form input
         feedback.setCustomer(currentUser);
         feedbackRepository.save(feedback);
         return convertToDTO(feedback);
     }
 
-    public FeedbackDTO updateFeedback(Long id, String comments, int rating) {
+    public FeedbackDTO updateFeedback(Long id, String comments, int rating, String customerName) {
         User currentUser = getCurrentUser();
         Optional<Feedback> optionalFeedback = feedbackRepository.findById(id);
         if (optionalFeedback.isPresent()) {
@@ -66,6 +67,7 @@ public class FeedbackService {
             if (feedback.getCustomer().getId().equals(currentUser.getId()) && feedback.getReply() == null) {
                 feedback.setComments(comments);
                 feedback.setRating(rating);
+                feedback.setCustomerName(customerName); // Update the customer name from form input
                 feedbackRepository.save(feedback);
                 return convertToDTO(feedback);
             }
@@ -110,8 +112,15 @@ public class FeedbackService {
         dto.setComments(feedback.getComments());
         dto.setFeedbackDate(LocalDateToString(feedback.getFeedbackDate()));
         dto.setCustomerId(feedback.getCustomer().getId());
-        dto.setCustomerName(feedback.getCustomer().getFirstName() + " " + feedback.getCustomer().getLastName());
-        dto.setResolved(feedback.isResolved());
+
+        // Use the customer-provided name if available, otherwise fall back to the user's name
+        if (feedback.getCustomerName() != null && !feedback.getCustomerName().isEmpty()) {
+            dto.setCustomerName(feedback.getCustomerName());
+        } else {
+            dto.setCustomerName(feedback.getCustomer().getFirstName() + " " + feedback.getCustomer().getLastName());
+        }
+
+        dto.setResolved(feedback.setId());
 
         // Add reply-related data if available
         if (feedback.getReply() != null) {

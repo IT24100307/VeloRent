@@ -1,6 +1,6 @@
 package Group2.Car.Rental.System.service;
 
-import Group2.Car.Rental.System.dto.UserProfileDto;
+import Group2.Car.Rental.System.dto.UserProfileDTO;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.User;
 import Group2.Car.Rental.System.repository.CustomerRepository;
@@ -29,9 +29,9 @@ public class ProfileService {
     /**
      * Get user profile information
      */
-    public UserProfileDto getUserProfile(String email) {
+    public UserProfileDTO getUserProfile(String email) {
         User user = getUserByEmail(email);
-        UserProfileDto profileDto = new UserProfileDto();
+        UserProfileDTO profileDto = new UserProfileDTO();
 
         // Set basic user information
         profileDto.setFirstName(user.getFirstName());
@@ -54,7 +54,7 @@ public class ProfileService {
      * Update user profile information with more reliable handling
      */
     @Transactional
-    public void updateProfile(String email, UserProfileDto profileDto) {
+    public void updateProfile(String email, UserProfileDTO profileDto) {
         try {
             System.out.println("ProfileService: Starting profile update for email: " + email);
             System.out.println("ProfileService: Profile data: " + profileDto);

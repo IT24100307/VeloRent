@@ -19,14 +19,14 @@ public class FeedbackController {
     private FeedbackService feedbackService;
 
     @PostMapping("/add")
-    public String addFeedback(@RequestParam String comments, @RequestParam int rating) {
-        feedbackService.createFeedback(comments, rating);
+    public String addFeedback(@RequestParam String comments, @RequestParam int rating, @RequestParam String customerName) {
+        feedbackService.createFeedback(comments, rating, customerName);
         return "redirect:/feedback";
     }
 
     @PostMapping("/update/{id}")
-    public String updateFeedback(@PathVariable Long id, @RequestParam String comments, @RequestParam int rating) {
-        feedbackService.updateFeedback(id, comments, rating);
+    public String updateFeedback(@PathVariable Long id, @RequestParam String feedback, @RequestParam int rating, @RequestParam String customerName) {
+        feedbackService.updateFeedback(id, feedback, rating, customerName);
         return "redirect:/feedback";
     }
 
