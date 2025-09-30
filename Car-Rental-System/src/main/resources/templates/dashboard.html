@@ -564,8 +564,64 @@
 
             <div class="form-actions" style="margin-top: 20px;">
               <button type="button" class="btn" onclick="closeVehicleDetailsModal()">Close</button>
-              <button type="button" class="btn btn-accent" id="rent-vehicle-btn">Rent This Vehicle</button>
+              <button type="button" class="btn btn-accent" id="rent-vehicle-btn" onclick="openBookingModal()">Rent This Vehicle</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Modal -->
+      <div id="booking-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header">
+            <h2 class="modal-title"><i class="fa fa-calendar"></i> Book Vehicle</h2>
+            <span class="close" onclick="closeBookingModal()">&times;</span>
+          </div>
+          <div id="booking-content">
+            <form id="booking-form">
+              <input type="hidden" id="booking-vehicle-id" name="vehicleId">
+
+              <div class="form-group">
+                <label for="booking-start-date">Start Date</label>
+                <input type="date" id="booking-start-date" class="form-control" required min="">
+              </div>
+
+              <div class="form-group">
+                <label for="booking-end-date">End Date</label>
+                <input type="date" id="booking-end-date" class="form-control" required min="">
+              </div>
+
+              <div class="form-group">
+                <label>Rental Duration</label>
+                <div id="rental-duration">0 days</div>
+              </div>
+
+              <div class="form-group">
+                <label>Cost Calculation</label>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                  <tr>
+                    <td>Daily Rate:</td>
+                    <td id="daily-rate-display" style="text-align: right;">Rs. 0.00</td>
+                  </tr>
+                  <tr>
+                    <td>Number of Days:</td>
+                    <td id="days-count-display" style="text-align: right;">0</td>
+                  </tr>
+                  <tr style="font-weight: bold; border-top: 1px solid var(--border-color); margin-top: 5px;">
+                    <td>Total Cost:</td>
+                    <td id="total-cost-display" style="text-align: right;">Rs. 0.00</td>
+                  </tr>
+                </table>
+                <input type="hidden" id="booking-total-cost" name="totalCost" value="0">
+              </div>
+
+              <div id="booking-message" class="message" style="display: none;"></div>
+
+              <div class="form-actions">
+                <button type="button" class="btn" onclick="closeBookingModal()">Cancel</button>
+                <button type="submit" class="btn btn-accent" id="confirm-booking-btn">Confirm Booking</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -846,6 +902,190 @@
         window.closeVehicleDetailsModal = function() {
           document.getElementById("vehicle-details-modal").style.display = "none";
         };
+
+        // Current vehicle being viewed/booked
+        let currentVehicle = null;
+
+        // Booking modal functions
+        window.openBookingModal = function() {
+          // Get the current vehicle from the details modal
+          const vehicleTitle = document.getElementById("modal-vehicle-title").textContent;
+          const vehicleMake = document.getElementById("modal-vehicle-make").textContent;
+          const vehicleModel = document.getElementById("modal-vehicle-model").textContent;
+
+          // Find the vehicle in our allVehicles array
+          currentVehicle = allVehicles.find(v =>
+            `${v.make} ${v.model}` === vehicleTitle ||
+            (v.make === vehicleMake && v.model === vehicleModel)
+          );
+
+          if (!currentVehicle) {
+            alert('Vehicle not found for booking');
+            return;
+          }
+
+          // Set vehicle ID in the booking form
+          document.getElementById("booking-vehicle-id").value = currentVehicle.vehicleId;
+
+          // Set minimum date to today
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById("booking-start-date").min = today;
+          document.getElementById("booking-end-date").min = today;
+
+          // Clear previous values
+          document.getElementById("booking-start-date").value = "";
+          document.getElementById("booking-end-date").value = "";
+          document.getElementById("rental-duration").textContent = "0 days";
+          document.getElementById("days-count-display").textContent = "0";
+
+          // Set rental rate display
+          const rentalRate = currentVehicle.has_discount ?
+            currentVehicle.discountedRatePerDay :
+            currentVehicle.rentalRatePerDay;
+          document.getElementById("daily-rate-display").textContent = `Rs. ${rentalRate}`;
+          document.getElementById("total-cost-display").textContent = `Rs. 0.00`;
+
+          // Hide any previous messages
+          document.getElementById("booking-message").style.display = "none";
+
+          // Close the vehicle details modal and open booking modal
+          closeVehicleDetailsModal();
+          document.getElementById("booking-modal").style.display = "block";
+        };
+
+        window.closeBookingModal = function() {
+          document.getElementById("booking-modal").style.display = "none";
+        };
+
+        // Calculate duration and total cost when dates change
+        document.getElementById("booking-start-date").addEventListener("change", calculateBookingDetails);
+        document.getElementById("booking-end-date").addEventListener("change", calculateBookingDetails);
+
+        function calculateBookingDetails() {
+          const startDateInput = document.getElementById("booking-start-date");
+          const endDateInput = document.getElementById("booking-end-date");
+
+          // Only calculate if both dates are selected
+          if (!startDateInput.value || !endDateInput.value) return;
+
+          const startDate = new Date(startDateInput.value);
+          const endDate = new Date(endDateInput.value);
+
+          // Set minimum end date based on start date
+          const nextDay = new Date(startDate);
+          nextDay.setDate(nextDay.getDate() + 1);
+          endDateInput.min = nextDay.toISOString().split('T')[0];
+
+          // Reset end date if it's before start date
+          if (endDate <= startDate) {
+            endDateInput.value = nextDay.toISOString().split('T')[0];
+            endDate.setTime(nextDay.getTime());
+          }
+
+          // Calculate duration in days
+          const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+          document.getElementById("rental-duration").textContent = `${duration} day${duration !== 1 ? 's' : ''}`;
+          document.getElementById("days-count-display").textContent = duration;
+
+          // Calculate total cost
+          if (currentVehicle) {
+            const dailyRate = currentVehicle.has_discount ?
+              currentVehicle.discountedRatePerDay :
+              currentVehicle.rentalRatePerDay;
+            const totalCost = duration * dailyRate;
+            document.getElementById("total-cost-display").textContent = `Rs. ${totalCost.toFixed(2)}`;
+            document.getElementById("booking-total-cost").value = totalCost.toFixed(2);
+          }
+        }
+
+        // Booking form submission
+        const bookingForm = document.getElementById("booking-form");
+        if (bookingForm) {
+          bookingForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const startDate = document.getElementById("booking-start-date").value;
+            const endDate = document.getElementById("booking-end-date").value;
+            const vehicleId = document.getElementById("booking-vehicle-id").value;
+            const totalCost = document.getElementById("booking-total-cost").value;
+
+            // Get user ID from localStorage if available
+            const userId = localStorage.getItem("userId");
+
+            if (!startDate || !endDate) {
+              showBookingMessage("Please select both start and end dates.", "error");
+              return;
+            }
+
+            // Create booking object
+            const bookingData = {
+              startDate: new Date(startDate).toISOString(),
+              endDate: new Date(endDate).toISOString(),
+              vehicleId: parseInt(vehicleId),
+              totalCost: parseFloat(totalCost),
+              customerId: userId
+            };
+
+            // Disable submit button and show loading
+            const submitButton = document.getElementById("confirm-booking-btn");
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Processing...";
+
+            // Submit the booking data to the server
+            fetch('/api/bookings', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(bookingData)
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Booking failed');
+              }
+              return response.json();
+            })
+            .then(data => {
+              showBookingMessage("Booking confirmed! Redirecting to your bookings page...", "success");
+
+              // Update vehicle status in the global array
+              if (currentVehicle) {
+                currentVehicle.status = "Booked";
+                // Refresh the vehicle list to reflect the new status
+                setTimeout(() => {
+                  loadAvailableVehicles();
+                  closeBookingModal();
+
+                  // Redirect to bookings page or reload dashboard
+                  window.location.href = "/dashboard?message=" +
+                    encodeURIComponent("Your booking has been confirmed!") +
+                    "&type=success";
+                }, 2000);
+              }
+            })
+            .catch(error => {
+              console.error('Error during booking:', error);
+              showBookingMessage("An error occurred. Please try again later.", "error");
+              submitButton.disabled = false;
+              submitButton.innerHTML = "Confirm Booking";
+            });
+          });
+        }
+
+        function showBookingMessage(message, type) {
+          const messageContainer = document.getElementById("booking-message");
+          messageContainer.textContent = message;
+          messageContainer.className = `message ${type}`;
+          messageContainer.style.display = "block";
+
+          if (type !== "error") {
+            // Hide message after 5 seconds for non-error messages
+            setTimeout(() => {
+              messageContainer.style.display = "none";
+            }, 5000);
+          }
+        }
       });
     </script>
   </body>
