@@ -69,4 +69,26 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    /**
+     * Return a booking (mark returned and free the vehicle)
+     */
+    @PostMapping("/{bookingId}/return")
+    public ResponseEntity<Map<String, Object>> returnBooking(@PathVariable Integer bookingId) {
+        Map<String, Object> response = bookingService.returnBooking(bookingId);
+        if ((Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    /**
+     * Get lightweight booking summaries for a customer (safe for JSON)
+     */
+    @GetMapping("/customer/{customerId}/summary")
+    public ResponseEntity<List<Group2.Car.Rental.System.dto.BookingSummaryDTO>> getCustomerBookingSummaries(@PathVariable Long customerId) {
+        List<Group2.Car.Rental.System.dto.BookingSummaryDTO> bookings = bookingService.getCustomerBookingSummaries(customerId);
+        return ResponseEntity.ok(bookings);
+    }
 }
