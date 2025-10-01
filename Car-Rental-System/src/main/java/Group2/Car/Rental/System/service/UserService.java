@@ -11,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserService {
@@ -143,14 +144,44 @@ public class UserService {
     public void changePassword(String email, ChangePasswordDto passwordDto) {
         User user = getUserByEmail(email);
 
-        // Verify current password
-        if (!passwordEncoder.matches(passwordDto.getCurrentPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Current password is incorrect");
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        if (passwordDto == null || !StringUtils.hasText(passwordDto.getCurrentPassword())
+                || !StringUtils.hasText(passwordDto.getNewPassword())
+                || !StringUtils.hasText(passwordDto.getConfirmPassword())) {
+            throw new IllegalArgumentException("All password fields are required");
         }
 
         // Verify that new password and confirm password match
         if (!passwordDto.getNewPassword().equals(passwordDto.getConfirmPassword())) {
             throw new IllegalArgumentException("New password and confirm password do not match");
+        }
+
+        // Optional: basic strength check
+        if (passwordDto.getNewPassword().length() < 8) {
+            throw new IllegalArgumentException("New password must be at least 8 characters long");
+        }
+
+        String stored = user.getPassword();
+        boolean currentMatches = false;
+
+        // 1) Try standard encoded match
+        if (StringUtils.hasText(stored) && passwordEncoder.matches(passwordDto.getCurrentPassword(), stored)) {
+            currentMatches = true;
+        } else {
+            // 2) Fallback: legacy plain-text password migration
+            // If stored password looks not encoded (no bcrypt prefix) and equals the provided current password
+            boolean looksPlain = stored != null && !stored.startsWith("$2a$") && !stored.startsWith("$2b$") && !stored.startsWith("$2y$");
+            if (looksPlain && stored.equals(passwordDto.getCurrentPassword())) {
+                currentMatches = true;
+                // Immediately migrate to BCrypt using the new password below
+            }
+        }
+
+        if (!currentMatches) {
+            throw new BadCredentialsException("Current password is incorrect");
         }
 
         // Encode and save new password

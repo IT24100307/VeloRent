@@ -11,9 +11,12 @@ $(document).ready(function() {
     const passwordSuccessAlert = $('#passwordSuccessAlert');
     const passwordErrorAlert = $('#passwordErrorAlert');
 
-    // Get email from URL parameter (for use with API calls)
+    // CSRF token for secure requests
+    const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    // Pick email from query string if present (needed when viewing another profile or when not authenticated)
     const urlParams = new URLSearchParams(window.location.search);
-    const userEmail = urlParams.get('email');
+    const queryEmail = urlParams.get('email');
 
     // Toggle Edit Mode
     editBtn.on('click', function() {
@@ -97,10 +100,13 @@ $(document).ready(function() {
 
         console.log("Updating profile with data:", profileData);
 
-        // Create URL with email parameter if available
+        // Create URL with email parameter if available (URL ?email or read-only #email field)
         let apiUrl = '/api/profile/update';
-        if (userEmail) {
-            apiUrl += '?email=' + encodeURIComponent(userEmail);
+        const pageEmailVal = ($('#email').length ? $('#email').val().trim() : null);
+        if (queryEmail) {
+            apiUrl += '?email=' + encodeURIComponent(queryEmail);
+        } else if (pageEmailVal) {
+            apiUrl += '?email=' + encodeURIComponent(pageEmailVal);
         }
 
         console.log("Sending request to:", apiUrl);
@@ -111,9 +117,13 @@ $(document).ready(function() {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(profileData),
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
-            },
+            xhrFields: { withCredentials: true },
+            headers: (function(){
+                const h = {};
+                const t = $('meta[name="_csrf"]').attr('content');
+                if (t) { h['X-CSRF-TOKEN'] = t; }
+                return h;
+            })(),
             success: function(response) {
                 console.log("Profile update response:", response);
                 if (response.success) {
@@ -231,50 +241,47 @@ $(document).ready(function() {
 
         // Create URL with email parameter if available
         let apiUrl = '/api/profile/change-password';
-        if (userEmail) {
-            apiUrl += '?email=' + encodeURIComponent(userEmail);
+        const pageEmailVal = ($('#email').length ? $('#email').val().trim() : null);
+        if (queryEmail) {
+            apiUrl += `?email=${encodeURIComponent(queryEmail)}`;
+        } else if (pageEmailVal) {
+            apiUrl += `?email=${encodeURIComponent(pageEmailVal)}`;
         }
 
-        // Send AJAX request
-        $.ajax({
-            url: apiUrl,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                currentPassword: currentPassword,
-                newPassword: newPassword,
-                confirmPassword: confirmPassword
-            }),
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
-            },
-            success: function(response) {
-                if (response.success) {
-                    // Show success message
-                    passwordSuccessAlert.text(response.message);
-                    passwordSuccessAlert.removeClass('d-none');
-                    passwordErrorAlert.addClass('d-none');
+        const headers = { 'Content-Type': 'application/json' };
+        if (header && token) { headers[header] = token; }
 
-                    // Clear password fields
-                    $('#currentPassword').val('');
-                    $('#newPassword').val('');
-                    $('#confirmPassword').val('');
-                } else {
-                    // Show error message
-                    passwordErrorAlert.text(response.message);
-                    passwordErrorAlert.removeClass('d-none');
-                    passwordSuccessAlert.addClass('d-none');
-                }
-            },
-            error: function(xhr) {
-                let errorMessage = 'An error occurred while changing your password.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                }
-                passwordErrorAlert.text(errorMessage);
-                passwordErrorAlert.removeClass('d-none');
-                passwordSuccessAlert.addClass('d-none');
+        fetch(apiUrl, {
+            method: 'POST',
+            headers,
+            credentials: 'same-origin',
+            body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+        })
+        .then(async (r) => {
+            let data = null;
+            try { data = await r.json(); } catch(_) { data = { success: false, message: r.statusText || 'Request failed' }; }
+
+            if (r.ok && data && data.success) {
+                passwordSuccessAlert.text(data.message || 'Password updated successfully');
+                passwordSuccessAlert.removeClass('d-none');
+                passwordErrorAlert.addClass('d-none');
+                $('#passwordForm')[0].reset();
+                return;
             }
+
+            const msg = (data && data.message) ? data.message : 'Error updating password';
+            passwordErrorAlert.text(msg);
+            passwordErrorAlert.removeClass('d-none');
+            passwordSuccessAlert.addClass('d-none');
+        })
+        .catch((e) => {
+            passwordErrorAlert.text('Network error while updating your password');
+            passwordErrorAlert.removeClass('d-none');
+            passwordSuccessAlert.addClass('d-none');
+        })
+        .finally(() => {
+            changePasswordBtn.prop('disabled', false);
+            changePasswordBtn.text('Change Password');
         });
     }
 });

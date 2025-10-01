@@ -46,8 +46,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/feedback/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
+
                         .requestMatchers("/api/payments/**").permitAll() // Allow access to payment endpoints
                         .requestMatchers("/api/bookings/**").permitAll() // Allow access to booking endpoints
+
+                        .requestMatchers("/api/profile/**").permitAll()
+
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
@@ -56,8 +60,8 @@ public class SecurityConfig {
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )
-                // Tell Spring Security not to create sessions, which is needed for JWT
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Use session when required so authenticated users remain logged in for API calls
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authenticationProvider(authenticationProvider());
 
         return http.build();
