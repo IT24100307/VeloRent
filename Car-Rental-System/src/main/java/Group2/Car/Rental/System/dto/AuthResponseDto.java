@@ -13,6 +13,12 @@ public class AuthResponseDto {
     private String role; // User's role
     private String redirect; // Redirect URL based on role
     
+    // Additional user info for client storage
+    private String userId;
+    private String userName;
+    private String userEmail;
+    private String customerId; // optional for ROLE_CUSTOMER
+
     // Constructor for backward compatibility
     public AuthResponseDto(String message, String token, boolean success) {
         this.message = message;

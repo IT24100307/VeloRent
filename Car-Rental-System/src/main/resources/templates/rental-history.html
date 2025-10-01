@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rental History | Car Rental System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #2ecc71;
+      --text-color: #333;
+      --light-text: #666;
+      --background-color: #f8f9fa;
+      --card-background: #fff;
+      --border-color: #e1e1e1;
+      --danger-color: #e74c3c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto','Segoe UI',Arial,sans-serif; }
+    body { background-color: var(--background-color); color: var(--text-color); }
+    header { background-color: var(--primary-color); color: #fff; padding: 1rem; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    nav { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.5rem; font-weight: bold; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px; }
+    .nav-links a:hover { background: rgba(255,255,255,.1); }
+    h1 { color: var(--primary-color); margin-bottom: 15px; }
+    .card { background: var(--card-background); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.05); padding: 16px; margin-bottom: 18px; }
+    .section-title { font-size: 18px; margin-bottom: 10px; }
+    .message { padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
+    .message.error { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.3); }
+    .message.success { background: rgba(46, 204, 113, 0.1); color: #27ae60; border: 1px solid rgba(46,204,113,.3); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 14px; }
+    th { background: var(--background-color); font-weight: 500; color: var(--primary-color); }
+    .btn { background: var(--primary-color); color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn:hover { background: #34495e; }
+    .btn-accent { background: var(--accent-color); }
+    .btn-accent:hover { background: #27ae60; }
+    .btn-light { background: #95a5a6; }
+    .actions { display: flex; gap: 8px; }
+    footer { margin-top: 40px; text-align: center; color: var(--light-text); font-size: 14px; padding: 20px; border-top: 1px solid var(--border-color); }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo">Car Rental System</div>
+      <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/feedback">About Us</a>
+        <a href="/security-settings">Security</a>
+        <a href="#" id="logout-btn">Logout</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div id="message-container"></div>
+
+  <h1>Rental History</h1>
+
+  <div class="card">
+    <div class="section-title">Currently Rented Vehicles</div>
+    <div id="current-empty" style="display:none; color: var(--light-text); padding: 12px;">No active rentals right now.</div>
+    <div style="overflow-x:auto;">
+      <table id="current-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Vehicle</th>
+            <th>Registration</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Total (Rs.)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="current-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Past Rentals</div>
+    <div id="past-empty" style="display:none; color: var(--light-text); padding: 12px;">No past rentals yet.</div>
+    <div style="overflow-x:auto;">
+      <table id="past-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Vehicle</th>
+            <th>Registration</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Total (Rs.)</th>
+          </tr>
+        </thead>
+        <tbody id="past-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Car Rental System. All rights reserved.</p>
+  </footer>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login?message=' + encodeURIComponent('Please log in to view rental history') + '&type=error';
+      return;
+    }
+
+    const messageContainer = document.getElementById('message-container');
+    function showMessage(text, type = 'info') {
+      messageContainer.innerHTML = `<div class="message ${type}">${text}</div>`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // logout
+    document.getElementById('logout-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.clear();
+      window.location.href = '/login?message=' + encodeURIComponent('You have been logged out') + '&type=success';
+    });
+
+    // Ensure we have identifiers
+    async function ensureIds() {
+      let userId = localStorage.getItem('userId');
+      let customerId = localStorage.getItem('customerId');
+      if (userId && customerId) return { userId, customerId };
+      try {
+        const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` }});
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            if (json.data.userId) localStorage.setItem('userId', json.data.userId);
+            if (json.data.customerId) localStorage.setItem('customerId', json.data.customerId);
+            userId = json.data.userId || userId;
+            customerId = json.data.customerId || customerId;
+          }
+        }
+      } catch {}
+      return { userId: localStorage.getItem('userId'), customerId: localStorage.getItem('customerId') };
+    }
+
+    // Load bookings
+    (async function loadBookings() {
+      const { userId } = await ensureIds();
+      if (!userId) {
+        showMessage('Could not determine your account. Please login again.', 'error');
+        return;
+      }
+      try {
+        // Use summary endpoint to avoid serialization issues
+        const res = await fetch(`/api/bookings/customer/${userId}/summary`, { headers: { Authorization: `Bearer ${token}` }});
+        if (!res.ok) throw new Error('Failed to load bookings');
+        const bookings = await res.json();
+        renderBookings(Array.isArray(bookings) ? bookings : []);
+      } catch (e) {
+        console.error(e);
+        showMessage('Failed to load your bookings. Please try again later.', 'error');
+      }
+    })();
+
+    function renderBookings(bookings) {
+      const current = [];
+      const past = [];
+
+      bookings.forEach(b => {
+        const status = (b.bookingStatus || '').toLowerCase();
+        if (status === 'returned' || status === 'cancelled') past.push(b); else current.push(b);
+      });
+
+      // Current
+      const currentBody = document.getElementById('current-body');
+      currentBody.innerHTML = '';
+      if (current.length === 0) {
+        document.getElementById('current-empty').style.display = 'block';
+        document.getElementById('current-table').style.display = 'none';
+      } else {
+        document.getElementById('current-empty').style.display = 'none';
+        document.getElementById('current-table').style.display = 'table';
+        current.forEach(b => {
+          const tr = document.createElement('tr');
+          const title = `${b.vehicleMake || ''} ${b.vehicleModel || ''}`.trim();
+          tr.innerHTML = `
+            <td>${b.bookingId}</td>
+            <td>${title || 'N/A'}</td>
+            <td>${b.registrationNumber || 'N/A'}</td>
+            <td>${formatDate(b.startDate)}</td>
+            <td>${formatDate(b.endDate)}</td>
+            <td>${b.bookingStatus || ''}</td>
+            <td>${(b.totalCost || 0)}</td>
+            <td class="actions">
+              <button class="btn btn-accent" data-action="return" data-id="${b.bookingId}">Return Vehicle</button>
+            </td>
+          `;
+          currentBody.appendChild(tr);
+        });
+      }
+
+      // Past
+      const pastBody = document.getElementById('past-body');
+      pastBody.innerHTML = '';
+      if (past.length === 0) {
+        document.getElementById('past-empty').style.display = 'block';
+        document.getElementById('past-table').style.display = 'none';
+      } else {
+        document.getElementById('past-empty').style.display = 'none';
+        document.getElementById('past-table').style.display = 'table';
+        past.forEach(b => {
+          const tr = document.createElement('tr');
+          const title = `${b.vehicleMake || ''} ${b.vehicleModel || ''}`.trim();
+          tr.innerHTML = `
+            <td>${b.bookingId}</td>
+            <td>${title || 'N/A'}</td>
+            <td>${b.registrationNumber || 'N/A'}</td>
+            <td>${formatDate(b.startDate)}</td>
+            <td>${formatDate(b.endDate)}</td>
+            <td>${b.bookingStatus || ''}</td>
+            <td>${(b.totalCost || 0)}</td>
+          `;
+          pastBody.appendChild(tr);
+        });
+      }
+
+      // Wire return buttons
+      document.querySelectorAll('button[data-action="return"]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const bookingId = btn.getAttribute('data-id');
+          btn.disabled = true; btn.textContent = 'Processing...';
+          try {
+            const res = await fetch(`/api/bookings/${bookingId}/return`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' }
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json.success) throw new Error(json.message || 'Failed');
+            showMessage('Vehicle returned successfully', 'success');
+            // Reload list
+            setTimeout(() => { window.location.reload(); }, 800);
+          } catch (e) {
+            console.error(e);
+            showMessage(e.message || 'Failed to return vehicle', 'error');
+            btn.disabled = false; btn.textContent = 'Return Vehicle';
+          }
+        })
+      });
+    }
+
+    function formatDate(val) {
+      if (!val) return '';
+      try { return new Date(val).toLocaleDateString(); } catch { return val; }
+    }
+  });
+</script>
+</body>
+</html>

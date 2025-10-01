@@ -463,7 +463,6 @@
                   </div>
                 </div>
                 <a href="/profile" id="profile-dropdown-link"><i class="fas fa-user-circle"></i> My Profile</a>
-                <a href="/rental-history">Rental History</a>
                 <a href="/logout" id="logout-btn-dropdown">Logout</a>
               </div>
             </div>
@@ -480,6 +479,7 @@
           <h1 class="dashboard-title">Dashboard</h1>
           <div class="dashboard-actions">
             <a href="#" class="btn btn-accent" id="rent-car-btn">Rent a Car</a>
+            <a href="/rental-history" class="btn" id="rental-history-btn">Rental History</a>
             <!-- Add vehicle button - hidden by default, shown for fleet managers -->
             <button
               id="add-vehicle-btn"
@@ -1036,6 +1036,15 @@
             btn.disabled = true;
             btn.textContent = 'Processing...';
 
+
+            // Store booking data in localStorage for payment page
+            localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
+            localStorage.setItem("selectedVehicle", JSON.stringify(currentVehicle));
+
+            // Close the booking modal and redirect to payment page
+            closeBookingModal();
+            window.location.href = "/payment";
+
             fetch('/api/bookings', {
               method: 'POST',
               headers,
@@ -1063,6 +1072,7 @@
               btn.disabled = false;
               btn.textContent = 'Confirm Booking';
             });
+
           });
         }
 

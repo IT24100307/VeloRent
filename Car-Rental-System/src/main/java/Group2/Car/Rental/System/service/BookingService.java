@@ -170,4 +170,76 @@ public class BookingService {
 
         return response;
     }
+
+    /**
+     * Mark a booking as returned and set vehicle status back to Available
+     */
+    @Transactional
+    public Map<String, Object> returnBooking(Integer bookingId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
+            if (!bookingOptional.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Booking not found");
+                return response;
+            }
+
+            Booking booking = bookingOptional.get();
+
+            if ("Returned".equalsIgnoreCase(booking.getBookingStatus())) {
+                response.put("success", true);
+                response.put("message", "Vehicle already returned");
+                response.put("booking", booking);
+                return response;
+            }
+
+            // Update booking status
+            booking.setBookingStatus("Returned");
+            bookingRepository.save(booking);
+
+            // Update vehicle status to available
+            Vehicle vehicle = booking.getVehicle();
+            if (vehicle != null) {
+                vehicle.setStatus("Available");
+                vehicleRepository.save(vehicle);
+            }
+
+            response.put("success", true);
+            response.put("message", "Vehicle returned successfully");
+            response.put("booking", booking);
+            return response;
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error returning vehicle: " + e.getMessage());
+            return response;
+        }
+    }
+
+    // Build lightweight booking summaries for safe JSON serialization
+    public List<Group2.Car.Rental.System.dto.BookingSummaryDTO> getCustomerBookingSummaries(Long customerId) {
+        Optional<Customer> customerOptional = customerRepository.findByUserId(customerId);
+        if (customerOptional.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        Customer customer = customerOptional.get();
+        List<Booking> bookings = bookingRepository.findByCustomer(customer);
+        java.util.ArrayList<Group2.Car.Rental.System.dto.BookingSummaryDTO> result = new java.util.ArrayList<>();
+        for (Booking b : bookings) {
+            Vehicle v = b.getVehicle();
+            Group2.Car.Rental.System.dto.BookingSummaryDTO dto = new Group2.Car.Rental.System.dto.BookingSummaryDTO(
+                    b.getBookingId(),
+                    b.getStartDate(),
+                    b.getEndDate(),
+                    b.getBookingStatus(),
+                    b.getTotalCost(),
+                    v != null ? v.getVehicleId() : null,
+                    v != null ? v.getMake() : null,
+                    v != null ? v.getModel() : null,
+                    v != null ? v.getRegistrationNumber() : null
+            );
+            result.add(dto);
+        }
+        return result;
+    }
 }

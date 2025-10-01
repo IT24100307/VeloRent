@@ -177,6 +177,19 @@ public class AuthService {
         String roleName = user.getRole().getName();
         response.put("role", roleName);
 
+        // Add user ID and name to response
+        response.put("userId", user.getId().toString());
+        response.put("userName", user.getFirstName() + " " + user.getLastName());
+        response.put("userEmail", user.getEmail());
+
+        // For customer role, also include customerId if available
+        if (roleName.equals("ROLE_CUSTOMER") && user.getCustomer() != null) {
+            Customer customer = user.getCustomer();
+            if (customer != null && customer.getUserId() != null) {
+                response.put("customerId", customer.getUserId().toString());
+            }
+        }
+
         // Determine the redirect URL based on role
         if (roleName.equals("ROLE_CUSTOMER")) {
             response.put("redirect", "/dashboard");

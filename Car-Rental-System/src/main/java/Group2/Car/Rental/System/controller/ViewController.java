@@ -102,4 +102,9 @@ public class ViewController {
         model.addAttribute("feedbacks", feedbacks);
         return "admin/feedback";
     }
+
+    @GetMapping("/rental-history")
+    public String rentalHistory() {
+        return "rental-history";
+    }
 }

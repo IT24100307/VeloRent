@@ -99,6 +99,20 @@ async function handleLogin(event) {
                         localStorage.setItem('userName', response.data.userName);
                     }
 
+                    // Store user ID and email
+                    if (response.data.userId) {
+                        localStorage.setItem('userId', response.data.userId);
+                    }
+
+                    if (response.data.userEmail) {
+                        localStorage.setItem('userEmail', response.data.userEmail);
+                    }
+
+                    // Store customer ID if available (for customer role)
+                    if (response.data.customerId) {
+                        localStorage.setItem('customerId', response.data.customerId);
+                    }
+
                     // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = redirectUrl;

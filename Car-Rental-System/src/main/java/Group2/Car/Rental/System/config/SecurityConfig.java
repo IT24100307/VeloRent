@@ -36,7 +36,8 @@ public class SecurityConfig {
                 // Disable CSRF protection for API endpoints
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
-                                                "/api/vehicles/**", "/api/profile/**", "/profile/api/**"))
+                                                "/api/vehicles/**", "/api/profile/**", "/profile/api/**",
+                                                "/api/payments/**", "/api/bookings/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
@@ -45,12 +46,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/feedback/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
+
+                        .requestMatchers("/api/payments/**").permitAll() // Allow access to payment endpoints
+                        .requestMatchers("/api/bookings/**").permitAll() // Allow access to booking endpoints
+
                         .requestMatchers("/api/profile/**").permitAll()
+
                         .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
-                                "/fleet-manager/dashboard", "/feedback", "/admin/feedback","/profile", "/profile/**")
+                                "/fleet-manager/dashboard", "/feedback", "/admin/feedback","/profile", "/profile/**", "/payment", "/rental-history")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )

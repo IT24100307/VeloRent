@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment | Car Rental System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #2ecc71;
+        --text-color: #333;
+        --light-text: #666;
+        --background-color: #f8f9fa;
+        --card-background: #fff;
+        --border-color: #e1e1e1;
+        --danger-color: #e74c3c;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .nav-links a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .payment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .payment-title {
+        font-size: 24px;
+        color: var(--primary-color);
+      }
+
+      .dashboard-content {
+        background-color: var(--card-background);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+      }
+
+      .payment-details {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: var(--card-background);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .booking-summary {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .booking-summary h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+
+      .booking-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .info-item {
+        font-size: 14px;
+      }
+
+      .info-label {
+        font-weight: 500;
+        color: var(--light-text);
+      }
+
+      .info-value {
+        font-weight: 500;
+      }
+
+      .payment-methods {
+        margin-top: 30px;
+      }
+
+      .payment-methods h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+
+      .payment-option {
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
+
+      .payment-option:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+
+      .payment-option.selected {
+        border-color: var(--accent-color);
+        background-color: rgba(46, 204, 113, 0.05);
+      }
+
+      .payment-option-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .payment-option-radio {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--accent-color);
+      }
+
+      .payment-option-title {
+        font-weight: 500;
+        font-size: 16px;
+      }
+
+      .payment-option-details {
+        margin-top: 10px;
+        padding-left: 30px;
+        font-size: 14px;
+        color: var(--light-text);
+      }
+
+      .card-details {
+        margin-top: 15px;
+        display: none;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--light-text);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .total-section {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .total-label {
+        font-weight: 500;
+      }
+
+      .grand-total {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn:hover {
+        background-color: #34495e;
+      }
+
+      .btn-accent {
+        background-color: var(--accent-color);
+      }
+
+      .btn-accent:hover {
+        background-color: #27ae60;
+      }
+
+      .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      footer {
+        margin-top: 50px;
+        text-align: center;
+        color: var(--light-text);
+        font-size: 14px;
+        padding: 20px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .message {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .message.error {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .message.success {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <div class="logo">Car Rental System</div>
+          <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/feedback">About Us</a>
+            <a href="/security-settings">Security</a>
+            <a href="#" id="logout-btn">Logout</a>
+            <!-- Profile dropdown -->
+            <div class="profile-dropdown">
+              <div class="profile-icon" id="profile-icon">
+                <span id="user-initials">U</span>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container">
+      <main>
+        <div id="message-container"></div>
+
+        <div class="payment-header">
+          <h1 class="payment-title">Complete Your Payment</h1>
+        </div>
+
+        <div class="dashboard-content">
+          <div class="payment-details">
+            <div class="booking-summary">
+              <h3>Booking Summary</h3>
+              <div class="booking-info">
+                <div class="info-item">
+                  <div class="info-label">Vehicle:</div>
+                  <div class="info-value" id="vehicle-name">Vehicle name here</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Booking ID:</div>
+                  <div class="info-value" id="booking-id">Not yet assigned</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Start Date:</div>
+                  <div class="info-value" id="start-date">Date here</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">End Date:</div>
+                  <div class="info-value" id="end-date">Date here</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Duration:</div>
+                  <div class="info-value" id="duration">0 days</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Daily Rate:</div>
+                  <div class="info-value" id="daily-rate">Rs. 0.00</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="payment-methods">
+              <h3>Select Payment Method</h3>
+              <div class="payment-option selected" id="card-payment-option">
+                <div class="payment-option-header">
+                  <input type="radio" name="payment-method" value="card" class="payment-option-radio" checked>
+                  <div class="payment-option-title">Credit / Debit Card</div>
+                </div>
+                <div class="payment-option-details">
+                  Pay securely with your credit or debit card. We accept Visa, MasterCard, and American Express.
+                </div>
+                <div class="card-details" id="card-details" style="display: block;">
+                  <div class="form-group">
+                    <label for="card-number">Card Number</label>
+                    <input type="text" id="card-number" class="form-control" placeholder="1234 5678 9012 3456">
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="expiry-date">Expiry Date (MM/YY)</label>
+                      <input type="text" id="expiry-date" class="form-control" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                      <label for="cvv">CVV</label>
+                      <input type="text" id="cvv" class="form-control" placeholder="123">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="card-name">Cardholder Name</label>
+                    <input type="text" id="card-name" class="form-control" placeholder="John Doe">
+                  </div>
+                </div>
+              </div>
+
+              <div class="payment-option" id="cash-payment-option">
+                <div class="payment-option-header">
+                  <input type="radio" name="payment-method" value="cash" class="payment-option-radio">
+                  <div class="payment-option-title">Pay with Cash</div>
+                </div>
+                <div class="payment-option-details">
+                  Pay in cash when you pick up the vehicle. Your booking will be marked as "pending" until payment is received.
+                </div>
+              </div>
+            </div>
+
+            <div class="total-section">
+              <div class="total-row">
+                <div class="total-label">Subtotal:</div>
+                <div class="total-value" id="subtotal">Rs. 0.00</div>
+              </div>
+              <div class="total-row">
+                <div class="total-label">Tax (18%):</div>
+                <div class="total-value" id="tax">Rs. 0.00</div>
+              </div>
+              <div class="total-row grand-total">
+                <div class="total-label">Total Amount:</div>
+                <div class="total-value" id="total-amount">Rs. 0.00</div>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <a href="/dashboard" class="btn">Cancel</a>
+              <button id="confirm-payment-btn" class="btn btn-accent">Confirm Payment</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>&copy; 2025 Car Rental System. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Check if user is logged in
+        const token = localStorage.getItem("token");
+        if (!token) {
+          window.location.href = "/login?message=" + encodeURIComponent("Please log in to access the payment page") + "&type=error";
+          return;
+        }
+
+        // Ensure we have user/customer identifiers in localStorage
+        async function ensureUserIdentifiers() {
+          const haveUserId = !!localStorage.getItem("userId");
+          const haveCustomerId = !!localStorage.getItem("customerId");
+          if (haveUserId && haveCustomerId) return; // already present
+          try {
+            const res = await fetch('/api/auth/me', {
+              method: 'GET',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) return;
+            const json = await res.json();
+            if (json && json.success && json.data) {
+              if (json.data.userId) localStorage.setItem('userId', json.data.userId);
+              if (json.data.userEmail) localStorage.setItem('userEmail', json.data.userEmail);
+              if (json.data.userName) localStorage.setItem('userName', json.data.userName);
+              if (json.data.customerId) localStorage.setItem('customerId', json.data.customerId);
+            }
+          } catch (_) { /* ignore */ }
+        }
+
+        // Kick off identifiers fetch (non-blocking)
+        ensureUserIdentifiers();
+
+        // Get booking data from localStorage
+        const bookingData = JSON.parse(localStorage.getItem("pendingBooking"));
+        const vehicleData = JSON.parse(localStorage.getItem("selectedVehicle"));
+
+        if (!bookingData || !vehicleData) {
+          window.location.href = "/dashboard?message=" + encodeURIComponent("Booking data not found. Please try again.") + "&type=error";
+          return;
+        }
+
+        // Fill in booking summary
+        document.getElementById("vehicle-name").textContent = `${vehicleData.make} ${vehicleData.model} (${vehicleData.year})`;
+
+        // Format dates for display
+        const startDate = new Date(bookingData.startDate);
+        const endDate = new Date(bookingData.endDate);
+        document.getElementById("start-date").textContent = startDate.toLocaleDateString();
+        document.getElementById("end-date").textContent = endDate.toLocaleDateString();
+
+        // Calculate duration
+        const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        document.getElementById("duration").textContent = `${duration} days`;
+
+        // Display rate
+        const dailyRate = vehicleData.has_discount ? vehicleData.discountedRatePerDay : vehicleData.rentalRatePerDay;
+        document.getElementById("daily-rate").textContent = `Rs. ${dailyRate}`;
+
+        // Calculate totals
+        const subtotal = bookingData.totalCost;
+        document.getElementById("subtotal").textContent = `Rs. ${subtotal}`;
+
+        const tax = subtotal * 0.18;
+        document.getElementById("tax").textContent = `Rs. ${tax.toFixed(2)}`;
+
+        const totalAmount = parseFloat(subtotal) + tax;
+        document.getElementById("total-amount").textContent = `Rs. ${totalAmount.toFixed(2)}`;
+
+        // Toggle payment options
+        const cardOption = document.getElementById("card-payment-option");
+        const cashOption = document.getElementById("cash-payment-option");
+        const cardDetails = document.getElementById("card-details");
+
+        cardOption.addEventListener("click", () => {
+          cardOption.classList.add("selected");
+          cashOption.classList.remove("selected");
+          cardOption.querySelector("input").checked = true;
+          cardDetails.style.display = "block";
+        });
+
+        cashOption.addEventListener("click", () => {
+          cashOption.classList.add("selected");
+          cardOption.classList.remove("selected");
+          cashOption.querySelector("input").checked = true;
+          cardDetails.style.display = "none";
+        });
+
+        // Handle payment submission
+        document.getElementById("confirm-payment-btn").addEventListener("click", async () => {
+          // Get selected payment method
+          const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+          // If card payment, validate card details
+          if (paymentMethod === "card") {
+            const cardNumber = document.getElementById("card-number").value;
+            const expiryDate = document.getElementById("expiry-date").value;
+            const cvv = document.getElementById("cvv").value;
+            const cardName = document.getElementById("card-name").value;
+
+            if (!cardNumber || !expiryDate || !cvv || !cardName) {
+              showMessage("Please fill in all card details.", "error");
+              return;
+            }
+
+            // Basic validation
+            if (cardNumber.replace(/\s/g, '').length !== 16) {
+              showMessage("Please enter a valid 16-digit card number.", "error");
+              return;
+            }
+
+            if (!/^\d{3,4}$/.test(cvv)) {
+              showMessage("Please enter a valid CVV.", "error");
+              return;
+            }
+
+            if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+              showMessage("Please enter a valid expiry date (MM/YY).", "error");
+              return;
+            }
+          }
+
+          try {
+            // Disable button to prevent multiple submissions
+            const confirmBtn = document.getElementById("confirm-payment-btn");
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "Processing...";
+
+            // Determine correct ID to send (BookingService expects USER ID under bookingData.customerId)
+            let storedCustomerId = localStorage.getItem("customerId");
+            let storedUserId = localStorage.getItem("userId");
+            let idToUse = bookingData.customerId || storedCustomerId || storedUserId;
+
+            // If missing, try to fetch from /api/auth/me and re-check
+            if (!idToUse) {
+              await ensureUserIdentifiers();
+              storedCustomerId = localStorage.getItem("customerId");
+              storedUserId = localStorage.getItem("userId");
+              idToUse = bookingData.customerId || storedCustomerId || storedUserId;
+            }
+
+            if (!idToUse) {
+              showMessage("Customer ID not found. Please try logging in again.", "error");
+              confirmBtn.disabled = false;
+              confirmBtn.textContent = "Confirm Payment";
+              return;
+            }
+
+            // Ensure numeric
+            bookingData.customerId = parseInt(idToUse);
+
+            console.log("Creating booking with data:", JSON.stringify(bookingData));
+            const bookingResponse = await fetch('/api/bookings', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(bookingData)
+            });
+
+            // Log the raw response for debugging
+            const bookingResponseText = await bookingResponse.text();
+            console.log("Raw booking response:", bookingResponseText);
+
+            // Parse the response
+            let bookingResult;
+            try {
+              bookingResult = JSON.parse(bookingResponseText);
+            } catch (e) {
+              console.error("Error parsing booking response:", e);
+              throw new Error("Invalid booking response format");
+            }
+
+            if (!bookingResponse.ok) {
+              throw new Error('Booking failed: ' + (bookingResult.message || 'Unknown error'));
+            }
+
+            // Extract bookingId from payload which is { success, booking: { bookingId, ... } }
+            const bookingPayload = bookingResult.booking || bookingResult;
+            const createdBookingId = bookingPayload.bookingId;
+            if (!createdBookingId) {
+              showMessage("Booking creation failed. No booking ID returned.", "error");
+              confirmBtn.disabled = false;
+              confirmBtn.textContent = "Confirm Payment";
+              return;
+            }
+
+            // Update booking ID display
+            document.getElementById("booking-id").textContent = createdBookingId;
+
+            // Now process payment
+            const paymentRequest = {
+              bookingId: createdBookingId,
+              paymentMethod: paymentMethod,
+              amount: totalAmount.toFixed(2)
+            };
+
+            console.log("Processing payment with data:", JSON.stringify(paymentRequest));
+            const paymentResponse = await fetch('/api/payments', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(paymentRequest)
+            });
+
+            // Log the raw response for debugging
+            const paymentResponseText = await paymentResponse.text();
+            console.log("Raw payment response:", paymentResponseText);
+
+            // Parse the response
+            let paymentResult;
+            try {
+              paymentResult = JSON.parse(paymentResponseText);
+            } catch (e) {
+              console.error("Error parsing payment response:", e);
+              throw new Error("Invalid payment response format");
+            }
+
+            if (!paymentResponse.ok) {
+              throw new Error('Payment failed: ' + (paymentResult.message || 'Unknown error'));
+            }
+
+            // Handle successful payment
+            showMessage("Payment processed successfully! Redirecting to dashboard...", "success");
+
+            // Clear booking data from localStorage
+            localStorage.removeItem("pendingBooking");
+            localStorage.removeItem("selectedVehicle");
+
+            // Redirect after a short delay
+            setTimeout(() => {
+              window.location.href = "/dashboard?message=" +
+                encodeURIComponent(`Your booking has been ${paymentMethod === 'card' ? 'confirmed' : 'placed and is pending payment'}.`) +
+                "&type=success";
+            }, 2000);
+
+          } catch (error) {
+            console.error('Error during booking/payment:', error);
+            showMessage(error.message || "An error occurred. Please try again later.", "error");
+            document.getElementById("confirm-payment-btn").disabled = false;
+            document.getElementById("confirm-payment-btn").textContent = "Confirm Payment";
+          }
+        });
+
+        // Helper function to show messages
+        function showMessage(message, type) {
+          const messageContainer = document.getElementById("message-container");
+          messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+
+          // Scroll to top to show message
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Set user initials in profile icon if available
+        const userName = localStorage.getItem("userName") || "User";
+        const userInitials = userName
+          .split(" ")
+          .map((n) => n.charAt(0))
+          .join("")
+          .toUpperCase();
+        document.getElementById("user-initials").textContent = userInitials;
+
+        // Setup logout button
+        document.getElementById("logout-btn").addEventListener("click", (e) => {
+          e.preventDefault();
+          localStorage.removeItem("token");
+          localStorage.removeItem("userRole");
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userName");
+          window.location.href = "/login?message=" + encodeURIComponent("You have been logged out") + "&type=success";
+        });
+      });
+    </script>
+  </body>
+</html>
