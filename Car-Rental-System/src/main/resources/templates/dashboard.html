@@ -631,6 +631,9 @@
       </footer>
     </div>
 
+    <!-- Scripts -->
+    <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // Check if user is logged in
@@ -1009,83 +1012,68 @@
             const vehicleId = document.getElementById("booking-vehicle-id").value;
             const totalCost = document.getElementById("booking-total-cost").value;
 
-            // Get user ID from localStorage if available
-            const userId = localStorage.getItem("userId");
-
             if (!startDate || !endDate) {
-              showBookingMessage("Please select both start and end dates.", "error");
-              return;
+                showBookingMessage("Please select both start and end dates.", "error");
+                return;
             }
 
-            // Create booking object
+            // Build booking request (no payments)
             const bookingData = {
-              startDate: new Date(startDate).toISOString(),
-              endDate: new Date(endDate).toISOString(),
-              vehicleId: parseInt(vehicleId),
-              totalCost: parseFloat(totalCost),
-              customerId: userId
+              startDate: startDate,
+              endDate: endDate,
+              vehicleId: vehicleId,
+              totalCost: totalCost
             };
 
-            // Disable submit button and show loading
-            const submitButton = document.getElementById("confirm-booking-btn");
-            submitButton.disabled = true;
-            submitButton.innerHTML = "Processing...";
+            const token = localStorage.getItem("token");
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            // Submit the booking data to the server
+            // Disable button while processing
+            const btn = document.getElementById('confirm-booking-btn');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
             fetch('/api/bookings', {
               method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              },
+              headers,
               body: JSON.stringify(bookingData)
             })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Booking failed');
-              }
-              return response.json();
+            .then(async (r) => {
+              let data = null; try { data = await r.json(); } catch(_) {}
+              if (!r.ok) throw new Error((data && data.message) || 'Booking failed');
+              return data;
             })
-            .then(data => {
-              showBookingMessage("Booking confirmed! Redirecting to your bookings page...", "success");
-
-              // Update vehicle status in the global array
-              if (currentVehicle) {
-                currentVehicle.status = "Booked";
-                // Refresh the vehicle list to reflect the new status
-                setTimeout(() => {
-                  loadAvailableVehicles();
-                  closeBookingModal();
-
-                  // Redirect to bookings page or reload dashboard
-                  window.location.href = "/dashboard?message=" +
-                    encodeURIComponent("Your booking has been confirmed!") +
-                    "&type=success";
-                }, 2000);
-              }
+            .then((data) => {
+              showBookingMessage('Booking confirmed successfully.', 'success');
+              // Close modal after short delay
+              setTimeout(() => {
+                closeBookingModal();
+                // Optional: redirect or refresh
+                window.location.href = '/dashboard?message=' + encodeURIComponent('Booking confirmed') + '&type=success';
+              }, 1200);
             })
-            .catch(error => {
-              console.error('Error during booking:', error);
-              showBookingMessage("An error occurred. Please try again later.", "error");
-              submitButton.disabled = false;
-              submitButton.innerHTML = "Confirm Booking";
+            .catch((err) => {
+              console.error(err);
+              showBookingMessage(err.message || 'Booking failed. Please try again.', 'error');
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.textContent = 'Confirm Booking';
             });
           });
         }
 
-        function showBookingMessage(message, type) {
-          const messageContainer = document.getElementById("booking-message");
-          messageContainer.textContent = message;
-          messageContainer.className = `message ${type}`;
-          messageContainer.style.display = "block";
-
-          if (type !== "error") {
-            // Hide message after 5 seconds for non-error messages
-            setTimeout(() => {
-              messageContainer.style.display = "none";
-            }, 5000);
-          }
+        function showBookingMessage(text, type) {
+          const el = document.getElementById('booking-message');
+          el.textContent = text;
+          el.className = 'message ' + (type || 'info');
+          el.style.display = 'block';
         }
+
+        // Removed: All payment-related functions (showPaymentModal, handlePaymentSubmission, card validation, etc.)
       });
     </script>
   </body>
