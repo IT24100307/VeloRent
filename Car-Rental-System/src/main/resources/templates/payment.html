@@ -588,9 +588,21 @@
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
               },
-              body: JSON.stringify(bookingData)
+              // Normalize payload: LocalDateTime format and numeric ids/amounts
+              body: JSON.stringify({
+                startDate: (typeof bookingData.startDate === 'string' && !bookingData.startDate.includes('T'))
+                  ? `${bookingData.startDate}T00:00:00`
+                  : bookingData.startDate,
+                endDate: (typeof bookingData.endDate === 'string' && !bookingData.endDate.includes('T'))
+                  ? `${bookingData.endDate}T00:00:00`
+                  : bookingData.endDate,
+                totalCost: (typeof bookingData.totalCost === 'string') ? Number(bookingData.totalCost) : bookingData.totalCost,
+                vehicleId: parseInt(bookingData.vehicleId, 10),
+                customerId: parseInt(bookingData.customerId, 10)
+              })
             });
 
             // Log the raw response for debugging
