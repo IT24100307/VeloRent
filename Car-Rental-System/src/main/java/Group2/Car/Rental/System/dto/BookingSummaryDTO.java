@@ -13,9 +13,11 @@ public class BookingSummaryDTO {
     private String vehicleMake;
     private String vehicleModel;
     private String registrationNumber;
+    private String imageUrl; // New field for vehicle image URL
 
     public BookingSummaryDTO() {}
 
+    // Backward-compatible constructor (without imageUrl)
     public BookingSummaryDTO(Integer bookingId, LocalDateTime startDate, LocalDateTime endDate, String bookingStatus,
                              BigDecimal totalCost, Integer vehicleId, String vehicleMake, String vehicleModel, String registrationNumber) {
         this.bookingId = bookingId;
@@ -27,6 +29,14 @@ public class BookingSummaryDTO {
         this.vehicleMake = vehicleMake;
         this.vehicleModel = vehicleModel;
         this.registrationNumber = registrationNumber;
+    }
+
+    // New constructor including imageUrl
+    public BookingSummaryDTO(Integer bookingId, LocalDateTime startDate, LocalDateTime endDate, String bookingStatus,
+                             BigDecimal totalCost, Integer vehicleId, String vehicleMake, String vehicleModel,
+                             String registrationNumber, String imageUrl) {
+        this(bookingId, startDate, endDate, bookingStatus, totalCost, vehicleId, vehicleMake, vehicleModel, registrationNumber);
+        this.imageUrl = imageUrl;
     }
 
     public Integer getBookingId() { return bookingId; }
@@ -47,4 +57,7 @@ public class BookingSummaryDTO {
     public void setVehicleModel(String vehicleModel) { this.vehicleModel = vehicleModel; }
     public String getRegistrationNumber() { return registrationNumber; }
     public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

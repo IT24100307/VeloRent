@@ -32,4 +32,11 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
         LocalDateTime endCheck,
         LocalDateTime startCheck,
         String status);
+
+    // New: overlap check excluding multiple non-blocking statuses (e.g., Cancelled, Returned)
+    List<Booking> findByVehicleAndStartDateBeforeAndEndDateAfterAndBookingStatusNotIn(
+        Vehicle vehicle,
+        LocalDateTime endCheck,
+        LocalDateTime startCheck,
+        List<String> statuses);
 }

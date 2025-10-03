@@ -1,6 +1,7 @@
 package Group2.Car.Rental.System.controller;
 
 import Group2.Car.Rental.System.dto.UserProfileDTO;
+import Group2.Car.Rental.System.entity.User;
 import Group2.Car.Rental.System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -23,15 +24,12 @@ public class ProfileController {
             Authentication authentication,
             @RequestParam(required = false) String email) {
 
-        // Use either the email from the request parameter or from authentication
-        String userEmail;
-        boolean isAuthenticated = false;
-
+        // Determine which user's profile to show: either explicit email or the authenticated user
+        String userEmail = null;
         if (email != null && !email.isEmpty()) {
             userEmail = email;
         } else if (authentication != null && authentication.isAuthenticated()) {
             userEmail = authentication.getName();
-            isAuthenticated = true;
         } else {
             // If no email provided and not authenticated, redirect to login
             return "redirect:/login?message=Please log in to view your profile&type=error";
@@ -42,13 +40,31 @@ public class ProfileController {
             return "redirect:/dashboard?message=Profile not found&type=error";
         }
 
-        // Get profile data
+        // Fetch profile data for the requested user
         UserProfileDTO profile = userService.getUserProfile(userEmail);
-
         model.addAttribute("profile", profile);
-        model.addAttribute("isCustomer",
-                isAuthenticated && authentication.getAuthorities().stream()
-                        .anyMatch(auth -> auth.getAuthority().equals("CUSTOMER")));
+
+        // Determine if the requested user is a customer (not just the authenticated principal)
+        boolean isCustomer = false;
+        try {
+            User targetUser = userService.getUserByEmail(userEmail);
+            if (targetUser != null) {
+                // Consider either role name or existence of a Customer record
+                String roleName = (targetUser.getRole() != null) ? targetUser.getRole().getName() : null;
+                if (roleName != null) {
+                    String rn = roleName.trim();
+                    isCustomer = rn.equals("CUSTOMER") || rn.equals("ROLE_CUSTOMER") || rn.contains("CUSTOMER");
+                }
+                // Fallback: if a Customer record exists, also treat as customer
+                if (!isCustomer && targetUser.getCustomer() != null) {
+                    isCustomer = true;
+                }
+            }
+        } catch (Exception ignored) {
+            // If anything goes wrong determining role, default to non-customer
+        }
+
+        model.addAttribute("isCustomer", isCustomer);
 
         return "profile";
     }

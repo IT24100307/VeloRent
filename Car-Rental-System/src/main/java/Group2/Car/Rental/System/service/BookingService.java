@@ -71,8 +71,8 @@ public class BookingService {
             LocalDateTime startDate = bookingRequest.getStartDate();
             LocalDateTime endDate = bookingRequest.getEndDate();
 
-            List<Booking> overlappingBookings = bookingRepository.findByVehicleAndStartDateBeforeAndEndDateAfterAndBookingStatusNot(
-                vehicle, endDate, startDate, "Cancelled");
+            List<Booking> overlappingBookings = bookingRepository.findByVehicleAndStartDateBeforeAndEndDateAfterAndBookingStatusNotIn(
+                vehicle, endDate, startDate, java.util.Arrays.asList("Cancelled", "Returned"));
 
             if (!overlappingBookings.isEmpty()) {
                 response.put("success", false);
@@ -97,7 +97,16 @@ public class BookingService {
             vehicleRepository.save(vehicle);
 
             response.put("success", true);
-            response.put("booking", savedBooking);
+            // Return a lightweight booking payload to avoid serialization issues
+            Map<String, Object> bookingPayload = new HashMap<>();
+            bookingPayload.put("bookingId", savedBooking.getBookingId());
+            bookingPayload.put("startDate", savedBooking.getStartDate());
+            bookingPayload.put("endDate", savedBooking.getEndDate());
+            bookingPayload.put("bookingStatus", savedBooking.getBookingStatus());
+            bookingPayload.put("totalCost", savedBooking.getTotalCost());
+            bookingPayload.put("vehicleId", vehicle.getVehicleId());
+            bookingPayload.put("customerId", customer.getUserId());
+            response.put("booking", bookingPayload);
             response.put("message", "Booking successfully created");
 
         } catch (Exception e) {
@@ -190,7 +199,13 @@ public class BookingService {
             if ("Returned".equalsIgnoreCase(booking.getBookingStatus())) {
                 response.put("success", true);
                 response.put("message", "Vehicle already returned");
-                response.put("booking", booking);
+                // return lightweight payload
+                Map<String, Object> retPayload = new HashMap<>();
+                retPayload.put("bookingId", booking.getBookingId());
+                retPayload.put("bookingStatus", booking.getBookingStatus());
+                Vehicle v = booking.getVehicle();
+                retPayload.put("vehicleId", v != null ? v.getVehicleId() : null);
+                response.put("booking", retPayload);
                 return response;
             }
 
@@ -207,7 +222,12 @@ public class BookingService {
 
             response.put("success", true);
             response.put("message", "Vehicle returned successfully");
-            response.put("booking", booking);
+            // Lightweight payload
+            Map<String, Object> retPayload = new HashMap<>();
+            retPayload.put("bookingId", booking.getBookingId());
+            retPayload.put("bookingStatus", booking.getBookingStatus());
+            retPayload.put("vehicleId", vehicle != null ? vehicle.getVehicleId() : null);
+            response.put("booking", retPayload);
             return response;
         } catch (Exception e) {
             response.put("success", false);
@@ -236,7 +256,8 @@ public class BookingService {
                     v != null ? v.getVehicleId() : null,
                     v != null ? v.getMake() : null,
                     v != null ? v.getModel() : null,
-                    v != null ? v.getRegistrationNumber() : null
+                    v != null ? v.getRegistrationNumber() : null,
+                    v != null ? v.getImageUrl() : null
             );
             result.add(dto);
         }
