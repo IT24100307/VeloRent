@@ -12,4 +12,9 @@ public class FleetManagerController {
     public String fleetManagerDashboard() {
         return "fleet-manager-dashboard";
     }
+
+    @GetMapping("/packages")
+    public String fleetManagerPackages() {
+        return "fleet-manager-packages";
+    }
 }
