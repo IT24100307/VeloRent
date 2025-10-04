@@ -1,17 +1,23 @@
 package Group2.Car.Rental.System.service;
 
 import Group2.Car.Rental.System.dto.BookingRequest;
+import Group2.Car.Rental.System.dto.PackageBookingRequest;
+import Group2.Car.Rental.System.dto.BookingResponse;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Vehicle;
+import Group2.Car.Rental.System.entity.VehiclePackage;
 import Group2.Car.Rental.System.repository.BookingRepository;
 import Group2.Car.Rental.System.repository.CustomerRepository;
 import Group2.Car.Rental.System.repository.VehicleRepository;
+import Group2.Car.Rental.System.repository.VehiclePackageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +34,9 @@ public class BookingService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private VehiclePackageRepository vehiclePackageRepository;
 
     /**
      * Create a new booking
@@ -118,6 +127,111 @@ public class BookingService {
     }
 
     /**
+     * Create a new package booking
+     * @param packageBookingRequest the package booking request DTO
+     * @param customerId the customer ID from authentication
+     * @return a map containing success status and the created booking or error message
+     */
+    @Transactional
+    public Map<String, Object> createPackageBooking(PackageBookingRequest packageBookingRequest, Integer customerId) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Get the package
+            Optional<VehiclePackage> packageOptional = vehiclePackageRepository.findById(packageBookingRequest.getPackageId());
+            if (!packageOptional.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Package not found");
+                return response;
+            }
+
+            VehiclePackage vehiclePackage = packageOptional.get();
+
+            // Check if package is active
+            if (!"Activated".equalsIgnoreCase(vehiclePackage.getStatus())) {
+                response.put("success", false);
+                response.put("message", "Package is not available for booking");
+                return response;
+            }
+
+            // Get the customer
+            Optional<Customer> customerOptional = customerRepository.findByUserId(customerId.longValue());
+            if (!customerOptional.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Customer not found");
+                return response;
+            }
+
+            Customer customer = customerOptional.get();
+
+            // Validate dates
+            if (packageBookingRequest.getStartDate().isAfter(packageBookingRequest.getEndDate())) {
+                response.put("success", false);
+                response.put("message", "Start date must be before end date");
+                return response;
+            }
+
+            if (packageBookingRequest.getStartDate().isBefore(LocalDateTime.now())) {
+                response.put("success", false);
+                response.put("message", "Start date cannot be in the past");
+                return response;
+            }
+
+            // Calculate total cost based on package duration and price
+            long daysBetween = ChronoUnit.DAYS.between(
+                packageBookingRequest.getStartDate().toLocalDate(),
+                packageBookingRequest.getEndDate().toLocalDate()
+            );
+
+            // For packages, we can either charge per day or use the fixed package price
+            // Here I'm using the package price as base and multiply by days if needed
+            BigDecimal totalCost = vehiclePackage.getPrice();
+            if (daysBetween > vehiclePackage.getDuration()) {
+                // If booking is longer than package duration, calculate additional cost
+                BigDecimal dailyRate = vehiclePackage.getPrice().divide(BigDecimal.valueOf(vehiclePackage.getDuration()));
+                BigDecimal additionalDays = BigDecimal.valueOf(daysBetween - vehiclePackage.getDuration());
+                totalCost = totalCost.add(dailyRate.multiply(additionalDays));
+            }
+
+            // Create the booking
+            Booking booking = new Booking(
+                packageBookingRequest.getStartDate(),
+                packageBookingRequest.getEndDate(),
+                totalCost,
+                customer,
+                vehiclePackage
+            );
+
+            // Save the booking
+            Booking savedBooking = bookingRepository.save(booking);
+
+            // Create response
+            BookingResponse bookingResponse = new BookingResponse(
+                savedBooking.getBookingId(),
+                "PACKAGE",
+                savedBooking.getStartDate(),
+                savedBooking.getEndDate(),
+                savedBooking.getTotalCost(),
+                savedBooking.getBookingStatus(),
+                customer.getUser().getFirstName() + " " + customer.getUser().getLastName(),
+                vehiclePackage.getPackageName(),
+                savedBooking.getCreatedAt()
+            );
+
+            response.put("success", true);
+            response.put("message", "Package booking created successfully");
+            response.put("booking", bookingResponse);
+
+            return response;
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error creating booking: " + e.getMessage());
+            return response;
+        }
+    }
+
+    /**
      * Get all bookings for a specific customer
      * @param customerId the customer's ID
      * @return list of bookings
@@ -131,6 +245,15 @@ public class BookingService {
     }
 
     /**
+     * Get all package bookings for a customer
+     * @param customerId the customer ID
+     * @return list of package bookings
+     */
+    public List<Booking> getPackageBookingsByCustomer(Integer customerId) {
+        return bookingRepository.findPackageBookingsByCustomer(customerId);
+    }
+
+    /**
      * Get all bookings for a specific vehicle
      * @param vehicleId the vehicle ID
      * @return list of bookings
@@ -141,6 +264,15 @@ public class BookingService {
             return bookingRepository.findByVehicle(vehicleOptional.get());
         }
         return List.of();
+    }
+
+    /**
+     * Get booking by ID
+     * @param bookingId the booking ID
+     * @return booking if found
+     */
+    public Optional<Booking> getBookingById(Integer bookingId) {
+        return bookingRepository.findById(bookingId);
     }
 
     /**

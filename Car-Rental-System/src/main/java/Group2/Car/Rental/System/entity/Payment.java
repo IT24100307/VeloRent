@@ -24,6 +24,12 @@ public class Payment {
     @Column(name = "payment_method", nullable = false)
     private String paymentMethod;
 
+    @Column(name = "payment_status")
+    private String paymentStatus = "Completed";
+
+    @Column(name = "transaction_id")
+    private String transactionId;
+
     @OneToOne
     @JoinColumn(name = "booking_id", unique = true, nullable = false)
     private Booking booking;
@@ -38,6 +44,18 @@ public class Payment {
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.booking = booking;
+        this.paymentStatus = "Completed";
+    }
+
+    // Constructor with transaction ID
+    public Payment(LocalDateTime paymentDate, BigDecimal amount, String paymentMethod,
+                  String transactionId, Booking booking) {
+        this.paymentDate = paymentDate;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.transactionId = transactionId;
+        this.booking = booking;
+        this.paymentStatus = "Completed";
     }
 
     // Getters and setters
@@ -71,6 +89,22 @@ public class Payment {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     public Booking getBooking() {
