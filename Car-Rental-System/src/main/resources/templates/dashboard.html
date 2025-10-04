@@ -882,6 +882,7 @@
     <!-- Scripts -->
     <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/dashboard-vehicles.js}"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // Check if user is logged in
@@ -1003,8 +1004,6 @@
           vehicleSearch.addEventListener("input", filterVehicles);
         }
 
-        // Global vehicles array to hold all vehicles
-        let allVehicles = [];
 
         function loadActivePackages() {
           const track = document.getElementById('packages-track');
