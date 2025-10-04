@@ -326,35 +326,35 @@
         <div id="message-container"></div>
 
         <div class="payment-header">
-          <h1 class="payment-title">Complete Your Payment</h1>
+          <h1 class="payment-title" id="payment-title">Complete Your Payment</h1>
         </div>
 
         <div class="dashboard-content">
           <div class="payment-details">
             <div class="booking-summary">
-              <h3>Booking Summary</h3>
-              <div class="booking-info">
-                <div class="info-item">
+              <h3 id="summary-title">Booking Summary</h3>
+              <div class="booking-info" id="booking-info-grid">
+                <div class="info-item" id="vehicle-row">
                   <div class="info-label">Vehicle:</div>
                   <div class="info-value" id="vehicle-name">Vehicle name here</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="booking-id-row">
                   <div class="info-label">Booking ID:</div>
                   <div class="info-value" id="booking-id">Not yet assigned</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="start-date-row">
                   <div class="info-label">Start Date:</div>
                   <div class="info-value" id="start-date">Date here</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="end-date-row">
                   <div class="info-label">End Date:</div>
                   <div class="info-value" id="end-date">Date here</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="duration-row">
                   <div class="info-label">Duration:</div>
                   <div class="info-value" id="duration">0 days</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="rate-row">
                   <div class="info-label">Daily Rate:</div>
                   <div class="info-value" id="daily-rate">Rs. 0.00</div>
                 </div>
@@ -441,6 +441,9 @@
           return;
         }
 
+        const params = new URLSearchParams(window.location.search);
+        const isPackageMode = params.get('mode') === 'package';
+
         // Ensure we have user/customer identifiers in localStorage
         async function ensureUserIdentifiers() {
           const haveUserId = !!localStorage.getItem("userId");
@@ -465,7 +468,120 @@
         // Kick off identifiers fetch (non-blocking)
         ensureUserIdentifiers();
 
-        // Get booking data from localStorage
+        // Toggle payment options
+        const cardOption = document.getElementById("card-payment-option");
+        const cashOption = document.getElementById("cash-payment-option");
+        const cardDetails = document.getElementById("card-details");
+
+        cardOption.addEventListener("click", () => {
+          cardOption.classList.add("selected");
+          cashOption.classList.remove("selected");
+          cardOption.querySelector("input").checked = true;
+          cardDetails.style.display = "block";
+        });
+
+        cashOption.addEventListener("click", () => {
+          cashOption.classList.add("selected");
+          cardOption.classList.remove("selected");
+          cashOption.querySelector("input").checked = true;
+          cardDetails.style.display = "none";
+        });
+
+        // Set user initials in profile icon if available
+        const userName = localStorage.getItem("userName") || "User";
+        const userInitials = userName
+          .split(" ")
+          .map((n) => n.charAt(0))
+          .join("")
+          .toUpperCase();
+        document.getElementById("user-initials").textContent = userInitials;
+
+        function setTotals(subtotal) {
+          document.getElementById("subtotal").textContent = `Rs. ${Number(subtotal).toFixed(2)}`;
+          const tax = Number(subtotal) * 0.18;
+          document.getElementById("tax").textContent = `Rs. ${tax.toFixed(2)}`;
+          const totalAmount = Number(subtotal) + tax;
+          document.getElementById("total-amount").textContent = `Rs. ${totalAmount.toFixed(2)}`;
+          return totalAmount;
+        }
+
+        if (isPackageMode) {
+          // Package purchase flow
+          document.getElementById('payment-title').textContent = 'Purchase Package';
+          document.getElementById('summary-title').textContent = 'Package Summary';
+
+          const pkg = JSON.parse(localStorage.getItem('selectedPackage'));
+          if (!pkg) {
+            window.location.href = "/dashboard?message=" + encodeURIComponent("Package selection not found. Please try again.") + "&type=error";
+            return;
+          }
+
+          // Fill in summary
+          document.getElementById('vehicle-name').textContent = `${pkg.packageName} (${pkg.duration} days)`;
+          // Hide irrelevant rows
+          ['booking-id-row','start-date-row','end-date-row','duration-row','rate-row'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.style.display = 'none';
+          });
+          // Totals from package price
+          const totalAmount = setTotals(pkg.price || 0);
+
+          document.getElementById('confirm-payment-btn').addEventListener('click', async () => {
+            // Get selected payment method
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+            // If card payment, validate card details
+            if (paymentMethod === "card") {
+              const cardNumber = document.getElementById("card-number").value;
+              const expiryDate = document.getElementById("expiry-date").value;
+              const cvv = document.getElementById("cvv").value;
+              const cardName = document.getElementById("card-name").value;
+
+              if (!cardNumber || !expiryDate || !cvv || !cardName) {
+                showMessage("Please fill in all card details.", "error");
+                return;
+              }
+              if (cardNumber.replace(/\s/g, '').length !== 16) {
+                showMessage("Please enter a valid 16-digit card number.", "error");
+                return;
+              }
+              if (!/^\d{3,4}$/.test(cvv)) {
+                showMessage("Please enter a valid CVV.", "error");
+                return;
+              }
+              if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+                showMessage("Please enter a valid expiry date (MM/YY).", "error");
+                return;
+              }
+            }
+
+            // Simulate successful purchase (no backend endpoint yet for packages)
+            const confirmBtn = document.getElementById('confirm-payment-btn');
+            confirmBtn.disabled = true; confirmBtn.textContent = 'Processing...';
+
+            // Optionally record a simple client-side receipt
+            const receipt = {
+              type: 'PACKAGE',
+              packageId: pkg.packageId,
+              packageName: pkg.packageName,
+              amount: Number(pkg.price || 0),
+              duration: pkg.duration,
+              paidAt: new Date().toISOString(),
+              method: paymentMethod
+            };
+            localStorage.setItem('lastPackageReceipt', JSON.stringify(receipt));
+            localStorage.removeItem('selectedPackage');
+
+            showMessage("Package purchase successful! Redirecting to dashboard...", "success");
+            setTimeout(() => {
+              window.location.href = "/dashboard?message=" + encodeURIComponent("Your package purchase is confirmed.") + "&type=success";
+            }, 1500);
+          });
+
+          // Done setting up package mode
+          return;
+        }
+
+        // Vehicle booking payment flow (existing)
         const bookingData = JSON.parse(localStorage.getItem("pendingBooking"));
         const vehicleData = JSON.parse(localStorage.getItem("selectedVehicle"));
 
@@ -493,32 +609,7 @@
 
         // Calculate totals
         const subtotal = bookingData.totalCost;
-        document.getElementById("subtotal").textContent = `Rs. ${subtotal}`;
-
-        const tax = subtotal * 0.18;
-        document.getElementById("tax").textContent = `Rs. ${tax.toFixed(2)}`;
-
-        const totalAmount = parseFloat(subtotal) + tax;
-        document.getElementById("total-amount").textContent = `Rs. ${totalAmount.toFixed(2)}`;
-
-        // Toggle payment options
-        const cardOption = document.getElementById("card-payment-option");
-        const cashOption = document.getElementById("cash-payment-option");
-        const cardDetails = document.getElementById("card-details");
-
-        cardOption.addEventListener("click", () => {
-          cardOption.classList.add("selected");
-          cashOption.classList.remove("selected");
-          cardOption.querySelector("input").checked = true;
-          cardDetails.style.display = "block";
-        });
-
-        cashOption.addEventListener("click", () => {
-          cashOption.classList.add("selected");
-          cardOption.classList.remove("selected");
-          cashOption.querySelector("input").checked = true;
-          cardDetails.style.display = "none";
-        });
+        const totalAmount = setTotals(subtotal);
 
         // Handle payment submission
         document.getElementById("confirm-payment-btn").addEventListener("click", async () => {
@@ -700,14 +791,6 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Set user initials in profile icon if available
-        const userName = localStorage.getItem("userName") || "User";
-        const userInitials = userName
-          .split(" ")
-          .map((n) => n.charAt(0))
-          .join("")
-          .toUpperCase();
-        document.getElementById("user-initials").textContent = userInitials;
 
         // Setup logout button
         document.getElementById("logout-btn").addEventListener("click", (e) => {
