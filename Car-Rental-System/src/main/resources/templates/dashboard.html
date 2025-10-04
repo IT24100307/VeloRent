@@ -756,26 +756,6 @@
               </div>
 
               <div class="form-group">
-                <label>Customer Details</label>
-                <div class="form-row">
-                  <div class="form-col">
-                    <input type="text" id="customer-name" class="form-control" placeholder="Full Name" required>
-                  </div>
-                  <div class="form-col">
-                    <input type="email" id="customer-email" class="form-control" placeholder="Email Address" required>
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-col">
-                    <input type="tel" id="customer-phone" class="form-control" placeholder="Phone Number" required>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <textarea id="customer-address" class="form-control" placeholder="Address" rows="3" required></textarea>
-                </div>
-              </div>
-
-              <div class="form-group">
                 <label>Cost Calculation</label>
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                   <tr>
@@ -880,6 +860,7 @@
     </div>
 
     <!-- Scripts -->
+    <script th:src="@{/js/package-booking-fix.js}"></script>
     <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/dashboard-vehicles.js}"></script>
@@ -1167,8 +1148,15 @@
           const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
           document.getElementById("package-rental-duration").textContent = `${duration} day${duration !== 1 ? 's' : ''}`;
 
-          // Calculate total cost
-          const packagePrice = parseFloat(document.getElementById("pkg-modal-price").textContent.replace(/[^0-9.-]+/g,"")) || 0;
+          // Get package price from the booking modal display
+          const packagePriceText = document.getElementById("package-booking-price").textContent;
+          const packagePrice = parseInt(packagePriceText.replace(/\D/g, '')) || 0;
+
+          // Update cost calculation display
+          document.getElementById("package-price-display").textContent = `Rs. ${packagePrice.toFixed(2)}`;
+          document.getElementById("package-days-display").textContent = `${duration} day${duration !== 1 ? 's' : ''}`;
+
+          // Calculate and display total cost - FIXED: multiply package price by duration
           const totalCost = duration * packagePrice;
           document.getElementById("package-total-cost").textContent = `Rs. ${totalCost.toFixed(2)}`;
         }
@@ -1182,10 +1170,6 @@
             const startDate = document.getElementById("package-start-date").value;
             const endDate = document.getElementById("package-end-date").value;
             const packageId = document.getElementById("package-booking-id").value;
-            const customerName = document.getElementById("customer-name").value;
-            const customerEmail = document.getElementById("customer-email").value;
-            const customerPhone = document.getElementById("customer-phone").value;
-            const customerAddress = document.getElementById("customer-address").value;
             const totalCost = document.getElementById("package-total-cost").textContent.replace(/[^0-9.-]+/g,"");
 
             if (!startDate || !endDate) {
@@ -1198,55 +1182,29 @@
               startDate: startDate,
               endDate: endDate,
               packageId: packageId,
-              customerName: customerName,
-              customerEmail: customerEmail,
-              customerPhone: customerPhone,
-              customerAddress: customerAddress,
               totalCost: totalCost
             };
 
-            const token = localStorage.getItem("token");
-            const headers = {
-              'Content-Type': 'application/json'
-            };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+            // Get package details for payment page
+            const packageName = document.getElementById("package-booking-name").textContent;
+            const packagePrice = document.getElementById("package-booking-price").textContent;
+            const duration = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
 
-            // Disable button while processing
-            const btn = document.querySelector('#package-booking-modal .btn-accent');
-            btn.disabled = true;
-            btn.textContent = 'Processing...';
+            // Store package booking data in localStorage for payment page
+            localStorage.setItem("pendingPackageBooking", JSON.stringify(bookingData));
+            localStorage.setItem("selectedPackage", JSON.stringify({
+              packageId: packageId,
+              packageName: packageName,
+              price: packagePrice,
+              duration: duration,
+              totalCost: totalCost,
+              startDate: startDate,
+              endDate: endDate
+            }));
 
-            // Send booking data to server
-            fetch('/api/bookings/package', {
-              method: 'POST',
-              headers,
-              body: JSON.stringify(bookingData)
-            })
-            .then(async (r) => {
-              let data = null; try { data = await r.json(); } catch(_) {}
-              if (!r.ok) throw new Error((data && data.message) || 'Booking failed');
-              return data;
-            })
-            .then((data) => {
-              // Show payment modal
-              document.getElementById("payment-booking-id").value = data.bookingId;
-              document.getElementById("payment-booking-details").innerHTML = `
-                <div><strong>Package:</strong> ${data.packageName}</div>
-                <div><strong>Duration:</strong> ${data.duration} days</div>
-                <div><strong>Total Cost:</strong> Rs. ${data.totalCost}</div>
-              `;
-              closePackageBookingModal();
-              document.getElementById("payment-modal").style.display = "block";
-            })
-            .catch((err) => {
-              console.error(err);
-              showBookingMessage(err.message || 'Booking failed. Please try again.', 'error');
-            })
-            .finally(() => {
-              btn.disabled = false;
-              btn.textContent = 'Proceed to Payment';
-            });
-
+            // Close the booking modal and redirect to payment page
+            closePackageBookingModal();
+            window.location.href = "/payment?mode=package";
           });
         }
 
