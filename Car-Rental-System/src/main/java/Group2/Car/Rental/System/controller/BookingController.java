@@ -3,6 +3,8 @@ package Group2.Car.Rental.System.controller;
 import Group2.Car.Rental.System.dto.BookingRequest;
 import Group2.Car.Rental.System.dto.PackageBookingRequest;
 import Group2.Car.Rental.System.entity.Booking;
+import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.repository.UserRepository;
 import Group2.Car.Rental.System.service.BookingService;
 import Group2.Car.Rental.System.service.PaymentService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -22,11 +25,13 @@ public class BookingController {
     private static final String SUCCESS_KEY = "success";
     private final BookingService bookingService;
     private final PaymentService paymentService;
+    private final UserRepository userRepository;
 
     // Constructor injection instead of field injection
-    public BookingController(BookingService bookingService, PaymentService paymentService) {
+    public BookingController(BookingService bookingService, PaymentService paymentService, UserRepository userRepository) {
         this.bookingService = bookingService;
         this.paymentService = paymentService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -188,63 +193,25 @@ public class BookingController {
 
     /**
      * Extract customer ID from authentication context
-     * This is a helper method to get the actual customer ID
+     * This method looks up the user by email from the JWT token and returns their ID
      */
     private Integer extractCustomerIdFromAuth(Authentication auth) {
         try {
-            String email = auth.getName(); // This should be the user's email from JWT
-
-            // Check if authentication has additional details with user ID
-            Object details = auth.getDetails();
-            if (details instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> detailsMap = (Map<String, Object>) details;
-                Object userId = detailsMap.get("userId");
-                if (userId != null) {
-                    return Integer.valueOf(userId.toString());
-                }
+            String email = auth.getName(); // This is the user's email from JWT token
+            
+            if (email == null || email.isEmpty()) {
+                throw new RuntimeException("No email found in authentication context");
             }
 
-            // If authentication principal contains user information
-            Object principal = auth.getPrincipal();
-            if (principal instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> principalMap = (Map<String, Object>) principal;
-                Object userId = principalMap.get("userId");
-                if (userId != null) {
-                    return Integer.valueOf(userId.toString());
-                }
-                // Try alternative keys
-                Object id = principalMap.get("id");
-                if (id != null) {
-                    return Integer.valueOf(id.toString());
-                }
+            // Look up the user by email to get their actual user ID
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            
+            if (userOptional.isEmpty()) {
+                throw new RuntimeException("User not found with email: " + email);
             }
-
-            // Enhanced fallback logic with more test users
-            if (email != null) {
-                switch (email.toLowerCase()) {
-                    case "john@example.com":
-                    case "admin@example.com":
-                    case "customer@example.com":
-                        return 1;
-                    case "jane@example.com":
-                    case "customer2@example.com":
-                        return 2;
-                    case "test@example.com":
-                        return 3;
-                    default:
-                        // For any other email, try to extract number if present
-                        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\d+");
-                        java.util.regex.Matcher matcher = pattern.matcher(email);
-                        if (matcher.find()) {
-                            return Integer.valueOf(matcher.group());
-                        }
-                }
-            }
-
-            // Last resort: return customer ID 1 for testing (ensure this customer exists in DB)
-            return 1;
+            
+            User user = userOptional.get();
+            return user.getId().intValue();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to extract customer ID from authentication: " + e.getMessage(), e);

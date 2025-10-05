@@ -70,6 +70,9 @@ async function handleLogin(event) {
                 // Regular login success
                 showMessage(response.data.message || 'Login successful!', 'success');
                 
+                // Clear any existing user data to prevent conflicts between different accounts
+                localStorage.clear();
+                
                 // Save the token and user role
                 if (response.data.token) {
                     localStorage.setItem('token', response.data.token);
@@ -78,16 +81,19 @@ async function handleLogin(event) {
                         localStorage.setItem('userRole', response.data.role);
                     }
                     
-                    // Determine redirect URL based on user role
-                    let redirectUrl = '/dashboard'; // Default dashboard
+                    // Check for return URL parameter
+                    const params = getQueryParams();
+                    let redirectUrl = params.returnUrl ? decodeURIComponent(params.returnUrl) : '/dashboard';
 
-                    // Check user role and redirect accordingly
-                    if (response.data.role) {
-                        const role = response.data.role;
-                        if (role.includes('FLEET_MANAGER')) {
-                            redirectUrl = '/fleet-manager/dashboard';
-                        } else if (role.includes('ADMIN') || role.includes('OWNER')) {
-                            redirectUrl = '/admin/dashboard';
+                    // If no return URL specified, determine redirect URL based on user role
+                    if (!params.returnUrl) {
+                        if (response.data.role) {
+                            const role = response.data.role;
+                            if (role.includes('FLEET_MANAGER')) {
+                                redirectUrl = '/fleet-manager/dashboard';
+                            } else if (role.includes('ADMIN') || role.includes('OWNER')) {
+                                redirectUrl = '/admin/dashboard';
+                            }
                         }
                     }
 

@@ -3,112 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rental History | Car Rental System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <title>Rental History | VeloRent - Luxury Car Rental</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+  <!-- Luxury Theme CSS -->
+  <link rel="stylesheet" href="/css/luxury-theme.css" />
   <style>
-    :root {
-      --primary-color: #2c3e50;
-      --secondary-color: #3498db;
-      --accent-color: #2ecc71;
-      --text-color: #333;
-      --light-text: #666;
-      --background-color: #f8f9fa;
-      --card-background: #fff;
-      --border-color: #e1e1e1;
-      --danger-color: #e74c3c;
-      --warning-color: #f39c12;
-      --shadow: 0 4px 20px rgba(0,0,0,.08);
-      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Roboto','Segoe UI',Arial,sans-serif;
-    }
-
+    /* Luxury Rental History Page Styling */
     body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      color: var(--text-color);
+      background: var(--gradient-luxury) !important;
+      color: var(--text-luxury-light) !important;
       min-height: 100vh;
-    }
-
-    header {
-      background: var(--gradient-primary);
-      color: #fff;
-      padding: 1rem;
-      box-shadow: var(--shadow);
+      padding-top: 80px;
+      font-family: var(--font-luxury-secondary);
     }
 
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 40px 20px;
     }
 
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* Enhanced Navigation Styling */
+    .navbar-luxury {
+      background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%) !important;
+      border-bottom: 2px solid var(--luxury-gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1rem 0;
     }
 
-    .logo {
-      font-size: 1.8rem;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    .navbar-brand-luxury {
+      font-size: 1.6rem !important;
+      font-weight: 700 !important;
+      color: var(--luxury-gold) !important;
+      font-family: var(--font-luxury-primary) !important;
+      text-decoration: none !important;
     }
 
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      align-items: center;
+    .nav-link-luxury {
+      color: var(--text-luxury-light) !important;
+      font-weight: 600 !important;
+      padding: 12px 20px !important;
+      border-radius: var(--radius-luxury-small) !important;
+      transition: var(--transition-smooth) !important;
+      text-decoration: none !important;
     }
 
-    .nav-links a {
-      color: #fff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      transition: all 0.3s ease;
-      background: rgba(255,255,255,0.1);
+    .nav-link-luxury:hover {
+      background: rgba(212, 175, 55, 0.2) !important;
+      color: var(--luxury-gold) !important;
     }
 
-    .nav-links a:hover {
-      background: rgba(255,255,255,0.2);
-      transform: translateY(-2px);
+    .btn-luxury {
+      background: var(--gradient-gold) !important;
+      color: var(--luxury-black) !important;
+      border: none !important;
+      padding: 10px 20px !important;
+      border-radius: var(--radius-luxury-small) !important;
+      font-weight: 600 !important;
     }
 
-    h1 {
-      color: var(--primary-color);
-      margin-bottom: 20px;
-      font-size: 2.5rem;
+    .btn-luxury-outline {
+      background: transparent !important;
+      color: var(--luxury-gold) !important;
+      border: 2px solid var(--luxury-gold) !important;
+    }
+
+    .rental-history-header {
       text-align: center;
-      font-weight: 300;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .rental-history-title {
+      font-size: 3rem;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .rental-history-title::before {
+      content: '\f1da';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      font-size: 2.5rem;
+    }
+
+    .rental-history-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 3px;
+      background: var(--gradient-gold);
+      border-radius: 2px;
     }
 
     .card {
-      background: var(--card-background);
-      border-radius: 15px;
-      box-shadow: var(--shadow);
-      padding: 25px;
-      margin-bottom: 25px;
-      border: 1px solid rgba(255,255,255,0.8);
+      background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+      border-radius: var(--radius-luxury-large);
+      box-shadow: var(--shadow-luxury);
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-gold);
     }
 
     .section-title {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: var(--primary-color);
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .section-title i {
-      color: var(--accent-color);
+      color: var(--luxury-gold);
+      font-size: 1.5rem;
     }
 
     .message {
@@ -197,13 +239,13 @@
     }
 
     .rental-card.current {
-      border-color: var(--accent-color);
-      box-shadow: 0 4px 20px rgba(46, 204, 113, 0.3);
+      border-color: var(--luxury-gold);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
     }
 
     .rental-card.past {
-      border-color: var(--secondary-color);
-      box-shadow: 0 4px 20px rgba(52, 152, 219, 0.3);
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
     }
 
     .rental-card.package {
@@ -271,8 +313,8 @@
       letter-spacing: 0.5px;
     }
 
-    .status-badge.confirmed { background: var(--accent-color); }
-    .status-badge.payment-pending { background: var(--secondary-color); }
+    .status-badge.confirmed { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
+    .status-badge.payment-pending { background: linear-gradient(135deg, var(--luxury-gold) 0%, #f4d03f 100%); }
     .status-badge.returned { background: #95a5a6; }
     .status-badge.cancelled { background: var(--danger-color); }
 
@@ -284,10 +326,11 @@
       font-weight: 600;
       font-size: 20px;
       margin-bottom: 15px;
-      color: var(--primary-color);
+      color: var(--luxury-gold);
       display: flex;
       align-items: center;
       gap: 10px;
+      font-family: var(--font-luxury-primary);
     }
 
     .package-badge {
@@ -332,7 +375,7 @@
       font-size: 24px;
       font-weight: 700;
       margin: 15px 0;
-      color: var(--accent-color);
+      color: var(--luxury-gold);
       text-align: center;
     }
 
@@ -347,10 +390,11 @@
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 15px;
-      color: var(--primary-color);
+      color: var(--luxury-gold);
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: var(--font-luxury-primary);
     }
 
     .vehicle-list {
@@ -359,15 +403,16 @@
     }
 
     .vehicle-item {
-      background: rgba(52, 152, 219, 0.1);
-      padding: 12px;
-      border-radius: 10px;
-      border-left: 4px solid var(--secondary-color);
-      transition: all 0.3s ease;
+      background: rgba(212, 175, 55, 0.1);
+      padding: 15px;
+      border-radius: var(--radius-luxury-small);
+      border-left: 4px solid var(--luxury-gold);
+      transition: var(--transition-smooth);
+      border: 1px solid rgba(212, 175, 55, 0.2);
     }
 
     .vehicle-item:hover {
-      background: rgba(52, 152, 219, 0.2);
+      background: rgba(212, 175, 55, 0.2);
       transform: translateX(5px);
     }
 
@@ -378,8 +423,9 @@
     }
 
     .vehicle-name {
-      font-weight: 500;
-      color: var(--primary-color);
+      font-weight: 600;
+      color: var(--text-luxury-light);
+      font-family: var(--font-luxury-secondary);
     }
 
     .vehicle-reg {
@@ -447,7 +493,7 @@
       width: 40px;
       height: 40px;
       border: 4px solid var(--border-color);
-      border-top: 4px solid var(--primary-color);
+      border-top: 4px solid var(--luxury-gold);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -459,26 +505,61 @@
   </style>
 </head>
 <body>
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo">
-        <i class="fas fa-car"></i> VeloRent
-      </div>
-      <div class="nav-links">
-        <a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="/feedback"><i class="fas fa-info-circle"></i> About Us</a>
-        <a href="/security-settings"><i class="fas fa-shield-alt"></i> Security</a>
-        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-      </div>
-    </nav>
+  <!-- Page Loader -->
+  <div class="page-loader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">VeloRent Rental History</div>
+    </div>
   </div>
-</header>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+    <div class="container">
+      <a class="navbar-brand-luxury" href="/dashboard">
+        <i class="fas fa-crown mr-2"></i> VeloRent
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link-luxury" href="/rental-history"><i class="fas fa-history mr-1"></i>Rental History</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link-luxury" href="/feedback"><i class="fas fa-info-circle mr-1"></i>About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
+          </li>
+        </ul>
+        <div class="auth-buttons">
+          <div class="dropdown">
+            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
+              <i class="fas fa-user-circle mr-1"></i>
+              <span id="user-initials">U</span>
+            </button>
+            <div class="dropdown-menu" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
+              <a class="dropdown-item hover-gold" href="#" id="logout-btn" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
 <div class="container">
   <div id="message-container"></div>
 
-  <h1><i class="fas fa-history"></i> Rental History</h1>
+  <div class="rental-history-header">
+    <h1 class="rental-history-title">My Rental History</h1>
+  </div>
 
   <div class="card">
     <div class="section-title">
@@ -511,8 +592,7 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 VeloRent Car Rental System. All rights reserved.</p>
-    <p>Drive your dreams, rent with confidence!</p>
+    <p>&copy; 2025 <span style="color: var(--luxury-gold); font-weight: 700; font-family: var(--font-luxury-primary);">VeloRent</span> - Luxury Car Rental System. All rights reserved.</p>
   </footer>
 </div>
 
@@ -539,22 +619,34 @@
 
     // Ensure we have user identifiers
     async function ensureIds() {
-      let userId = localStorage.getItem('userId');
-      let customerId = localStorage.getItem('customerId');
-      if (userId && customerId) return { userId, customerId };
+      // Always fetch fresh user data from the server to ensure consistency
       try {
         const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` }});
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {
-            if (json.data.userId) localStorage.setItem('userId', json.data.userId);
-            if (json.data.customerId) localStorage.setItem('customerId', json.data.customerId);
-            userId = json.data.userId || userId;
-            customerId = json.data.customerId || customerId;
+            // Clear and update localStorage with fresh data
+            if (json.data.userId) {
+              localStorage.setItem('userId', json.data.userId);
+            }
+            if (json.data.customerId) {
+              localStorage.setItem('customerId', json.data.customerId);
+            }
+            return { 
+              userId: json.data.userId, 
+              customerId: json.data.customerId 
+            };
           }
         }
-      } catch {}
-      return { userId: localStorage.getItem('userId'), customerId: localStorage.getItem('customerId') };
+      } catch (e) {
+        console.error('Failed to fetch user info:', e);
+      }
+      
+      // Fallback to localStorage values if API call fails
+      return { 
+        userId: localStorage.getItem('userId'), 
+        customerId: localStorage.getItem('customerId') 
+      };
     }
 
     // Load bookings
@@ -822,7 +914,11 @@
       placeholder.innerHTML = '<i class="fas fa-image"></i>';
       img.parentNode.replaceChild(placeholder, img);
     };
-  });
-</script>
+    });
+  </script>
+
+  <!-- Luxury Theme Scripts -->
+  <script src="/js/luxury-theme.js"></script>
+  <script src="/js/luxury-theme-enhancer.js"></script>
 </body>
 </html>

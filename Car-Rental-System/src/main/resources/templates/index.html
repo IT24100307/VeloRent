@@ -3,53 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VeloRent - Car Rental Service</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <title>VeloRent - Luxury Car Rental Experience</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
-    <!-- Custom CSS -->
+    <!-- Luxury Theme CSS (Main styling) -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <!-- Bootstrap CSS (Secondary for grid system) -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Custom Luxury Enhancements -->
     <style>
-      :root {
-        --primary-color: #4361ee;
-        --secondary-color: #3f37c9;
-        --accent-color: #4cc9f0;
-        --light-bg: #f8f9fa;
-        --dark-bg: #212529;
-        --text-light: #f8f9fa;
-        --text-dark: #212529;
-      }
-
+      /* Additional luxury styling to complement the main theme */
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: var(--light-bg);
+        padding-top: 80px; /* Account for fixed navbar */
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
       }
 
-      .navbar {
-        background-color: var(--primary-color);
+      
+      /* Smooth scrolling enhancements */
+      html {
+        scroll-behavior: smooth;
       }
-
-      .navbar-brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: white !important;
-      }
-
-      .nav-link {
-        color: rgba(255, 255, 255, 0.85) !important;
-        font-weight: 500;
-      }
-
-      .nav-link:hover {
-        color: white !important;
-      }
-
-      .auth-buttons .btn {
-        margin-left: 10px;
-        border-radius: 20px;
-        padding: 8px 20px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+      
+      /* Package slideshow luxury enhancements */
+      .packages-slider-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
+        background: var(--luxury-charcoal);
       }
 
       .btn-outline-light {
@@ -108,21 +92,50 @@
         font-weight: bold;
         text-align: center;
         margin: 60px 0 30px;
-        color: var(--dark-bg);
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+      }
+      
+      .section-title::after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 3px;
+        background: var(--gradient-gold);
+        margin: 1rem auto;
+        border-radius: 2px;
       }
 
       .vehicle-card {
         border: none;
-        border-radius: 10px;
+        border-radius: var(--radius-luxury-large);
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        box-shadow: var(--shadow-luxury);
+        transition: var(--transition-smooth);
         margin-bottom: 25px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .vehicle-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-luxury-intense);
+        border-color: var(--luxury-gold);
+      }
+      
+      .vehicle-card .card-body {
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+      }
+      
+      .vehicle-card .card-title {
+        color: var(--luxury-gold) !important;
+        font-weight: 600;
+        font-size: 1.2rem;
       }
 
       .vehicle-img {
@@ -133,33 +146,56 @@
       .vehicle-price {
         font-size: 1.5rem;
         font-weight: bold;
-        color: var(--primary-color);
+        color: var(--luxury-gold) !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
       }
 
       .vehicle-status {
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: #29cc97;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 20px;
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+        padding: 8px 15px;
+        border-radius: 25px;
         font-size: 0.8rem;
-        font-weight: bold;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: var(--shadow-luxury);
       }
 
       .filter-section {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        padding: 25px;
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
         margin-bottom: 30px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .filter-title {
-        font-weight: bold;
-        color: var(--dark-bg);
+        font-weight: 600;
+        color: var(--luxury-gold) !important;
         margin-bottom: 15px;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      
+      .filter-section select,
+      .filter-section input {
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: var(--radius-luxury-small);
+      }
+      
+      .filter-section select:focus,
+      .filter-section input:focus {
+        border-color: var(--luxury-gold) !important;
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
       }
 
       .loading-spinner {
@@ -199,52 +235,577 @@
         font-size: 1.5rem;
         margin-right: 15px;
       }
+
+      /* Packages Slideshow Styles */
+      .packages-slider-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .packages-slider {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        will-change: transform;
+      }
+
+      .package-slide {
+        min-width: 100%;
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+        color: var(--text-luxury-light);
+        padding: 60px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+      }
+
+      .package-slide::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(212, 175, 55, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%);
+        z-index: 1;
+      }
+
+      .package-content {
+        flex: 1;
+        z-index: 2;
+        position: relative;
+      }
+
+      .package-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .package-description {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        opacity: 0.9;
+      }
+
+      .package-details {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .package-detail-item {
+        text-align: center;
+      }
+
+      .package-detail-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        display: block;
+      }
+
+      .package-detail-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .package-price {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #ffd700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        margin-bottom: 10px;
+      }
+
+      .package-rent-btn {
+        background: var(--gradient-gold);
+        border: none;
+        padding: 15px 35px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 50px;
+        color: var(--luxury-black);
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        box-shadow: var(--shadow-luxury);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .package-rent-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-luxury-intense);
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+      }
+
+      .package-rent-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+      }
+
+      .package-rent-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .package-rent-btn:hover::before {
+        left: 100%;
+      }
+
+      .package-image {
+        flex: 0 0 300px;
+        z-index: 2;
+        position: relative;
+      }
+
+      .package-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .slider-controls {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 3;
+      }
+
+      .slider-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .slider-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.1);
+      }
+
+      .slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .dot.active {
+        background: var(--primary-color);
+        transform: scale(1.2);
+      }
+
+      @media (max-width: 768px) {
+        .package-slide {
+          flex-direction: column;
+          text-align: center;
+          padding: 40px 20px;
+        }
+
+        .package-image {
+          flex: none;
+          margin-top: 30px;
+        }
+
+        .package-title {
+          font-size: 2rem;
+        }
+
+        .package-price {
+          font-size: 2.5rem;
+        }
+
+        .package-details {
+          justify-content: center;
+        }
+      }
+
+      /* Customer Feedback Section Styles */
+      .feedback-section {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feedback-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+        opacity: 0.3;
+        z-index: 1;
+      }
+
+      .feedback-section .container {
+        position: relative;
+        z-index: 2;
+      }
+
+      .feedback-card {
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        border-radius: var(--radius-luxury-large);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-luxury);
+        transition: var(--transition-smooth);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feedback-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+      }
+
+      .feedback-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-luxury-intense);
+        border-color: var(--luxury-gold);
+      }
+
+      .feedback-rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .feedback-rating .stars {
+        display: flex;
+        margin-right: 10px;
+      }
+
+      .feedback-rating .star {
+        color: #ffd700;
+        font-size: 1.2rem;
+        margin-right: 2px;
+      }
+
+      .feedback-rating .star.empty {
+        color: #ddd;
+      }
+
+      .feedback-rating .rating-text {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .feedback-comment {
+        font-style: italic;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--text-luxury-gray) !important;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .feedback-comment::before {
+        content: '"';
+        font-size: 3rem;
+        color: var(--luxury-gold);
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        opacity: 0.3;
+        font-family: Georgia, serif;
+      }
+
+      .feedback-comment::after {
+        content: '"';
+        font-size: 3rem;
+        color: var(--primary-color);
+        position: absolute;
+        bottom: -40px;
+        right: 10px;
+        opacity: 0.3;
+        font-family: Georgia, serif;
+      }
+
+      /* Additional luxury theme overrides */
+      .text-muted {
+        color: var(--text-luxury-muted) !important;
+      }
+      
+      .btn-primary {
+        background: var(--gradient-gold) !important;
+        border: none !important;
+        color: var(--luxury-black) !important;
+        font-weight: 600 !important;
+        padding: 10px 20px !important;
+        border-radius: var(--radius-luxury-small) !important;
+        transition: var(--transition-smooth) !important;
+      }
+      
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: var(--shadow-luxury) !important;
+      }
+      
+      .btn-outline-secondary {
+        border-color: var(--luxury-gold) !important;
+        color: var(--luxury-gold) !important;
+        background: transparent !important;
+        border-radius: var(--radius-luxury-small) !important;
+        transition: var(--transition-smooth) !important;
+      }
+      
+      .btn-outline-secondary:hover {
+        background: var(--luxury-gold) !important;
+        color: var(--luxury-black) !important;
+        transform: translateY(-2px) !important;
+      }
+      
+      /* Loading and error messages */
+      .loading-spinner {
+        color: var(--luxury-gold) !important;
+      }
+      
+      .alert {
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: var(--radius-luxury-small) !important;
+      }
+
+      .feedback-customer {
+        display: flex;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+      }
+
+      .feedback-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+
+      .feedback-customer-info h6 {
+        margin: 0;
+        color: var(--luxury-gold) !important;
+        font-weight: 600;
+      }
+
+      .feedback-customer-info small {
+        color: var(--text-luxury-muted) !important;
+        font-size: 0.85rem;
+      }
+
+      .feedback-loading {
+        padding: 40px;
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+      }
+
+      .feedback-loading i {
+        margin-right: 10px;
+        color: var(--primary-color);
+      }
+
+      .feedback-error {
+        padding: 40px;
+        text-align: center;
+        color: #dc3545;
+        font-size: 1.1rem;
+      }
+
+      .feedback-empty {
+        padding: 40px;
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+      }
+
+      @media (max-width: 768px) {
+        .feedback-card {
+          padding: 20px;
+          margin-bottom: 20px;
+        }
+
+        .feedback-comment {
+          font-size: 1rem;
+        }
+
+        .feedback-avatar {
+          width: 40px;
+          height: 40px;
+          font-size: 1rem;
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent</div>
+      </div>
+    </div>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="/">
-          <i class="fas fa-car-side mr-2"></i> VeloRent
+        <a class="navbar-brand-luxury" href="/" data-animation="animate-fade-in-left">
+          <i class="fas fa-crown mr-2"></i> VeloRent
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#vehicles">Vehicles</a>
+              <a class="nav-link-luxury" href="#vehicles">Vehicles</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Services</a>
+              <a class="nav-link-luxury" href="#packages-slideshow">Packages</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/feedback">About Us</a>
+              <a class="nav-link-luxury" href="/feedback">About Us</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
+              <a class="nav-link-luxury" href="#customer-feedback">Reviews</a>
             </li>
           </ul>
           <div class="auth-buttons">
-            <a href="/login" class="btn btn-outline-light">Login</a>
-            <a href="/register" class="btn btn-light">Register</a>
+            <a href="/login" class="btn-luxury btn-luxury-outline mr-2">
+              <i class="fas fa-sign-in-alt mr-1"></i> Login
+            </a>
+            <a href="/register" class="btn-luxury btn-luxury-gold">
+              <i class="fas fa-user-plus mr-1"></i> Register
+            </a>
           </div>
         </div>
       </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1563450392-1ef48ff2d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') no-repeat center center; background-size: cover; min-height: 100vh; display: flex; align-items: center; text-align: center; position: relative; overflow: hidden;">
+      <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <h1 class="hero-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(3rem, 6vw, 5rem); font-weight: 900; margin-bottom: 2rem; text-shadow: 2px 4px 8px rgba(0,0,0,0.5);">
+              Luxury Car Rental Experience
+            </h1>
+            <p class="hero-subtitle animate-fade-in-up animate-delay-1" style="font-size: 1.4rem; margin-bottom: 3rem; color: var(--text-luxury-light); font-weight: 300; line-height: 1.8; text-shadow: 1px 2px 4px rgba(0,0,0,0.5);">
+              Discover our exclusive collection of premium vehicles and embark on unforgettable journeys with unmatched luxury and style
+            </p>
+            <div class="hero-buttons animate-fade-in-up animate-delay-2">
+              <a href="#vehicles" class="btn-luxury btn-luxury-gold mr-3 mb-3">
+                <i class="fas fa-crown mr-2"></i> Explore Fleet
+              </a>
+              <a href="#packages-slideshow" class="btn-luxury btn-luxury-outline mb-3">
+                <i class="fas fa-gift mr-2"></i> View Packages
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Floating Elements -->
+      <div style="position: absolute; top: 20%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+      <div style="position: absolute; bottom: 30%; right: 15%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(192,192,192,0.08) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite reverse;"></div>
+    </section>
+
+    <style>
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+    </style>
+
+    <!-- Packages Slideshow Section -->
+    <section id="packages-slideshow" class="py-5" style="background: var(--luxury-dark); position: relative;">
       <div class="container">
-        <h1 class="hero-title">Find Your Perfect Ride</h1>
-        <p class="hero-subtitle">Explore our fleet of premium vehicles for your next adventure</p>
-        <a href="#vehicles" class="btn btn-primary btn-lg">
-          <i class="fas fa-search mr-2"></i> Browse Vehicles
-        </a>
+        <div class="text-center mb-5">
+          <h2 class="section-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 1rem;">
+            Exclusive Rental Packages
+          </h2>
+          <p class="animate-fade-in-up animate-delay-1" style="color: var(--text-luxury-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Discover our curated selection of premium rental packages designed for the discerning traveler
+          </p>
+        </div>
+        <div class="packages-slider-container">
+          <div class="packages-slider" id="packages-slider">
+            <!-- Package slides will be dynamically inserted here -->
+          </div>
+          <div class="slider-controls">
+            <button class="slider-btn prev-btn" id="prev-btn">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-btn next-btn" id="next-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="slider-dots" id="slider-dots">
+            <!-- Dots will be dynamically inserted here -->
+          </div>
+        </div>
       </div>
     </section>
 
@@ -296,19 +857,26 @@
     </div>
 
     <!-- Vehicles Section -->
-    <section id="vehicles">
+    <section id="vehicles" class="py-5" style="background: var(--gradient-luxury); position: relative;">
       <div class="container">
-        <h2 class="section-title">Available Vehicles</h2>
+        <div class="text-center mb-5">
+          <h2 class="section-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 1rem;">
+            Premium Vehicle Collection
+          </h2>
+          <p class="animate-fade-in-up animate-delay-1" style="color: var(--text-luxury-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Choose from our exclusive fleet of luxury vehicles, each meticulously maintained for your perfect driving experience
+          </p>
+        </div>
 
         <!-- Loading Spinner (shown initially) -->
-        <div id="loading-spinner" class="loading-spinner">
-          <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
+        <div id="loading-spinner" class="text-center py-5">
+          <div class="loader-spinner mx-auto mb-3"></div>
+          <p style="color: var(--luxury-gold); font-weight: 600;">Loading Premium Vehicles...</p>
         </div>
 
         <!-- Error Message (hidden initially) -->
-        <div id="error-message" class="alert alert-danger text-center" style="display: none;">
+        <div id="error-message" class="alert-luxury alert-error-luxury text-center" style="display: none;">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
           Unable to load vehicles. Please try again later.
         </div>
 
@@ -319,49 +887,97 @@
       </div>
     </section>
 
+    <!-- Customer Feedback Section -->
+    <section id="customer-feedback" class="feedback-section py-5" style="background: var(--luxury-dark); position: relative;">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 1rem;">
+            Client Testimonials
+          </h2>
+          <p class="section-subtitle animate-fade-in-up animate-delay-1" style="color: var(--text-luxury-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Discover why discerning clients choose VeloRent for their luxury transportation needs
+          </p>
+        </div>
+        
+        <div class="row" id="feedback-container">
+          <!-- Feedback cards will be dynamically inserted here -->
+          <div class="col-12 text-center">
+            <div class="feedback-loading">
+              <div class="loader-spinner mx-auto mb-3"></div>
+              <p style="color: var(--luxury-gold); font-weight: 600;">Loading Client Testimonials...</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-5">
+          <a href="/feedback" class="btn-luxury btn-luxury-gold">
+            <i class="fas fa-comments mr-2"></i>View All Testimonials
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" style="background: var(--luxury-black); border-top: 1px solid rgba(212, 175, 55, 0.2); padding: 4rem 0 2rem;">
       <div class="container">
         <div class="row">
           <div class="col-md-4 mb-4">
-            <h5 class="footer-title">VeloRent</h5>
-            <p>Your trusted partner for all your vehicle rental needs. Quality vehicles at affordable prices.</p>
-            <div class="social-icons mt-3">
-              <a href="#"><i class="fab fa-facebook"></i></a>
-              <a href="#"><i class="fab fa-twitter"></i></a>
-              <a href="#"><i class="fab fa-instagram"></i></a>
-              <a href="#"><i class="fab fa-linkedin"></i></a>
+            <h5 class="footer-title" style="font-family: var(--font-luxury-primary); color: var(--luxury-gold); font-size: 1.5rem; margin-bottom: 1.5rem;">
+              <i class="fas fa-crown mr-2"></i>VeloRent
+            </h5>
+            <p style="color: var(--text-luxury-gray); line-height: 1.8; margin-bottom: 2rem;">
+              Experience the pinnacle of luxury transportation with our exclusive fleet of premium vehicles and unparalleled service excellence.
+            </p>
+            <div class="social-icons">
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; margin-right: 1rem; transition: var(--transition-luxury);">
+                <i class="fab fa-facebook"></i>
+              </a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; margin-right: 1rem; transition: var(--transition-luxury);">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; margin-right: 1rem; transition: var(--transition-luxury);">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; transition: var(--transition-luxury);">
+                <i class="fab fa-linkedin"></i>
+              </a>
             </div>
           </div>
           <div class="col-md-3 mb-4">
-            <h5 class="footer-title">Quick Links</h5>
+            <h5 class="footer-title" style="color: var(--luxury-silver); font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Quick Links</h5>
             <div class="footer-links">
-              <a href="#">About Us</a>
-              <a href="#">Services</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Privacy Policy</a>
+              <a href="/feedback" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">About Us</a>
+              <a href="#packages-slideshow" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Premium Packages</a>
+              <a href="#vehicles" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Luxury Fleet</a>
+              <a href="#customer-feedback" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Testimonials</a>
             </div>
           </div>
           <div class="col-md-3 mb-4">
-            <h5 class="footer-title">Support</h5>
+            <h5 class="footer-title" style="color: var(--luxury-silver); font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Support</h5>
             <div class="footer-links">
-              <a href="#">FAQ</a>
-              <a href="#">Help Center</a>
-              <a href="#">Contact Us</a>
-              <a href="#">Careers</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">24/7 Concierge</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">VIP Support</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Terms & Conditions</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Privacy Policy</a>
             </div>
           </div>
           <div class="col-md-2 mb-4">
-            <h5 class="footer-title">Contact</h5>
-            <address>
-              <p><i class="fas fa-map-marker-alt mr-2"></i> No32 Main St Melsiripura</p>
-              <p><i class="fas fa-phone mr-2"></i> (123) 456-7890</p>
-              <p><i class="fas fa-envelope mr-2"></i> 2025_Y2_S1_KUR_02@gmail.com</p>
+            <h5 class="footer-title" style="color: var(--luxury-silver); font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Contact</h5>
+            <address style="color: var(--text-luxury-gray); line-height: 2;">
+              <p><i class="fas fa-map-marker-alt mr-2" style="color: var(--luxury-gold);"></i> No32 Main St Melsiripura</p>
+              <p><i class="fas fa-phone mr-2" style="color: var(--luxury-gold);"></i> (123) 456-7890</p>
+              <p><i class="fas fa-envelope mr-2" style="color: var(--luxury-gold);"></i> luxury@velorent.com</p>
             </address>
           </div>
         </div>
-        <hr class="mt-4 mb-4" style="background-color: #6c757d;">
-        <p class="text-center">&copy; 2025 VeloRent. All rights reserved.</p>
+        <hr style="border-color: rgba(212, 175, 55, 0.2); margin: 3rem 0 2rem;">
+        <div class="text-center">
+          <p style="color: var(--text-luxury-muted); margin: 0;">
+            &copy; 2025 VeloRent. All rights reserved. | Crafted with 
+            <i class="fas fa-heart" style="color: var(--luxury-gold);"></i> 
+            for luxury enthusiasts
+          </p>
+        </div>
       </div>
     </footer>
 
@@ -477,7 +1093,7 @@
                   <h5 class="card-title">${vehicle.year} ${vehicle.make} ${vehicle.model}</h5>
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="vehicle-price">Rs ${vehicle.rentalRatePerDay}/day</span>
-                    <small class="text-muted">Reg: ${vehicle.registrationNumber}</small>
+                    <small style="color: var(--text-luxury-muted) !important;">Reg: ${vehicle.registrationNumber}</small>
                   </div>
                   <hr>
                   <div class="d-flex justify-content-between">
@@ -537,6 +1153,453 @@
           // Redirect to login for now, can be enhanced to show modal with details
           window.location.href = `/login?vehicleId=${vehicleId}`;
         };
+
+        // Packages Slideshow Functionality
+        const packagesSlider = document.querySelector('.packages-slider');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        let currentSlide = 0;
+        let slideInterval;
+        let totalSlides = 0;
+
+        // Packages data will be fetched from API
+        let packagesData = [];
+
+        // Fetch packages from API
+        function fetchPackagesData() {
+          fetch('/api/public/packages')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch packages');
+              }
+              return response.json();
+            })
+            .then(data => {
+              packagesData = data.map(pkg => ({
+                id: pkg.packageId,
+                title: pkg.packageName,
+                description: `${pkg.packageName} - Duration: ${pkg.duration} days`,
+                duration: `${pkg.duration} Days`,
+                mileage: pkg.vehicles && pkg.vehicles.length > 0 ? `${pkg.vehicles.length} Vehicle${pkg.vehicles.length > 1 ? 's' : ''}` : 'Multiple Vehicles',
+                fuel: 'Full Tank',
+                price: `Rs. ${pkg.price}`,
+                image: pkg.imageUrl || '/images/default-package.jpg'
+              }));
+              
+              if (packagesData.length > 0) {
+                initializeSlideshow();
+              } else {
+                // Hide slideshow section if no packages available
+                const slideshowSection = document.getElementById('packages-slideshow');
+                if (slideshowSection) {
+                  slideshowSection.style.display = 'none';
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching packages:', error);
+              // Hide slideshow section on error
+              const slideshowSection = document.getElementById('packages-slideshow');
+              if (slideshowSection) {
+                slideshowSection.style.display = 'none';
+              }
+            });
+        }
+
+        // Initialize slideshow with data
+        function initializeSlideshow() {
+          if (packagesSlider && packagesData.length > 0) {
+            totalSlides = packagesData.length;
+            
+            // Clear existing slides
+            packagesSlider.innerHTML = '';
+            
+            // Create slides from data
+            packagesData.forEach((pkg, index) => {
+              const slide = document.createElement('div');
+              slide.className = 'package-slide';
+              slide.innerHTML = `
+                <div class="package-content">
+                  <h2 class="package-title">${pkg.title}</h2>
+                  <p class="package-description">${pkg.description}</p>
+                  <div class="package-details">
+                    <div class="package-detail-item">
+                      <span class="package-detail-value">${pkg.duration}</span>
+                      <span class="package-detail-label">Duration</span>
+                    </div>
+                    <div class="package-detail-item">
+                      <span class="package-detail-value">${pkg.mileage}</span>
+                      <span class="package-detail-label">Vehicles</span>
+                    </div>
+                    <div class="package-detail-item">
+                      <span class="package-detail-value">${pkg.fuel}</span>
+                      <span class="package-detail-label">Fuel</span>
+                    </div>
+                  </div>
+                  <div class="package-price">${pkg.price}</div>
+                  <button class="package-rent-btn" onclick="rentPackage(${pkg.id})" title="Click to login and book this package">
+                    🔒 Rent Now
+                  </button>
+                </div>
+                <div class="package-image">
+                  <img src="${pkg.image}" alt="${pkg.title}" class="package-img" 
+                       onerror="this.src='/images/default-package.jpg'">
+                </div>
+              `;
+              packagesSlider.appendChild(slide);
+            });
+
+            // Create dots
+            createDots();
+            
+            // Update dots
+            updateDots();
+            
+            // Start auto-slide
+            startAutoSlide();
+          }
+        }
+
+        // Create dots based on number of packages
+        function createDots() {
+          const sliderDots = document.getElementById('slider-dots');
+          if (sliderDots) {
+            sliderDots.innerHTML = '';
+            packagesData.forEach((_, index) => {
+              const dot = document.createElement('span');
+              dot.className = 'dot';
+              dot.addEventListener('click', () => {
+                stopAutoSlide();
+                goToSlide(index);
+                startAutoSlide();
+              });
+              sliderDots.appendChild(dot);
+            });
+          }
+        }
+
+        // Update slide position
+        function updateSlidePosition() {
+          if (packagesSlider) {
+            packagesSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+          }
+        }
+
+        // Update dots
+        function updateDots() {
+          const dots = document.querySelectorAll('.dot');
+          dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+          });
+        }
+
+        // Go to next slide
+        function nextSlide() {
+          currentSlide = (currentSlide + 1) % totalSlides;
+          updateSlidePosition();
+        }
+
+        // Go to previous slide
+        function prevSlide() {
+          currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+          updateSlidePosition();
+        }
+
+        // Go to specific slide
+        function goToSlide(slideIndex) {
+          currentSlide = slideIndex;
+          updateSlidePosition();
+        }
+
+        // Start auto-slide (every 5 seconds)
+        function startAutoSlide() {
+          slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        // Stop auto-slide
+        function stopAutoSlide() {
+          clearInterval(slideInterval);
+        }
+
+        // Event listeners for navigation
+        if (prevBtn) {
+          prevBtn.addEventListener('click', () => {
+            stopAutoSlide();
+            prevSlide();
+            startAutoSlide();
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            stopAutoSlide();
+            nextSlide();
+            startAutoSlide();
+          });
+        }
+
+        // Event listeners for dots are now handled in createDots function
+
+        // Pause auto-slide on hover
+        if (packagesSlider) {
+          packagesSlider.addEventListener('mouseenter', stopAutoSlide);
+          packagesSlider.addEventListener('mouseleave', startAutoSlide);
+        }
+
+        // Fetch packages and initialize slideshow
+        fetchPackagesData();
+
+        // Fetch and display customer feedback
+        fetchCustomerFeedback();
+
+        // Rent package function (requires login)
+        window.rentPackage = function(packageId) {
+          console.log('Rent package clicked for ID:', packageId);
+          
+          // Check if user is logged in by checking for token
+          const token = localStorage.getItem('token');
+          const userEmail = localStorage.getItem('userEmail');
+          
+          console.log('Token exists:', !!token);
+          console.log('User email exists:', !!userEmail);
+          
+          if (!token || !userEmail) {
+            // User is not logged in, redirect to login page with return URL
+            const returnUrl = encodeURIComponent(`/dashboard?packageId=${packageId}`);
+            const loginUrl = `/login?returnUrl=${returnUrl}&message=Please login to book this package`;
+            console.log('Redirecting to login:', loginUrl);
+            window.location.href = loginUrl;
+          } else {
+            // User is logged in, redirect to dashboard with package pre-selected
+            const dashboardUrl = `/dashboard?packageId=${packageId}`;
+            console.log('Redirecting to dashboard:', dashboardUrl);
+            window.location.href = dashboardUrl;
+          }
+        };
+
+        // Fetch customer feedback from API
+        function fetchCustomerFeedback() {
+          const feedbackContainer = document.getElementById('feedback-container');
+          
+          if (!feedbackContainer) return;
+
+          fetch('/api/public/feedback?page=0&size=6')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch feedback');
+              }
+              return response.json();
+            })
+            .then(feedbacks => {
+              if (feedbacks && feedbacks.length > 0) {
+                displayFeedback(feedbacks);
+              } else {
+                feedbackContainer.innerHTML = `
+                  <div class="col-12">
+                    <div class="feedback-empty">
+                      <i class="fas fa-comments"></i>
+                      <p>No customer feedback available yet.</p>
+                    </div>
+                  </div>
+                `;
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching feedback:', error);
+              feedbackContainer.innerHTML = `
+                <div class="col-12">
+                  <div class="feedback-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Unable to load customer feedback at this time.</p>
+                  </div>
+                </div>
+              `;
+            });
+        }
+
+        // Display feedback in cards
+        function displayFeedback(feedbacks) {
+          const feedbackContainer = document.getElementById('feedback-container');
+          if (!feedbackContainer) return;
+
+          feedbackContainer.innerHTML = '';
+
+          feedbacks.forEach(feedback => {
+            const feedbackCard = createFeedbackCard(feedback);
+            feedbackContainer.appendChild(feedbackCard);
+          });
+        }
+
+        // Create a feedback card element
+        function createFeedbackCard(feedback) {
+          const col = document.createElement('div');
+          col.className = 'col-lg-4 col-md-6 mb-4';
+
+          // Generate star rating
+          const stars = generateStarRating(feedback.rating);
+          
+          // Get customer initials for avatar
+          const initials = getCustomerInitials(feedback.customerName);
+          
+          // Format date
+          const feedbackDate = formatFeedbackDate(feedback.feedbackDate);
+
+          col.innerHTML = `
+            <div class="feedback-card">
+              <div class="feedback-rating">
+                <div class="stars">${stars}</div>
+                <span class="rating-text">${feedback.rating}/5</span>
+              </div>
+              <div class="feedback-comment">
+                ${feedback.comments}
+              </div>
+              <div class="feedback-customer">
+                <div class="feedback-avatar">${initials}</div>
+                <div class="feedback-customer-info">
+                  <h6>${feedback.customerName}</h6>
+                  <small>${feedbackDate}</small>
+                </div>
+              </div>
+            </div>
+          `;
+
+          return col;
+        }
+
+        // Generate star rating HTML
+        function generateStarRating(rating) {
+          let stars = '';
+          for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+              stars += '<i class="fas fa-star star"></i>';
+            } else {
+              stars += '<i class="far fa-star star empty"></i>';
+            }
+          }
+          return stars;
+        }
+
+        // Get customer initials for avatar
+        function getCustomerInitials(name) {
+          if (!name) return '?';
+          const names = name.split(' ');
+          if (names.length >= 2) {
+            return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase();
+          }
+          return name.charAt(0).toUpperCase();
+        }
+
+        // Format feedback date
+        function formatFeedbackDate(dateString) {
+          if (!dateString) return '';
+          try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          } catch (e) {
+            return dateString;
+          }
+        }
+      });
+    </script>
+
+    <!-- Luxury Theme JavaScript -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
+
+    <!-- Enhanced Page Interactions -->
+    <script>
+      // Initialize luxury theme features
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling offset for fixed navbar
+        const navHeight = document.querySelector('.navbar-luxury').offsetHeight;
+        document.documentElement.style.setProperty('--nav-height', navHeight + 'px');
+        
+        // Update scroll padding for smooth anchor navigation
+        document.documentElement.style.scrollPaddingTop = (navHeight + 20) + 'px';
+        
+        // Enhanced vehicle card creation with luxury styling
+        const originalCreateVehicleCard = window.createVehicleCard;
+        window.createVehicleCard = function(vehicle) {
+          const card = document.createElement('div');
+          card.className = 'col-lg-4 col-md-6 mb-4';
+          card.innerHTML = `
+            <div class="card-luxury hover-luxury animate-fade-in-up" style="height: 100%;">
+              <div style="position: relative; overflow: hidden; border-radius: var(--radius-luxury) var(--radius-luxury) 0 0;">
+                <img src="${vehicle.imageUrl || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'}" 
+                     class="card-img-top" alt="${vehicle.make} ${vehicle.model}" 
+                     style="height: 220px; object-fit: cover; transition: var(--transition-luxury);"
+                     onmouseover="this.style.transform='scale(1.1)'"
+                     onmouseout="this.style.transform='scale(1)'">
+                <div style="position: absolute; top: 15px; right: 15px; background: var(--gradient-gold); color: var(--luxury-black); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                  ${vehicle.status === 'AVAILABLE' ? 'Available' : 'Reserved'}
+                </div>
+              </div>
+              <div class="card-body" style="padding: 1.5rem;">
+                <h5 style="font-family: var(--font-luxury-primary); color: var(--luxury-gold); font-size: 1.3rem; margin-bottom: 0.5rem;">
+                  ${vehicle.make} ${vehicle.model}
+                </h5>
+                <p style="color: var(--text-luxury-gray); font-size: 0.9rem; margin-bottom: 1rem;">
+                  ${vehicle.year} • ${vehicle.fuelType} • ${vehicle.transmission}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span style="color: var(--luxury-gold); font-size: 1.4rem; font-weight: 700;">
+                      $${vehicle.dailyRate}
+                    </span>
+                    <span style="color: var(--text-luxury-muted); font-size: 0.9rem;">
+                      /day
+                    </span>
+                  </div>
+                  <a href="/login" class="btn-luxury btn-luxury-gold" style="font-size: 0.85rem; padding: 8px 16px;">
+                    <i class="fas fa-key mr-1"></i> Rent Now
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+          return card;
+        };
+        
+        // Enhanced feedback card creation
+        const originalCreateFeedbackCard = window.createFeedbackCard;
+        if (originalCreateFeedbackCard) {
+          window.createFeedbackCard = function(feedback) {
+            const card = document.createElement('div');
+            card.className = 'col-lg-4 col-md-6 mb-4';
+            card.innerHTML = `
+              <div class="card-luxury hover-luxury animate-fade-in-up" style="height: 100%; background: var(--luxury-charcoal);">
+                <div class="card-body" style="padding: 2rem;">
+                  <div class="d-flex align-items-center mb-3">
+                    <div style="width: 50px; height: 50px; background: var(--gradient-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                      <i class="fas fa-user" style="color: var(--luxury-black); font-size: 1.2rem;"></i>
+                    </div>
+                    <div>
+                      <h6 style="color: var(--luxury-gold); margin: 0; font-weight: 600;">${feedback.customerName}</h6>
+                      <div style="color: var(--luxury-gold); font-size: 0.9rem;">
+                        ${'★'.repeat(feedback.rating)}${'☆'.repeat(5 - feedback.rating)}
+                      </div>
+                    </div>
+                  </div>
+                  <p style="color: var(--text-luxury-light); font-style: italic; line-height: 1.6; margin: 0;">
+                    "${feedback.comment}"
+                  </p>
+                  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                    <small style="color: var(--text-luxury-muted);">
+                      ${new Date(feedback.feedbackDate).toLocaleDateString()}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            `;
+            return card;
+          };
+        }
       });
     </script>
   </body>

@@ -61,6 +61,9 @@ async function handleVerify2FA(event) {
         if (response.data.success) {
             showMessage(response.data.message || 'Verification successful!', 'success');
             
+            // Clear any existing user data to prevent conflicts between different accounts
+            localStorage.clear();
+            
             // Save the token
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
@@ -74,6 +77,20 @@ async function handleVerify2FA(event) {
             // Set user name in localStorage if available
             if (response.data.userName) {
                 localStorage.setItem('userName', response.data.userName);
+            }
+
+            // Store user ID and email
+            if (response.data.userId) {
+                localStorage.setItem('userId', response.data.userId);
+            }
+
+            if (response.data.userEmail) {
+                localStorage.setItem('userEmail', response.data.userEmail);
+            }
+
+            // Store customer ID if available (for customer role)
+            if (response.data.customerId) {
+                localStorage.setItem('customerId', response.data.customerId);
             }
 
             // Clear the session storage

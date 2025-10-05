@@ -3,109 +3,473 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Account | Car Rental System</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/auth-styles.css" />
+    <title>Join VeloRent | Luxury Car Rental Experience</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- Luxury Theme CSS (Main styling) -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <!-- Bootstrap CSS (Secondary for grid system) -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
   </head>
   <body>
-    <div class="auth-container">
-      <div class="auth-header">
-        <h1>Create Account</h1>
-        <p>Join our car rental service today</p>
-      </div>
-
-      <div id="message-container" class="message"></div>
-
-      <form id="register-form" class="auth-form">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input type="text" id="firstName" name="firstName" required />
-        </div>
-
-        <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" name="lastName" required />
-        </div>
-
-        <!-- Customer fields moved here -->
-        <div id="customerDetailsSection">
-          <div class="form-group">
-            <label for="contactNumber">Contact Number</label>
-            <input type="tel" id="contactNumber" name="contactNumber" />
-          </div>
-
-          <div class="form-group">
-            <label for="addressStreet">Street Address</label>
-            <input type="text" id="addressStreet" name="addressStreet" />
-          </div>
-
-          <div class="form-group">
-            <label for="addressCity">City</label>
-            <input type="text" id="addressCity" name="addressCity" />
-          </div>
-
-          <div class="form-group">
-            <label for="addressPostalCode">Postal Code</label>
-            <input
-              type="text"
-              id="addressPostalCode"
-              name="addressPostalCode"
-            />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required />
-          <small>Password must be at least 8 characters</small>
-        </div>
-
-        <div class="form-group">
-          <label for="passwordConfirm">Confirm Password</label>
-          <input
-            type="password"
-            id="passwordConfirm"
-            name="passwordConfirm"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="roleName">Register as:</label>
-          <select id="roleName" name="roleName">
-            <option value="ROLE_CUSTOMER" selected>Customer</option>
-            <option value="ROLE_FLEET_MANAGER">Fleet Manager</option>
-            <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
-            <option value="ROLE_OWNER">Owner</option>
-          </select>
-        </div>
-
-        <!-- Staff details section (without title) -->
-        <div id="staffDetailsSection" style="display: none">
-          <div class="form-group">
-            <label for="staffIdCode">Staff ID Code</label>
-            <input type="text" id="staffIdCode" name="staffIdCode" />
-            <small>Required for administrator accounts</small>
-          </div>
-        </div>
-
-        <button type="submit" class="btn">Create Account</button>
-      </form>
-
-      <div class="auth-links">
-        <a href="/login">Already have an account? Login here</a>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent</div>
       </div>
     </div>
 
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+      <div class="container">
+        <a class="navbar-brand-luxury" href="/">
+          <i class="fas fa-crown mr-2"></i> VeloRent
+        </a>
+        <div class="ml-auto">
+          <a href="/login" class="btn-luxury btn-luxury-outline mr-2">
+            <i class="fas fa-sign-in-alt mr-1"></i> Login
+          </a>
+          <a href="/" class="btn-luxury btn-luxury-silver">
+            <i class="fas fa-home mr-1"></i> Home
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Registration Container -->
+    <div class="luxury-auth-container">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-md-10">
+            <div class="form-luxury animate-fade-in-up">
+              <!-- Header -->
+              <div class="text-center mb-4">
+                <div class="luxury-icon-circle">
+                  <i class="fas fa-user-plus"></i>
+                </div>
+                <h1 class="luxury-title">
+                  Join VeloRent
+                </h1>
+                <p class="luxury-subtitle">
+                  Begin your luxury car rental journey today
+                </p>
+              </div>
+
+              <!-- Message Container -->
+              <div id="message-container" class="message-container"></div>
+
+              <!-- Registration Form -->
+              <form id="register-form">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group-luxury">
+                      <label for="firstName" class="form-label-luxury">
+                        <i class="fas fa-user mr-2"></i>First Name
+                      </label>
+                      <input 
+                        type="text" 
+                        id="firstName" 
+                        name="firstName" 
+                        class="form-control-luxury" 
+                        placeholder="Enter your first name"
+                        required 
+                        data-label="First Name"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group-luxury">
+                      <label for="lastName" class="form-label-luxury">
+                        <i class="fas fa-user mr-2"></i>Last Name
+                      </label>
+                      <input 
+                        type="text" 
+                        id="lastName" 
+                        name="lastName" 
+                        class="form-control-luxury" 
+                        placeholder="Enter your last name"
+                        required 
+                        data-label="Last Name"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group-luxury">
+                  <label for="email" class="form-label-luxury">
+                    <i class="fas fa-envelope mr-2"></i>Email Address
+                  </label>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-control-luxury" 
+                    placeholder="Enter your email address"
+                    required 
+                    data-label="Email"
+                  />
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group-luxury">
+                      <label for="password" class="form-label-luxury">
+                        <i class="fas fa-lock mr-2"></i>Password
+                      </label>
+                      <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control-luxury" 
+                        placeholder="Create secure password"
+                        required 
+                        data-label="Password"
+                      />
+                      <small style="color: var(--text-luxury-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+                        Password must be at least 8 characters
+                      </small>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group-luxury">
+                      <label for="passwordConfirm" class="form-label-luxury">
+                        <i class="fas fa-lock mr-2"></i>Confirm Password
+                      </label>
+                      <input 
+                        type="password" 
+                        id="passwordConfirm" 
+                        name="passwordConfirm" 
+                        class="form-control-luxury" 
+                        placeholder="Confirm your password"
+                        required 
+                        data-label="Confirm Password"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group-luxury">
+                  <label for="roleName" class="form-label-luxury">
+                    <i class="fas fa-user-tag mr-2"></i>Account Type
+                  </label>
+                  <select id="roleName" name="roleName" class="form-control-luxury">
+                    <option value="ROLE_CUSTOMER" selected>Premium Customer</option>
+                    <option value="ROLE_FLEET_MANAGER">Fleet Manager</option>
+                    <option value="ROLE_SYSTEM_ADMIN">System Administrator</option>
+                    <option value="ROLE_OWNER">Business Owner</option>
+                  </select>
+                </div>
+
+                <!-- Customer Details Section -->
+                <div id="customerDetailsSection" class="animate-fade-in-up">
+                  <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); margin: 2rem 0 1.5rem; padding-top: 1.5rem;">
+                    <h4 style="color: var(--luxury-gold); font-family: var(--font-luxury-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">
+                      <i class="fas fa-address-card mr-2"></i>Contact Information
+                    </h4>
+                  </div>
+                  
+                  <div class="form-group-luxury">
+                    <label for="contactNumber" class="form-label-luxury">
+                      <i class="fas fa-phone mr-2"></i>Phone Number
+                    </label>
+                    <input 
+                      type="tel" 
+                      id="contactNumber" 
+                      name="contactNumber" 
+                      class="form-control-luxury" 
+                      placeholder="Enter your phone number"
+                      data-label="Phone Number"
+                    />
+                  </div>
+
+                  <div class="form-group-luxury">
+                    <label for="addressStreet" class="form-label-luxury">
+                      <i class="fas fa-road mr-2"></i>Street Address
+                    </label>
+                    <input 
+                      type="text" 
+                      id="addressStreet" 
+                      name="addressStreet" 
+                      class="form-control-luxury" 
+                      placeholder="Enter your street address"
+                      data-label="Street Address"
+                    />
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="form-group-luxury">
+                        <label for="addressCity" class="form-label-luxury">
+                          <i class="fas fa-city mr-2"></i>City
+                        </label>
+                        <input 
+                          type="text" 
+                          id="addressCity" 
+                          name="addressCity" 
+                          class="form-control-luxury" 
+                          placeholder="Enter your city"
+                          data-label="City"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group-luxury">
+                        <label for="addressPostalCode" class="form-label-luxury">
+                          <i class="fas fa-mail-bulk mr-2"></i>Postal Code
+                        </label>
+                        <input 
+                          type="text" 
+                          id="addressPostalCode" 
+                          name="addressPostalCode" 
+                          class="form-control-luxury" 
+                          placeholder="Postal code"
+                          data-label="Postal Code"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Staff Details Section -->
+                <div id="staffDetailsSection" style="display: none;" class="animate-fade-in-up">
+                  <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); margin: 2rem 0 1.5rem; padding-top: 1.5rem;">
+                    <h4 style="color: var(--luxury-gold); font-family: var(--font-luxury-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">
+                      <i class="fas fa-id-badge mr-2"></i>Staff Information
+                    </h4>
+                  </div>
+                  
+                  <div class="form-group-luxury">
+                    <label for="staffIdCode" class="form-label-luxury">
+                      <i class="fas fa-id-card mr-2"></i>Staff ID Code
+                    </label>
+                    <input 
+                      type="text" 
+                      id="staffIdCode" 
+                      name="staffIdCode" 
+                      class="form-control-luxury" 
+                      placeholder="Enter your staff identification code"
+                      data-label="Staff ID Code"
+                    />
+                    <small style="color: var(--text-luxury-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+                      Required for administrator and staff accounts
+                    </small>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-luxury btn-luxury-gold w-100 mb-4">
+                  <i class="fas fa-user-plus mr-2"></i>
+                  Create VeloRent Account
+                </button>
+              </form>
+
+              <!-- Auth Links -->
+              <div class="text-center">
+                <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 1.5rem;">
+                  <span style="color: var(--text-luxury-muted);">Already have an account? </span>
+                  <a href="/login" class="hover-gold" style="color: var(--luxury-gold); text-decoration: none; font-weight: 600;">
+                    Sign In Here
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background Elements -->
+    <div style="position: fixed; top: 10%; right: 5%; width: 250px; height: 250px; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); border-radius: 50%; animation: float 10s ease-in-out infinite;"></div>
+    <div style="position: fixed; bottom: 15%; left: 8%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(192,192,192,0.03) 0%, transparent 70%); border-radius: 50%; animation: float 7s ease-in-out infinite reverse;"></div>
+
+    <!-- Scripts -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
     <script src="/js/auth-common.js"></script>
     <script src="/js/register.js"></script>
+
+    <!-- Enhanced Registration Interactions -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize luxury theme message handling
+        function showLuxuryMessage(message, type = 'info') {
+          const messageContainer = document.getElementById('message-container');
+          if (!messageContainer) return;
+          
+          let alertClass = 'alert-info-luxury';
+          let icon = 'fas fa-info-circle';
+          
+          switch(type) {
+            case 'error':
+              alertClass = 'alert-error-luxury';
+              icon = 'fas fa-exclamation-triangle';
+              break;
+            case 'success':
+              alertClass = 'alert-success-luxury';
+              icon = 'fas fa-check-circle';
+              break;
+            case 'warning':
+              alertClass = 'alert-warning-luxury';
+              icon = 'fas fa-exclamation-circle';
+              break;
+          }
+          
+          messageContainer.innerHTML = `
+            <div class="alert-luxury ${alertClass}">
+              <i class="${icon} mr-2"></i>
+              ${message}
+            </div>
+          `;
+          
+          // Auto-hide success messages
+          if (type === 'success') {
+            setTimeout(() => {
+              messageContainer.innerHTML = '';
+            }, 5000);
+          }
+        }
+        
+        // Override global showMessage
+        window.showMessage = showLuxuryMessage;
+        
+        // Handle URL parameters for messages
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const messageType = urlParams.get('type') || 'info';
+        
+        if (message) {
+          showLuxuryMessage(decodeURIComponent(message), messageType);
+          // Clean up URL
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+
+        // Enhanced role selection handling
+        const roleSelect = document.getElementById('roleName');
+        const customerSection = document.getElementById('customerDetailsSection');
+        const staffSection = document.getElementById('staffDetailsSection');
+        
+        function updateSectionVisibility() {
+          const selectedRole = roleSelect.value;
+          
+          if (selectedRole === 'ROLE_CUSTOMER') {
+            customerSection.style.display = 'block';
+            staffSection.style.display = 'none';
+            customerSection.classList.add('animate-fade-in-up');
+          } else {
+            customerSection.style.display = 'none';
+            staffSection.style.display = 'block';
+            staffSection.classList.add('animate-fade-in-up');
+          }
+        }
+        
+        roleSelect.addEventListener('change', updateSectionVisibility);
+        updateSectionVisibility(); // Initial call
+
+        // Add loading state to register button on form submit
+        const registerForm = document.getElementById('register-form');
+        const submitButton = registerForm.querySelector('button[type="submit"]');
+        
+        registerForm.addEventListener('submit', function() {
+          if (window.LuxuryTheme) {
+            window.LuxuryTheme.addLoadingState(submitButton, 'Creating Account...');
+          }
+        });
+
+        // Remove loading state on error or success
+        window.addEventListener('registerResult', function(event) {
+          if (window.LuxuryTheme) {
+            window.LuxuryTheme.removeLoadingState(submitButton);
+          }
+        });
+      });
+    </script>
+
+    <style>
+      /* Override CSS for register page specific styling */
+      .luxury-auth-container {
+        min-height: 100vh;
+        padding: 120px 20px 40px;
+        background: var(--luxury-black);
+        background-image: 
+          radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+          radial-gradient(circle at 85% 80%, rgba(192, 192, 192, 0.03) 0%, transparent 50%);
+      }
+      
+      .luxury-icon-circle {
+        width: 80px;
+        height: 80px;
+        background: var(--gradient-gold);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        animation: luxuryPulse 2s infinite;
+      }
+      
+      .luxury-icon-circle i {
+        font-size: 2rem;
+        color: var(--luxury-black);
+      }
+      
+      .luxury-title {
+        font-family: var(--font-luxury-primary);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--luxury-gold);
+        font-weight: 700;
+      }
+      
+      .luxury-subtitle {
+        color: var(--text-luxury-gray);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+      }
+      
+      .message-container {
+        margin-bottom: 1.5rem;
+        min-height: 0;
+      }
+      
+      /* Floating background animations */
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-25px); }
+      }
+      
+      /* Form validation styling */
+      .form-control-luxury.error {
+        border-color: #ef5350;
+        box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.1);
+      }
+      
+      .error-message {
+        color: #ef5350;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        animation: luxuryFadeInUp 0.3s ease;
+      }
+      
+      /* Enhanced select dropdown styling */
+      .form-control-luxury select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d4af37' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 12px center;
+        background-repeat: no-repeat;
+        background-size: 16px 12px;
+        padding-right: 2.5rem;
+      }
+      
+      /* Ensure navbar is above everything */
+      .navbar-luxury {
+        z-index: 1000;
+      }
+      
+      /* Enhanced form sections */
+      #customerDetailsSection,
+      #staffDetailsSection {
+        animation: luxuryFadeInUp 0.5s ease;
+      }
+    </style>
   </body>
 </html>
