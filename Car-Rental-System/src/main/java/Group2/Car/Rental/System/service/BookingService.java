@@ -538,9 +538,46 @@ public class BookingService {
         Customer customer = customerOptional.get();
         List<Booking> bookings = bookingRepository.findByCustomer(customer);
         java.util.ArrayList<Group2.Car.Rental.System.dto.BookingSummaryDTO> result = new java.util.ArrayList<>();
+
         for (Booking b : bookings) {
-            Vehicle v = b.getVehicle();
-            Group2.Car.Rental.System.dto.BookingSummaryDTO dto = new Group2.Car.Rental.System.dto.BookingSummaryDTO(
+            Group2.Car.Rental.System.dto.BookingSummaryDTO dto;
+
+            // Check if this is a package booking or vehicle booking
+            if ("PACKAGE".equals(b.getBookingType()) && b.getVehiclePackage() != null) {
+                // Handle package booking
+                VehiclePackage pkg = b.getVehiclePackage();
+
+                // Create vehicle info list for the package
+                java.util.List<Group2.Car.Rental.System.dto.BookingSummaryDTO.VehicleInfo> vehicleInfoList =
+                    new java.util.ArrayList<>();
+
+                for (Vehicle v : pkg.getVehicles()) {
+                    vehicleInfoList.add(new Group2.Car.Rental.System.dto.BookingSummaryDTO.VehicleInfo(
+                        v.getVehicleId(),
+                        v.getMake(),
+                        v.getModel(),
+                        v.getRegistrationNumber(),
+                        v.getImageUrl()
+                    ));
+                }
+
+                // Create package booking DTO
+                dto = new Group2.Car.Rental.System.dto.BookingSummaryDTO(
+                    b.getBookingId(),
+                    b.getStartDate(),
+                    b.getEndDate(),
+                    b.getBookingStatus(),
+                    b.getTotalCost(),
+                    pkg.getPackageId(),
+                    pkg.getPackageName(),
+                    pkg.getImageUrl(),
+                    pkg.getDuration(),
+                    vehicleInfoList
+                );
+            } else {
+                // Handle individual vehicle booking
+                Vehicle v = b.getVehicle();
+                dto = new Group2.Car.Rental.System.dto.BookingSummaryDTO(
                     b.getBookingId(),
                     b.getStartDate(),
                     b.getEndDate(),
@@ -551,7 +588,9 @@ public class BookingService {
                     v != null ? v.getModel() : null,
                     v != null ? v.getRegistrationNumber() : null,
                     v != null ? v.getImageUrl() : null
-            );
+                );
+            }
+
             result.add(dto);
         }
         return result;
