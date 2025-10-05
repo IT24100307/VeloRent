@@ -3,53 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VeloRent - Car Rental Service</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <title>VeloRent - Luxury Car Rental Experience</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
-    <!-- Custom CSS -->
+    <!-- Luxury Theme CSS (Main styling) -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <!-- Bootstrap CSS (Secondary for grid system) -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Custom Luxury Enhancements -->
     <style>
-      :root {
-        --primary-color: #4361ee;
-        --secondary-color: #3f37c9;
-        --accent-color: #4cc9f0;
-        --light-bg: #f8f9fa;
-        --dark-bg: #212529;
-        --text-light: #f8f9fa;
-        --text-dark: #212529;
-      }
-
+      /* Additional luxury styling to complement the main theme */
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: var(--light-bg);
+        padding-top: 80px; /* Account for fixed navbar */
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
       }
 
-      .navbar {
-        background-color: var(--primary-color);
+      
+      /* Smooth scrolling enhancements */
+      html {
+        scroll-behavior: smooth;
       }
-
-      .navbar-brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: white !important;
-      }
-
-      .nav-link {
-        color: rgba(255, 255, 255, 0.85) !important;
-        font-weight: 500;
-      }
-
-      .nav-link:hover {
-        color: white !important;
-      }
-
-      .auth-buttons .btn {
-        margin-left: 10px;
-        border-radius: 20px;
-        padding: 8px 20px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+      
+      /* Package slideshow luxury enhancements */
+      .packages-slider-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
+        background: var(--luxury-charcoal);
       }
 
       .btn-outline-light {
@@ -108,21 +92,50 @@
         font-weight: bold;
         text-align: center;
         margin: 60px 0 30px;
-        color: var(--dark-bg);
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+      }
+      
+      .section-title::after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 3px;
+        background: var(--gradient-gold);
+        margin: 1rem auto;
+        border-radius: 2px;
       }
 
       .vehicle-card {
         border: none;
-        border-radius: 10px;
+        border-radius: var(--radius-luxury-large);
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        box-shadow: var(--shadow-luxury);
+        transition: var(--transition-smooth);
         margin-bottom: 25px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .vehicle-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-luxury-intense);
+        border-color: var(--luxury-gold);
+      }
+      
+      .vehicle-card .card-body {
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+      }
+      
+      .vehicle-card .card-title {
+        color: var(--luxury-gold) !important;
+        font-weight: 600;
+        font-size: 1.2rem;
       }
 
       .vehicle-img {
@@ -133,33 +146,56 @@
       .vehicle-price {
         font-size: 1.5rem;
         font-weight: bold;
-        color: var(--primary-color);
+        color: var(--luxury-gold) !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
       }
 
       .vehicle-status {
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: #29cc97;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 20px;
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+        padding: 8px 15px;
+        border-radius: 25px;
         font-size: 0.8rem;
-        font-weight: bold;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: var(--shadow-luxury);
       }
 
       .filter-section {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        padding: 25px;
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
         margin-bottom: 30px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .filter-title {
-        font-weight: bold;
-        color: var(--dark-bg);
+        font-weight: 600;
+        color: var(--luxury-gold) !important;
         margin-bottom: 15px;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      
+      .filter-section select,
+      .filter-section input {
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: var(--radius-luxury-small);
+      }
+      
+      .filter-section select:focus,
+      .filter-section input:focus {
+        border-color: var(--luxury-gold) !important;
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
       }
 
       .loading-spinner {
@@ -218,14 +254,15 @@
 
       .package-slide {
         min-width: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+        color: var(--text-luxury-light);
         padding: 60px 40px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
         overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
       }
 
       .package-slide::before {
@@ -235,7 +272,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.2);
+        background: linear-gradient(45deg, rgba(212, 175, 55, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%);
         z-index: 1;
       }
 
@@ -249,7 +286,9 @@
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 15px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
 
       .package-description {
@@ -290,16 +329,16 @@
       }
 
       .package-rent-btn {
-        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        background: var(--gradient-gold);
         border: none;
         padding: 15px 35px;
         font-size: 1.2rem;
         font-weight: bold;
         border-radius: 50px;
-        color: white;
+        color: var(--luxury-black);
         cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        transition: var(--transition-smooth);
+        box-shadow: var(--shadow-luxury);
         text-transform: uppercase;
         letter-spacing: 1px;
         position: relative;
@@ -307,9 +346,9 @@
       }
 
       .package-rent-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
-        background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-luxury-intense);
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
       }
 
       .package-rent-btn:active {
@@ -448,13 +487,14 @@
       }
 
       .feedback-card {
-        background: white;
-        border-radius: 15px;
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        border-radius: var(--radius-luxury-large);
         padding: 30px;
         margin-bottom: 30px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: var(--shadow-luxury);
+        transition: var(--transition-smooth);
+        border: 1px solid rgba(212, 175, 55, 0.2);
         position: relative;
         overflow: hidden;
       }
@@ -466,12 +506,13 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        background: var(--gradient-gold);
       }
 
       .feedback-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-luxury-intense);
+        border-color: var(--luxury-gold);
       }
 
       .feedback-rating {
@@ -505,7 +546,7 @@
         font-style: italic;
         font-size: 1.1rem;
         line-height: 1.6;
-        color: #444;
+        color: var(--text-luxury-gray) !important;
         margin-bottom: 20px;
         position: relative;
       }
@@ -513,7 +554,7 @@
       .feedback-comment::before {
         content: '"';
         font-size: 3rem;
-        color: var(--primary-color);
+        color: var(--luxury-gold);
         position: absolute;
         top: -10px;
         left: -10px;
@@ -532,11 +573,58 @@
         font-family: Georgia, serif;
       }
 
+      /* Additional luxury theme overrides */
+      .text-muted {
+        color: var(--text-luxury-muted) !important;
+      }
+      
+      .btn-primary {
+        background: var(--gradient-gold) !important;
+        border: none !important;
+        color: var(--luxury-black) !important;
+        font-weight: 600 !important;
+        padding: 10px 20px !important;
+        border-radius: var(--radius-luxury-small) !important;
+        transition: var(--transition-smooth) !important;
+      }
+      
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: var(--shadow-luxury) !important;
+      }
+      
+      .btn-outline-secondary {
+        border-color: var(--luxury-gold) !important;
+        color: var(--luxury-gold) !important;
+        background: transparent !important;
+        border-radius: var(--radius-luxury-small) !important;
+        transition: var(--transition-smooth) !important;
+      }
+      
+      .btn-outline-secondary:hover {
+        background: var(--luxury-gold) !important;
+        color: var(--luxury-black) !important;
+        transform: translateY(-2px) !important;
+      }
+      
+      /* Loading and error messages */
+      .loading-spinner {
+        color: var(--luxury-gold) !important;
+      }
+      
+      .alert {
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: var(--radius-luxury-small) !important;
+      }
+
       .feedback-customer {
         display: flex;
         align-items: center;
         padding-top: 15px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .feedback-avatar {
@@ -556,12 +644,12 @@
 
       .feedback-customer-info h6 {
         margin: 0;
-        color: #333;
+        color: var(--luxury-gold) !important;
         font-weight: 600;
       }
 
       .feedback-customer-info small {
-        color: #666;
+        color: var(--text-luxury-muted) !important;
         font-size: 0.85rem;
       }
 
@@ -610,56 +698,98 @@
     </style>
   </head>
   <body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent</div>
+      </div>
+    </div>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="/">
-          <i class="fas fa-car-side mr-2"></i> VeloRent
+        <a class="navbar-brand-luxury" href="/" data-animation="animate-fade-in-left">
+          <i class="fas fa-crown mr-2"></i> VeloRent
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#vehicles">Vehicles</a>
+              <a class="nav-link-luxury" href="#vehicles">Vehicles</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Services</a>
+              <a class="nav-link-luxury" href="#packages-slideshow">Packages</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/feedback">About Us</a>
+              <a class="nav-link-luxury" href="/feedback">About Us</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
+              <a class="nav-link-luxury" href="#customer-feedback">Reviews</a>
             </li>
           </ul>
           <div class="auth-buttons">
-            <a href="/login" class="btn btn-outline-light">Login</a>
-            <a href="/register" class="btn btn-light">Register</a>
+            <a href="/login" class="btn-luxury btn-luxury-outline mr-2">
+              <i class="fas fa-sign-in-alt mr-1"></i> Login
+            </a>
+            <a href="/register" class="btn-luxury btn-luxury-gold">
+              <i class="fas fa-user-plus mr-1"></i> Register
+            </a>
           </div>
         </div>
       </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="container">
-        <h1 class="hero-title">Find Your Perfect Ride</h1>
-        <p class="hero-subtitle">Explore our fleet of premium vehicles for your next adventure</p>
-        <a href="#vehicles" class="btn btn-primary btn-lg">
-          <i class="fas fa-search mr-2"></i> Browse Vehicles
-        </a>
+    <section class="hero-section" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1563450392-1ef48ff2d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') no-repeat center center; background-size: cover; min-height: 100vh; display: flex; align-items: center; text-align: center; position: relative; overflow: hidden;">
+      <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <h1 class="hero-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(3rem, 6vw, 5rem); font-weight: 900; margin-bottom: 2rem; text-shadow: 2px 4px 8px rgba(0,0,0,0.5);">
+              Luxury Car Rental Experience
+            </h1>
+            <p class="hero-subtitle animate-fade-in-up animate-delay-1" style="font-size: 1.4rem; margin-bottom: 3rem; color: var(--text-luxury-light); font-weight: 300; line-height: 1.8; text-shadow: 1px 2px 4px rgba(0,0,0,0.5);">
+              Discover our exclusive collection of premium vehicles and embark on unforgettable journeys with unmatched luxury and style
+            </p>
+            <div class="hero-buttons animate-fade-in-up animate-delay-2">
+              <a href="#vehicles" class="btn-luxury btn-luxury-gold mr-3 mb-3">
+                <i class="fas fa-crown mr-2"></i> Explore Fleet
+              </a>
+              <a href="#packages-slideshow" class="btn-luxury btn-luxury-outline mb-3">
+                <i class="fas fa-gift mr-2"></i> View Packages
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
+      <!-- Floating Elements -->
+      <div style="position: absolute; top: 20%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+      <div style="position: absolute; bottom: 30%; right: 15%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(192,192,192,0.08) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite reverse;"></div>
     </section>
 
+    <style>
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+    </style>
+
     <!-- Packages Slideshow Section -->
-    <section id="packages-slideshow" class="py-5" style="background-color: #f8f9fa;">
+    <section id="packages-slideshow" class="py-5" style="background: var(--luxury-dark); position: relative;">
       <div class="container">
-        <h2 class="section-title">Featured Rental Packages</h2>
+        <div class="text-center mb-5">
+          <h2 class="section-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 1rem;">
+            Exclusive Rental Packages
+          </h2>
+          <p class="animate-fade-in-up animate-delay-1" style="color: var(--text-luxury-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Discover our curated selection of premium rental packages designed for the discerning traveler
+          </p>
+        </div>
         <div class="packages-slider-container">
           <div class="packages-slider" id="packages-slider">
             <!-- Package slides will be dynamically inserted here -->
@@ -727,19 +857,26 @@
     </div>
 
     <!-- Vehicles Section -->
-    <section id="vehicles">
+    <section id="vehicles" class="py-5" style="background: var(--gradient-luxury); position: relative;">
       <div class="container">
-        <h2 class="section-title">Available Vehicles</h2>
+        <div class="text-center mb-5">
+          <h2 class="section-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 1rem;">
+            Premium Vehicle Collection
+          </h2>
+          <p class="animate-fade-in-up animate-delay-1" style="color: var(--text-luxury-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Choose from our exclusive fleet of luxury vehicles, each meticulously maintained for your perfect driving experience
+          </p>
+        </div>
 
         <!-- Loading Spinner (shown initially) -->
-        <div id="loading-spinner" class="loading-spinner">
-          <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
+        <div id="loading-spinner" class="text-center py-5">
+          <div class="loader-spinner mx-auto mb-3"></div>
+          <p style="color: var(--luxury-gold); font-weight: 600;">Loading Premium Vehicles...</p>
         </div>
 
         <!-- Error Message (hidden initially) -->
-        <div id="error-message" class="alert alert-danger text-center" style="display: none;">
+        <div id="error-message" class="alert-luxury alert-error-luxury text-center" style="display: none;">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
           Unable to load vehicles. Please try again later.
         </div>
 
@@ -751,71 +888,96 @@
     </section>
 
     <!-- Customer Feedback Section -->
-    <section class="feedback-section py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+    <section id="customer-feedback" class="feedback-section py-5" style="background: var(--luxury-dark); position: relative;">
       <div class="container">
         <div class="text-center mb-5">
-          <h2 class="section-title" style="color: #333; margin-bottom: 20px;">What Our Customers Say</h2>
-          <p class="section-subtitle" style="color: #666; font-size: 1.1rem;">Real experiences from our valued customers</p>
+          <h2 class="section-title animate-fade-in-up" style="font-family: var(--font-luxury-primary); font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 1rem;">
+            Client Testimonials
+          </h2>
+          <p class="section-subtitle animate-fade-in-up animate-delay-1" style="color: var(--text-luxury-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Discover why discerning clients choose VeloRent for their luxury transportation needs
+          </p>
         </div>
         
         <div class="row" id="feedback-container">
           <!-- Feedback cards will be dynamically inserted here -->
           <div class="col-12 text-center">
             <div class="feedback-loading">
-              <i class="fas fa-spinner fa-spin"></i> Loading feedback...
+              <div class="loader-spinner mx-auto mb-3"></div>
+              <p style="color: var(--luxury-gold); font-weight: 600;">Loading Client Testimonials...</p>
             </div>
           </div>
         </div>
         
-        <div class="text-center mt-4">
-          <a href="/feedback" class="btn btn-primary">View All Feedback</a>
+        <div class="text-center mt-5">
+          <a href="/feedback" class="btn-luxury btn-luxury-gold">
+            <i class="fas fa-comments mr-2"></i>View All Testimonials
+          </a>
         </div>
       </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" style="background: var(--luxury-black); border-top: 1px solid rgba(212, 175, 55, 0.2); padding: 4rem 0 2rem;">
       <div class="container">
         <div class="row">
           <div class="col-md-4 mb-4">
-            <h5 class="footer-title">VeloRent</h5>
-            <p>Your trusted partner for all your vehicle rental needs. Quality vehicles at affordable prices.</p>
-            <div class="social-icons mt-3">
-              <a href="#"><i class="fab fa-facebook"></i></a>
-              <a href="#"><i class="fab fa-twitter"></i></a>
-              <a href="#"><i class="fab fa-instagram"></i></a>
-              <a href="#"><i class="fab fa-linkedin"></i></a>
+            <h5 class="footer-title" style="font-family: var(--font-luxury-primary); color: var(--luxury-gold); font-size: 1.5rem; margin-bottom: 1.5rem;">
+              <i class="fas fa-crown mr-2"></i>VeloRent
+            </h5>
+            <p style="color: var(--text-luxury-gray); line-height: 1.8; margin-bottom: 2rem;">
+              Experience the pinnacle of luxury transportation with our exclusive fleet of premium vehicles and unparalleled service excellence.
+            </p>
+            <div class="social-icons">
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; margin-right: 1rem; transition: var(--transition-luxury);">
+                <i class="fab fa-facebook"></i>
+              </a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; margin-right: 1rem; transition: var(--transition-luxury);">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; margin-right: 1rem; transition: var(--transition-luxury);">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); font-size: 1.5rem; transition: var(--transition-luxury);">
+                <i class="fab fa-linkedin"></i>
+              </a>
             </div>
           </div>
           <div class="col-md-3 mb-4">
-            <h5 class="footer-title">Quick Links</h5>
+            <h5 class="footer-title" style="color: var(--luxury-silver); font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Quick Links</h5>
             <div class="footer-links">
-              <a href="#">About Us</a>
-              <a href="#">Services</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Privacy Policy</a>
+              <a href="/feedback" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">About Us</a>
+              <a href="#packages-slideshow" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Premium Packages</a>
+              <a href="#vehicles" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Luxury Fleet</a>
+              <a href="#customer-feedback" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Testimonials</a>
             </div>
           </div>
           <div class="col-md-3 mb-4">
-            <h5 class="footer-title">Support</h5>
+            <h5 class="footer-title" style="color: var(--luxury-silver); font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Support</h5>
             <div class="footer-links">
-              <a href="#">FAQ</a>
-              <a href="#">Help Center</a>
-              <a href="#">Contact Us</a>
-              <a href="#">Careers</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">24/7 Concierge</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">VIP Support</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Terms & Conditions</a>
+              <a href="#" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; display: block; padding: 0.5rem 0; transition: var(--transition-fast);">Privacy Policy</a>
             </div>
           </div>
           <div class="col-md-2 mb-4">
-            <h5 class="footer-title">Contact</h5>
-            <address>
-              <p><i class="fas fa-map-marker-alt mr-2"></i> No32 Main St Melsiripura</p>
-              <p><i class="fas fa-phone mr-2"></i> (123) 456-7890</p>
-              <p><i class="fas fa-envelope mr-2"></i> 2025_Y2_S1_KUR_02@gmail.com</p>
+            <h5 class="footer-title" style="color: var(--luxury-silver); font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Contact</h5>
+            <address style="color: var(--text-luxury-gray); line-height: 2;">
+              <p><i class="fas fa-map-marker-alt mr-2" style="color: var(--luxury-gold);"></i> No32 Main St Melsiripura</p>
+              <p><i class="fas fa-phone mr-2" style="color: var(--luxury-gold);"></i> (123) 456-7890</p>
+              <p><i class="fas fa-envelope mr-2" style="color: var(--luxury-gold);"></i> luxury@velorent.com</p>
             </address>
           </div>
         </div>
-        <hr class="mt-4 mb-4" style="background-color: #6c757d;">
-        <p class="text-center">&copy; 2025 VeloRent. All rights reserved.</p>
+        <hr style="border-color: rgba(212, 175, 55, 0.2); margin: 3rem 0 2rem;">
+        <div class="text-center">
+          <p style="color: var(--text-luxury-muted); margin: 0;">
+            &copy; 2025 VeloRent. All rights reserved. | Crafted with 
+            <i class="fas fa-heart" style="color: var(--luxury-gold);"></i> 
+            for luxury enthusiasts
+          </p>
+        </div>
       </div>
     </footer>
 
@@ -931,7 +1093,7 @@
                   <h5 class="card-title">${vehicle.year} ${vehicle.make} ${vehicle.model}</h5>
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="vehicle-price">Rs ${vehicle.rentalRatePerDay}/day</span>
-                    <small class="text-muted">Reg: ${vehicle.registrationNumber}</small>
+                    <small style="color: var(--text-luxury-muted) !important;">Reg: ${vehicle.registrationNumber}</small>
                   </div>
                   <hr>
                   <div class="d-flex justify-content-between">
@@ -1342,6 +1504,101 @@
           } catch (e) {
             return dateString;
           }
+        }
+      });
+    </script>
+
+    <!-- Luxury Theme JavaScript -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
+
+    <!-- Enhanced Page Interactions -->
+    <script>
+      // Initialize luxury theme features
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling offset for fixed navbar
+        const navHeight = document.querySelector('.navbar-luxury').offsetHeight;
+        document.documentElement.style.setProperty('--nav-height', navHeight + 'px');
+        
+        // Update scroll padding for smooth anchor navigation
+        document.documentElement.style.scrollPaddingTop = (navHeight + 20) + 'px';
+        
+        // Enhanced vehicle card creation with luxury styling
+        const originalCreateVehicleCard = window.createVehicleCard;
+        window.createVehicleCard = function(vehicle) {
+          const card = document.createElement('div');
+          card.className = 'col-lg-4 col-md-6 mb-4';
+          card.innerHTML = `
+            <div class="card-luxury hover-luxury animate-fade-in-up" style="height: 100%;">
+              <div style="position: relative; overflow: hidden; border-radius: var(--radius-luxury) var(--radius-luxury) 0 0;">
+                <img src="${vehicle.imageUrl || 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'}" 
+                     class="card-img-top" alt="${vehicle.make} ${vehicle.model}" 
+                     style="height: 220px; object-fit: cover; transition: var(--transition-luxury);"
+                     onmouseover="this.style.transform='scale(1.1)'"
+                     onmouseout="this.style.transform='scale(1)'">
+                <div style="position: absolute; top: 15px; right: 15px; background: var(--gradient-gold); color: var(--luxury-black); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                  ${vehicle.status === 'AVAILABLE' ? 'Available' : 'Reserved'}
+                </div>
+              </div>
+              <div class="card-body" style="padding: 1.5rem;">
+                <h5 style="font-family: var(--font-luxury-primary); color: var(--luxury-gold); font-size: 1.3rem; margin-bottom: 0.5rem;">
+                  ${vehicle.make} ${vehicle.model}
+                </h5>
+                <p style="color: var(--text-luxury-gray); font-size: 0.9rem; margin-bottom: 1rem;">
+                  ${vehicle.year} • ${vehicle.fuelType} • ${vehicle.transmission}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span style="color: var(--luxury-gold); font-size: 1.4rem; font-weight: 700;">
+                      $${vehicle.dailyRate}
+                    </span>
+                    <span style="color: var(--text-luxury-muted); font-size: 0.9rem;">
+                      /day
+                    </span>
+                  </div>
+                  <a href="/login" class="btn-luxury btn-luxury-gold" style="font-size: 0.85rem; padding: 8px 16px;">
+                    <i class="fas fa-key mr-1"></i> Rent Now
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+          return card;
+        };
+        
+        // Enhanced feedback card creation
+        const originalCreateFeedbackCard = window.createFeedbackCard;
+        if (originalCreateFeedbackCard) {
+          window.createFeedbackCard = function(feedback) {
+            const card = document.createElement('div');
+            card.className = 'col-lg-4 col-md-6 mb-4';
+            card.innerHTML = `
+              <div class="card-luxury hover-luxury animate-fade-in-up" style="height: 100%; background: var(--luxury-charcoal);">
+                <div class="card-body" style="padding: 2rem;">
+                  <div class="d-flex align-items-center mb-3">
+                    <div style="width: 50px; height: 50px; background: var(--gradient-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                      <i class="fas fa-user" style="color: var(--luxury-black); font-size: 1.2rem;"></i>
+                    </div>
+                    <div>
+                      <h6 style="color: var(--luxury-gold); margin: 0; font-weight: 600;">${feedback.customerName}</h6>
+                      <div style="color: var(--luxury-gold); font-size: 0.9rem;">
+                        ${'★'.repeat(feedback.rating)}${'☆'.repeat(5 - feedback.rating)}
+                      </div>
+                    </div>
+                  </div>
+                  <p style="color: var(--text-luxury-light); font-style: italic; line-height: 1.6; margin: 0;">
+                    "${feedback.comment}"
+                  </p>
+                  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                    <small style="color: var(--text-luxury-muted);">
+                      ${new Date(feedback.feedbackDate).toLocaleDateString()}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            `;
+            return card;
+          };
         }
       });
     </script>

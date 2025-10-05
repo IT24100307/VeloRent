@@ -35,6 +35,11 @@ function loadAvailableVehicles() {
     allVehicles = vehicles;
     displayVehicles(vehicles);
 
+    // Populate filter dropdowns if available
+    if (window.populateFilterDropdowns) {
+      window.populateFilterDropdowns();
+    }
+
     // Hide loading and show vehicles container
     loadingElement.style.display = "none";
     vehiclesContainer.style.display = "block";
@@ -79,11 +84,11 @@ function displayVehicles(vehicles) {
         <div class="vehicle-make-model">${vehicle.make} ${vehicle.model}</div>
         <div class="vehicle-year">${vehicle.year}</div>
         <div class="vehicle-price">${priceDisplay}</div>
-        <div class="vehicle-status" style="color: ${vehicle.status === 'AVAILABLE' ? 'var(--accent-color)' : 'var(--light-text)'}">
+        <div class="vehicle-status" style="color: ${vehicle.status === 'AVAILABLE' ? '#27ae60' : 'var(--text-luxury-muted)'}">
           ${vehicle.status}
         </div>
-        <button class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})">
-          View Details
+        <button class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})" type="button">
+          <i class="fas fa-eye"></i> View Details
         </button>
       </div>
     `;
@@ -92,8 +97,14 @@ function displayVehicles(vehicles) {
   });
 }
 
-// Filter vehicles based on search input
+// Filter vehicles based on search input (legacy support)
 function filterVehicles() {
+  // Call the new combined function if it exists, otherwise use basic filtering
+  if (window.filterAndSortVehicles) {
+    window.filterAndSortVehicles();
+    return;
+  }
+  
   const searchTerm = document.getElementById("vehicle-search").value.toLowerCase();
 
   if (!searchTerm) {

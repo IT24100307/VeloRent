@@ -3,19 +3,311 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Two-Factor Authentication Setup | Car Rental System</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/auth-styles.css" />
+    <title>Security Settings | VeloRent - Luxury Car Rental</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- Luxury Theme CSS -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <style>
+      /* Luxury Security Settings Styling */
+      body {
+        background: var(--gradient-luxury) !important;
+        color: var(--text-luxury-light) !important;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: var(--font-luxury-secondary);
+      }
+
+      .security-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0;
+      }
+
+      .luxury-card {
+        background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .luxury-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+      }
+
+      .security-header {
+        padding: 40px 40px 30px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+        border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+        text-align: center;
+      }
+
+      .security-title {
+        font-size: 2.5rem;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .security-title::before {
+        content: '\f3ed';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 2rem;
+      }
+
+      .security-subtitle {
+        color: var(--text-luxury-muted);
+        font-size: 1.1rem;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      .security-body {
+        padding: 40px;
+      }
+
+      .message {
+        padding: 20px;
+        border-radius: var(--radius-luxury-medium);
+        margin-bottom: 25px;
+        font-weight: 600;
+        border: 2px solid;
+        position: relative;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .message.error {
+        color: #e74c3c;
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+        border-color: rgba(231, 76, 60, 0.5);
+      }
+
+      .message.success {
+        color: #27ae60;
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(46, 204, 113, 0.05) 100%);
+        border-color: rgba(46, 204, 113, 0.5);
+      }
+
+      .btn {
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--radius-luxury-small);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition-smooth);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      }
+
+      .qr-code-container {
+        text-align: center;
+        margin: 30px 0;
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: var(--radius-luxury-medium);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+      }
+
+      .secret-key {
+        background: rgba(0, 0, 0, 0.4);
+        padding: 15px;
+        border-radius: var(--radius-luxury-small);
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        color: var(--luxury-gold);
+        text-align: center;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        letter-spacing: 2px;
+        margin: 15px 0;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        color: var(--luxury-gold);
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+        font-family: var(--font-luxury-primary);
+      }
+
+      .form-control {
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: var(--radius-luxury-small);
+        padding: 12px 15px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-luxury-light);
+        font-size: 1rem;
+        font-weight: 500;
+        transition: var(--transition-smooth);
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 2px;
+      }
+
+      .form-control:focus {
+        border-color: var(--luxury-gold);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        background: rgba(0, 0, 0, 0.4);
+        color: var(--text-luxury-light);
+      }
+
+      .auth-divider {
+        text-align: center;
+        margin: 30px 0;
+        position: relative;
+      }
+
+      .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(212, 175, 55, 0.3);
+      }
+
+      .auth-divider span {
+        background: var(--luxury-black);
+        padding: 0 20px;
+        color: var(--luxury-gold);
+        font-weight: 600;
+        position: relative;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .back-link a {
+        color: var(--luxury-gold);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition-smooth);
+      }
+
+      .back-link a:hover {
+        color: var(--text-luxury-light);
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <div class="auth-container">
-      <div class="auth-header">
-        <h1>Security Settings</h1>
-        <p>Set up Two-Factor Authentication</p>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent Security</div>
       </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+      <div class="container">
+        <a class="navbar-brand-luxury" href="/dashboard">
+          <i class="fas fa-crown mr-2"></i> VeloRent
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/rental-history"><i class="fas fa-history mr-1"></i>Rental History</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/feedback"><i class="fas fa-info-circle mr-1"></i>About Us</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
+            </li>
+          </ul>
+          <div class="auth-buttons">
+            <div class="dropdown">
+              <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
+                <i class="fas fa-user-circle mr-1"></i>
+                <span id="user-initials">U</span>
+              </button>
+              <div class="dropdown-menu" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
+                <a class="dropdown-item hover-gold" href="#" id="logout-btn" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
+                  <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="security-container">
+      <div class="luxury-card">
+        <div class="security-header">
+          <h1 class="security-title">Security Settings</h1>
+          <p class="security-subtitle">Set up Two-Factor Authentication</p>
+        </div>
+        <div class="security-body">
 
       <div id="message-container" class="message"></div>
 
@@ -85,12 +377,26 @@
         </form>
       </div>
 
-      <div class="auth-links">
-        <a href="/dashboard">Back to Dashboard</a>
+          <div class="back-link">
+            <a href="/dashboard"><i class="fas fa-arrow-left mr-2"></i>Back to Dashboard</a>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Luxury Footer -->
+    <footer style="margin-top: 60px; background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%); color: var(--text-luxury-light); padding: 40px 0; border-top: 2px solid var(--luxury-gold); text-align: center;">
+      <p style="margin: 0; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+        &copy; 2025 <span style="color: var(--luxury-gold); font-weight: 700; font-family: var(--font-luxury-primary);">VeloRent</span> - Luxury Car Rental System. All rights reserved.
+        <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+      </p>
+    </footer>
+
     <script src="/js/auth-common.js"></script>
     <script src="/js/2fa-setup.js"></script>
+    <!-- Luxury Theme Scripts -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
   </body>
 </html>

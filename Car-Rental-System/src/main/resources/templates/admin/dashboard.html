@@ -3,35 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard | Car Rental System</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Admin Dashboard | VeloRent - Luxury Car Rental</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- Luxury Theme CSS (Main styling) -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <!-- Bootstrap CSS (Secondary for grid system) -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
     <style>
-      :root {
-        --primary-color: #1a237e;
-        --secondary-color: #3498db;
-        --accent-color: #2ecc71;
-        --danger-color: #e74c3c;
-        --text-color: #333;
-        --light-text: #666;
-        --background-color: #f8f9fa;
-        --card-background: #fff;
-        --border-color: #e1e1e1;
-      }
+      /* Admin Dashboard Luxury Theme Overrides */
 
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+        font-family: var(--font-luxury-secondary);
       }
 
       body {
-        background-color: var(--background-color);
-        color: var(--text-color);
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
         line-height: 1.6;
+        min-height: 100vh;
       }
 
       .container {
@@ -41,10 +36,11 @@
       }
 
       header {
-        background-color: var(--primary-color);
-        color: white;
+        background: var(--luxury-charcoal);
+        color: var(--text-luxury-light);
         padding: 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-luxury);
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       nav {
@@ -56,6 +52,8 @@
       .logo {
         font-size: 1.5rem;
         font-weight: bold;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
       }
 
       .nav-links {
@@ -64,15 +62,20 @@
       }
 
       .nav-links a {
-        color: white;
+        color: var(--text-luxury-light);
         text-decoration: none;
-        padding: 8px 15px;
-        border-radius: 4px;
-        transition: background-color 0.3s;
+        padding: 10px 18px;
+        border-radius: var(--radius-luxury-small);
+        transition: var(--transition-smooth);
+        font-weight: 500;
+        border: 1px solid transparent;
       }
 
       .nav-links a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background: var(--luxury-gold);
+        color: var(--luxury-black);
+        border-color: var(--luxury-gold);
+        transform: translateY(-1px);
       }
 
       main {
@@ -83,12 +86,27 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .dashboard-title {
-        font-size: 24px;
-        color: var(--primary-color);
+        font-size: 28px;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+      }
+      
+      .dashboard-title::before {
+        content: '\f3fd';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 15px;
+        color: var(--luxury-gold);
+        font-size: 1.2em;
       }
 
       .dashboard-actions {
@@ -97,83 +115,268 @@
       }
 
       .btn {
-        background-color: var(--primary-color);
-        color: white;
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
         border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
+        border-radius: var(--radius-luxury-small);
+        padding: 12px 20px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: var(--transition-smooth);
         text-decoration: none;
         display: inline-block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       .btn:hover {
-        background-color: #0d1b69;
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-luxury);
       }
 
       .btn-secondary {
-        background-color: var(--secondary-color);
+        background: transparent;
+        color: var(--luxury-gold);
+        border: 2px solid var(--luxury-gold);
       }
 
       .btn-secondary:hover {
-        background-color: #2980b9;
+        background: var(--luxury-gold);
+        color: var(--luxury-black);
       }
 
       .btn-danger {
-        background-color: var(--danger-color);
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
       }
 
       .btn-danger:hover {
-        background-color: #c0392b;
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
       }
 
-      .customer-list {
-        background-color: var(--card-background);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      .customer-list, .user-list {
+        background: var(--luxury-charcoal);
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
         overflow: hidden;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        backdrop-filter: blur(10px);
       }
 
-      .customer-list table {
+      .customer-list table, .user-list table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
       }
 
       .customer-list th,
-      .customer-list td {
-        padding: 12px 15px;
+      .customer-list td,
+      .user-list th,
+      .user-list td {
+        padding: 20px 25px;
         text-align: left;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+        color: var(--text-luxury-light);
+        vertical-align: middle;
+        position: relative;
       }
 
-      .customer-list th {
-        background-color: #f1f5f9;
-        font-weight: 500;
+      .customer-list th,
+      .user-list th {
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+        font-weight: 700;
+        color: var(--luxury-gold);
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1.2px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 2px solid var(--luxury-gold);
       }
 
-      .customer-list tr:hover {
-        background-color: #f9f9f9;
+      .customer-list th::before,
+      .user-list th::before {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, var(--luxury-gold) 50%, transparent 100%);
+        animation: shimmer 2s infinite;
+      }
+
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+
+      .customer-list tbody tr,
+      .user-list tbody tr {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: var(--radius-luxury-small);
+      }
+
+      .customer-list tbody tr:hover,
+      .user-list tbody tr:hover {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
         cursor: pointer;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+      }
+
+      .customer-list tbody tr:last-child td,
+      .user-list tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Add user icons and styling */
+      .user-id-cell {
+        font-weight: 700;
+        color: var(--luxury-gold);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+      }
+
+      .user-name-cell {
+        font-weight: 600;
+        font-size: 1.05rem;
+        position: relative;
+      }
+
+      .user-name-cell::before {
+        content: '\f007';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 10px;
+        color: var(--luxury-gold);
+        opacity: 0.7;
+      }
+
+      .user-email-cell {
+        font-family: 'Courier New', monospace;
+        font-size: 0.95rem;
+        color: var(--text-luxury-muted);
+      }
+
+      .user-role-cell {
+        position: relative;
+      }
+
+      .user-role-cell::before {
+        content: '\f2bd';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 8px;
+        color: var(--luxury-gold);
+        opacity: 0.7;
       }
 
       .action-cell {
-        width: 100px;
+        width: 180px;
+        text-align: center;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .btn-action {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        border-radius: var(--radius-luxury-small);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .btn-action:hover::before {
+        left: 100%;
+      }
+
+      .btn-details {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+      }
+
+      .btn-details:hover {
+        background: linear-gradient(135deg, #2980b9 0%, #1f5c8a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      .btn-edit {
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+      }
+
+      .btn-edit:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      }
+
+      .btn-delete {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+      }
+
+      .btn-delete:hover {
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .btn-role {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+      }
+
+      .btn-role:hover {
+        background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
       }
 
       .customer-details {
-        background-color: var(--card-background);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 20px;
+        background: var(--luxury-charcoal);
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
+        padding: 25px;
         margin-top: 20px;
         display: none;
+        border: 1px solid rgba(212, 175, 55, 0.2);
       }
 
       .customer-details h3 {
-        margin-bottom: 15px;
-        color: var(--primary-color);
+        margin-bottom: 20px;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-size: 1.4rem;
       }
 
       .customer-info {
@@ -187,13 +390,17 @@
       }
 
       .info-label {
-        font-weight: 500;
-        color: var(--light-text);
+        font-weight: 600;
+        color: var(--text-luxury-muted);
         font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
       }
 
       .info-value {
         font-size: 1.1rem;
+        color: var(--text-luxury-light);
       }
 
       .back-btn {
@@ -265,14 +472,46 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 0;
+        padding: 25px 30px;
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%);
+        border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        position: relative;
+      }
+
+      .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 2px;
+        background: var(--gradient-gold);
+        border-radius: 2px;
       }
 
       .section-title {
-        font-size: 1.3rem;
-        color: var(--primary-color);
+        font-size: 1.4rem;
+        color: var(--luxury-gold);
         margin: 0;
-        padding: 15px;
+        padding: 0;
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+
+      .section-title i {
+        margin-right: 15px;
+        font-size: 1.2em;
+        background: var(--gradient-gold);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
       .user-list {
@@ -316,23 +555,29 @@
       }
 
       .tab-button {
-        background: none;
+        background: transparent;
         border: none;
-        padding: 10px 20px;
+        padding: 15px 25px;
         font-size: 1rem;
         cursor: pointer;
         border-bottom: 3px solid transparent;
-        transition: all 0.3s;
-        font-weight: 500;
+        transition: var(--transition-smooth);
+        font-weight: 600;
+        color: var(--text-luxury-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: var(--radius-luxury-small) var(--radius-luxury-small) 0 0;
       }
 
       .tab-button:hover {
-        background-color: rgba(0, 0, 0, 0.03);
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--luxury-gold);
       }
 
       .tab-button.active {
-        border-bottom: 3px solid var(--primary-color);
-        color: var(--primary-color);
+        border-bottom: 3px solid var(--luxury-gold);
+        color: var(--luxury-gold);
+        background: rgba(212, 175, 55, 0.1);
       }
 
       .tab-content {
@@ -342,19 +587,71 @@
       .tab-content.active {
         display: block;
       }
+      
+      /* DataTables Luxury Theme Overrides */
+      .dataTables_wrapper {
+        color: var(--text-luxury-light) !important;
+      }
+      
+      .dataTables_filter input {
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: var(--radius-luxury-small) !important;
+        padding: 8px 12px !important;
+      }
+      
+      .dataTables_length select {
+        background: var(--luxury-black) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: var(--radius-luxury-small) !important;
+      }
+      
+      .dataTables_info {
+        color: var(--text-luxury-muted) !important;
+      }
+      
+      .paginate_button {
+        background: var(--luxury-charcoal) !important;
+        color: var(--text-luxury-light) !important;
+        border: 1px solid rgba(212, 175, 55, 0.2) !important;
+        border-radius: var(--radius-luxury-small) !important;
+        margin: 0 2px !important;
+      }
+      
+      .paginate_button:hover {
+        background: var(--luxury-gold) !important;
+        color: var(--luxury-black) !important;
+      }
+      
+      .paginate_button.current {
+        background: var(--luxury-gold) !important;
+        color: var(--luxury-black) !important;
+      }
     </style>
   </head>
   <body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent Admin</div>
+      </div>
+    </div>
+
     <header>
       <nav class="container">
-        <div class="logo">VeloRent Admin</div>
+        <div class="logo">
+          <i class="fas fa-crown mr-2"></i>VeloRent Admin
+        </div>
         <div class="nav-links">
-          <a href="/admin/dashboard">Dashboard</a>
-          <a href="#">Vehicles</a>
-          <a href="/admin/offers">Offers</a>
-          <a href="/admin/feedback">Feedback</a>
-          <a href="#">Reports</a>
-          <a href="/logout">Logout</a>
+          <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+          <a href="#"><i class="fas fa-car mr-1"></i>Vehicles</a>
+          <a href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a>
+          <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
+          <a href="#"><i class="fas fa-chart-bar mr-1"></i>Reports</a>
+          <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
         </div>
       </nav>
     </header>
@@ -378,8 +675,10 @@
 
         <div class="tab-content active" id="customers-tab">
           <section class="user-list customer-list">
-            <div class="section-header">
-              <h2 class="section-title">Customer List</h2>
+            <div class="section-header" style="padding: 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+              <h2 class="section-title" style="color: var(--luxury-gold); font-family: var(--font-luxury-primary); font-size: 1.3rem; margin: 0; display: flex; align-items: center;">
+                <i class="fas fa-users mr-2"></i>Customer Management
+              </h2>
             </div>
             <table>
               <thead>
@@ -689,11 +988,15 @@
         const actionCell = document.createElement('td');
         actionCell.classList.add('action-cell');
 
+        // Create action buttons container
+        const actionButtons = document.createElement('div');
+        actionButtons.classList.add('action-buttons');
+
         // Create details button
         const detailsButton = document.createElement('button');
-        detailsButton.textContent = 'Details';
-        detailsButton.classList.add('btn', 'btn-secondary');
-        detailsButton.style.marginRight = '5px';
+        detailsButton.innerHTML = '<i class="fas fa-info-circle"></i>';
+        detailsButton.classList.add('btn-action', 'btn-details');
+        detailsButton.title = 'View Details';
         detailsButton.onclick = function(e) {
           e.stopPropagation(); // Prevent row click event
           showUserDetails(user.id);
@@ -701,16 +1004,17 @@
 
         // Create change role button
         const changeRoleButton = document.createElement('button');
-        changeRoleButton.textContent = 'Change Role';
-        changeRoleButton.classList.add('btn');
-        changeRoleButton.style.marginRight = '5px';
+        changeRoleButton.innerHTML = '<i class="fas fa-user-cog"></i>';
+        changeRoleButton.classList.add('btn-action', 'btn-role');
+        changeRoleButton.title = 'Change Role';
         changeRoleButton.onclick = function(e) {
           e.stopPropagation(); // Prevent row click event
           showChangeRoleModal(user.id, `${user.firstName} ${user.lastName}`, user.role);
         };
 
-        actionCell.appendChild(detailsButton);
-        actionCell.appendChild(changeRoleButton);
+        actionButtons.appendChild(detailsButton);
+        actionButtons.appendChild(changeRoleButton);
+        actionCell.appendChild(actionButtons);
 
         return actionCell;
       }
@@ -818,22 +1122,28 @@
               // Create cells for customer info
               const idCell = document.createElement('td');
               idCell.textContent = customer.id;
+              idCell.classList.add('user-id-cell');
 
               const nameCell = document.createElement('td');
               nameCell.textContent = `${customer.firstName} ${customer.lastName}`;
-              nameCell.classList.add('customer-name');
+              nameCell.classList.add('user-name-cell');
 
               const emailCell = document.createElement('td');
               emailCell.textContent = customer.email;
+              emailCell.classList.add('user-email-cell');
 
               const actionCell = document.createElement('td');
               actionCell.classList.add('action-cell');
 
+              // Create action buttons container
+              const actionButtons = document.createElement('div');
+              actionButtons.classList.add('action-buttons');
+
               // Create edit button
               const editButton = document.createElement('button');
-              editButton.textContent = 'Edit';
-              editButton.classList.add('btn', 'btn-secondary');
-              editButton.style.marginRight = '5px';
+              editButton.innerHTML = '<i class="fas fa-edit"></i>';
+              editButton.classList.add('btn-action', 'btn-edit');
+              editButton.title = 'Edit Customer';
               editButton.onclick = function(e) {
                 e.stopPropagation(); // Prevent row click event
                 showEditForm(customer.id);
@@ -841,15 +1151,17 @@
 
               // Create delete button
               const deleteButton = document.createElement('button');
-              deleteButton.textContent = 'Delete';
-              deleteButton.classList.add('btn', 'btn-danger');
+              deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+              deleteButton.classList.add('btn-action', 'btn-delete');
+              deleteButton.title = 'Delete Customer';
               deleteButton.onclick = function(e) {
                 e.stopPropagation(); // Prevent row click event
                 showDeleteConfirmation(customer.id);
               };
 
-              actionCell.appendChild(editButton);
-              actionCell.appendChild(deleteButton);
+              actionButtons.appendChild(editButton);
+              actionButtons.appendChild(deleteButton);
+              actionCell.appendChild(actionButtons);
 
               // Add cells to row
               row.appendChild(idCell);
@@ -891,15 +1203,19 @@
               // Create cells for user info
               const idCell = document.createElement('td');
               idCell.textContent = user.id;
+              idCell.classList.add('user-id-cell');
 
               const nameCell = document.createElement('td');
               nameCell.textContent = `${user.firstName} ${user.lastName}`;
+              nameCell.classList.add('user-name-cell');
 
               const emailCell = document.createElement('td');
               emailCell.textContent = user.email;
+              emailCell.classList.add('user-email-cell');
 
               const deptCell = document.createElement('td');
               deptCell.textContent = user.staffIdCode || 'N/A';
+              deptCell.classList.add('user-role-cell');
 
               // Create action buttons
               const actionCell = createActionButtons(user);
@@ -1236,5 +1552,9 @@
         });
       }
     </script>
+
+    <!-- Luxury Theme JavaScript -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
   </body>
 </html>

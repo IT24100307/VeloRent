@@ -3,61 +3,386 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Packages | Fleet Manager</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <title>Manage Packages | VeloRent Fleet Manager</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+  <!-- Luxury Theme CSS -->
+  <link rel="stylesheet" href="/css/luxury-theme.css" />
   <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
   <style>
+    /* Luxury Theme CSS Variables */
     :root {
-      --primary-color: #2c3e50;
-      --secondary-color: #3498db;
-      --accent-color: #2ecc71;
-      --danger-color: #e74c3c;
-      --text-color: #333;
-      --light-text: #666;
-      --background-color: #f8f9fa;
-      --card-background: #fff;
-      --border-color: #e1e1e1;
+      --luxury-black: #0a0a0a;
+      --luxury-charcoal: #1a1a1a;
+      --luxury-dark: #2a2a2a;
+      --luxury-gold: #d4af37;
+      --luxury-gold-light: #f4d03f;
+      --luxury-silver: #c0c0c0;
+      --text-luxury-light: #f8f9fa;
+      --text-luxury-muted: #adb5bd;
+      --text-luxury-dark: #343a40;
+      --gradient-luxury: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+      --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+      --shadow-luxury: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius-luxury-small: 8px;
+      --radius-luxury-medium: 12px;
+      --radius-luxury-large: 16px;
+      --radius-luxury: var(--radius-luxury-medium);
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-luxury-primary: 'Playfair Display', serif;
+      --font-luxury-secondary: 'Inter', sans-serif;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Roboto", "Segoe UI", Arial, sans-serif; }
-    body { background-color: var(--background-color); color: var(--text-color); }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    header { background-color: var(--primary-color); color: white; padding: 1rem; }
-    nav { display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-    .nav-links { display: flex; gap: 10px; }
-    .nav-links a { color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; }
-    .nav-links a:hover { background-color: rgba(255,255,255,0.1); }
 
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
-    .btn { background-color: var(--primary-color); color: #fff; border: none; padding: 10px 14px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-    .btn:hover { background-color: #34495e; }
-    .btn-accent { background: var(--accent-color); }
-    .btn-accent:hover { background: #27ae60; }
-    .btn-danger { background: var(--danger-color); }
-    .btn-danger:hover { background: #c0392b; }
+    /* Page Loader */
+    .page-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-luxury);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
 
-    .card { background: var(--card-background); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.05); padding: 16px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); }
-    th { background: var(--primary-color); color: #fff; font-weight: 500; }
-    tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+    .page-loader.fade-out {
+      opacity: 0;
+    }
 
-    .status { padding: 4px 10px; border-radius: 12px; font-size: 12px; display: inline-block; }
-    .status.active { background: rgba(46,204,113,.15); color: #27ae60; }
-    .status.inactive { background: rgba(231,76,60,.15); color: #c0392b; }
+    .loader-content {
+      text-align: center;
+    }
 
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100; }
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(212, 175, 55, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--luxury-gold);
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto 20px;
+    }
+
+    .loader-text {
+      color: var(--luxury-gold);
+      font-size: 1.2rem;
+      font-weight: 600;
+      font-family: var(--font-luxury-primary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-luxury-secondary); }
+    body { 
+      background: var(--gradient-luxury) !important; 
+      color: var(--text-luxury-light) !important; 
+      min-height: 100vh;
+      padding-top: 80px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+    
+    /* Enhanced Navigation Styling */
+    .navbar-luxury {
+      background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%) !important;
+      border-bottom: 2px solid var(--luxury-gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1rem 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .navbar-brand-luxury {
+      font-size: 1.8rem !important;
+      font-weight: 700 !important;
+      color: var(--luxury-gold) !important;
+      font-family: var(--font-luxury-primary) !important;
+      text-decoration: none !important;
+    }
+
+    .nav-link-luxury {
+      color: var(--text-luxury-light) !important;
+      font-weight: 600 !important;
+      padding: 12px 20px !important;
+      border-radius: var(--radius-luxury-small) !important;
+      transition: var(--transition-smooth) !important;
+      text-decoration: none !important;
+    }
+
+    .nav-link-luxury:hover {
+      background: rgba(212, 175, 55, 0.2) !important;
+      color: var(--luxury-gold) !important;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .dashboard-title {
+      font-size: 3rem;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .dashboard-title::before {
+      content: '\f1b6';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      font-size: 2.5rem;
+    }
+
+    .dashboard-subtitle {
+      color: var(--text-luxury-muted);
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 30px;
+    }
+
+    .page-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin: 40px 0; 
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+      padding: 30px;
+      border-radius: var(--radius-luxury-large);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    .page-header h2 {
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .btn { 
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--radius-luxury-small);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-gold);
+      color: var(--luxury-black);
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    }
+    
+    .btn-accent { 
+      background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+      color: white;
+    }
+    
+    .btn-accent:hover { 
+      background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+    }
+    
+    .btn-danger { 
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      color: white;
+    }
+    
+    .btn-danger:hover { 
+      background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    /* Luxury Cards */
+    .luxury-card {
+      background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+      border-radius: var(--radius-luxury-large);
+      padding: 30px;
+      box-shadow: var(--shadow-luxury);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .luxury-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-gold);
+    }
+
+    .luxury-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+      border-color: var(--luxury-gold);
+    }
+    
+    .card { 
+      background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+      border-radius: var(--radius-luxury-large);
+      box-shadow: var(--shadow-luxury);
+      padding: 30px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-gold);
+    }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 20px; 
+    }
+    
+    th, td { 
+      padding: 15px 12px; 
+      text-align: left; 
+      border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+      color: var(--text-luxury-light);
+    }
+    
+    th { 
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+      color: var(--luxury-gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: var(--font-luxury-primary);
+    }
+    
+    tr:nth-child(even) { 
+      background: rgba(212, 175, 55, 0.05); 
+    }
+    
+    tr:hover {
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    /* Status badges */
+    .status { 
+      padding: 6px 12px; 
+      border-radius: var(--radius-luxury-small); 
+      font-size: 0.85rem; 
+      display: inline-block;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status.active { 
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(46, 204, 113, 0.1) 100%);
+      color: #27ae60;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+    
+    .status.inactive { 
+      background: linear-gradient(135deg, rgba(231, 76, 60, 0.2) 0%, rgba(231, 76, 60, 0.1) 100%);
+      color: #e74c3c;
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    .modal { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000; 
+    }
+    
     .modal .content {
-      background: #fff;
+      background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
       width: 95%;
-      max-width: 1000px;
-      height: 85vh;
+      max-width: 1200px;
+      height: 90vh;
       margin: 20px auto;
-      border-radius: 8px;
-      padding: 20px;
+      border-radius: var(--radius-luxury-large);
+      padding: 40px;
       display: flex;
       flex-direction: column;
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      box-shadow: var(--shadow-luxury);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .modal .content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-gold);
     }
     .modal .header {
       display:flex;
@@ -75,16 +400,52 @@
       padding-right: 8px;
     }
     .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; height: 100%; }
-    .form-group { display:flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-weight: 500; }
-    .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; }
+    .form-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px;
+      margin-bottom: 25px;
+    }
+    
+    .form-group label { 
+      font-weight: 700;
+      color: var(--luxury-gold);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: var(--font-luxury-primary);
+    }
+    
+    .form-group input, .form-group select { 
+      padding: 12px 15px;
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: var(--radius-luxury-small);
+      font-size: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-luxury-light);
+      font-weight: 500;
+      transition: var(--transition-smooth);
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--luxury-gold);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
     .vehicle-list {
       height: 100%;
       overflow-y: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-      background: var(--background-color);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: var(--radius-luxury-medium);
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
     }
     .vehicle-item {
       display: flex;
@@ -187,36 +548,175 @@
     }
     .form-actions {
       display: flex;
-      gap: 12px;
+      gap: 15px;
       justify-content: flex-end;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
-      margin-top: 16px;
+      padding-top: 20px;
+      border-top: 2px solid rgba(212, 175, 55, 0.3);
+      margin-top: 20px;
       flex-shrink: 0;
+    }
+
+    /* Enhanced vehicle item styling */
+    .vehicle-item {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+      border: 2px solid rgba(212, 175, 55, 0.2);
+      border-radius: var(--radius-luxury-medium);
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .vehicle-item:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--luxury-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .vehicle-item.selected {
+      border-color: var(--luxury-gold);
+      background: rgba(212, 175, 55, 0.2);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .vehicle-name {
+      color: var(--luxury-gold);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      font-family: var(--font-luxury-primary);
+    }
+
+    .vehicle-info {
+      color: var(--text-luxury-light);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .vehicle-image {
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: var(--radius-luxury-small);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .image-preview {
+      border: 2px dashed rgba(212, 175, 55, 0.3);
+      border-radius: var(--radius-luxury-medium);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--luxury-gold);
+    }
+
+    /* Modal header styling */
+    .modal .header h3 {
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .dashboard-title {
+        font-size: 2rem;
+      }
+      
+      .page-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+      
+      .modal .content {
+        width: 98%;
+        height: 95vh;
+        margin: 10px auto;
+        padding: 20px;
+      }
+      
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
     }
   </style>
 </head>
 <body>
-<header>
-  <nav class="container">
-    <div class="logo"><i class="fas fa-box"></i> Fleet Manager • Packages</div>
-    <div class="nav-links">
-      <a href="/fleet-manager/dashboard"><i class="fas fa-arrow-left"></i> Back</a>
-      <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-  </nav>
-</header>
-
-<main class="container">
-  <div id="flash" style="margin:10px 0;"></div>
-  <div class="page-header">
-    <h2><i class="fas fa-box"></i> Packages</h2>
-    <div>
-      <button class="btn btn-accent" onclick="openPackageModal()"><i class="fas fa-plus"></i> New Package</button>
+  <!-- Page Loader -->
+  <div class="page-loader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">VeloRent Packages</div>
     </div>
   </div>
 
-  <div class="card">
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+    <div class="container">
+      <a class="navbar-brand-luxury" href="/fleet-manager/packages">
+        <i class="fas fa-crown mr-2"></i> VeloRent Package Manager
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link-luxury" href="/fleet-manager/packages"><i class="fas fa-box mr-1"></i>Packages</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-home mr-1"></i>Main Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link-luxury" href="/logout" style="color: var(--text-luxury-light) !important; transition: var(--transition-smooth);" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
+              <i class="fas fa-sign-out-alt mr-1"></i>Logout
+            </a>
+          </li>
+          <li class="nav-item">
+            <div class="dropdown">
+              <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" style="margin-left: 15px;">
+                <i class="fas fa-user-circle mr-1"></i>
+                <span id="user-initials">FM</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
+                <div class="dropdown-item-text" style="color: var(--luxury-gold); font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+                  <div id="user-name-dropdown">Fleet Manager</div>
+                  <small id="user-email-dropdown" style="color: var(--text-luxury-muted);">fleet@velorent.com</small>
+                </div>
+                <a class="dropdown-item" href="/profile" style="color: var(--text-luxury-light); padding: 0.75rem 1rem; transition: var(--transition-smooth); text-decoration: none;" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
+                  <i class="fas fa-user mr-2"></i>Profile
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<main class="container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Package Management</h1>
+    <p class="dashboard-subtitle">Manage luxury rental packages for VeloRent fleet</p>
+  </div>
+
+  <div id="flash" style="margin:20px 0;"></div>
+  
+  <div class="page-header">
+    <h2><i class="fas fa-box mr-2"></i> Rental Packages</h2>
+    <div>
+      <button class="btn btn-accent" onclick="openPackageModal()"><i class="fas fa-plus mr-2"></i> Create New Package</button>
+    </div>
+  </div>
+
+  <div class="luxury-card">
     <table>
       <thead>
       <tr>
@@ -239,9 +739,9 @@
 <!-- Modal -->
 <div class="modal" id="pkg-modal">
   <div class="content">
-    <div class="header">
-      <h3 id="modal-title">New Package</h3>
-      <button class="btn" onclick="closePackageModal()"><i class="fas fa-times"></i> Close</button>
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid rgba(212, 175, 55, 0.3); padding-bottom: 20px;">
+      <h3 id="modal-title" style="color: var(--luxury-gold); font-family: var(--font-luxury-primary); font-weight: 700; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; margin: 0;"><i class="fas fa-plus-circle mr-2"></i>New Package</h3>
+      <button class="btn btn-danger" onclick="closePackageModal()"><i class="fas fa-times mr-2"></i> Close</button>
     </div>
     <div class="modal-body">
       <form id="pkg-form" onsubmit="savePackage(event)">
@@ -289,12 +789,12 @@
         </div>
       </form>
     </div>
-    <div class="form-actions">
-      <button type="button" class="btn" onclick="closePackageModal()">
-        <i class="fas fa-times"></i> Cancel
+    <div class="form-actions" style="display: flex; gap: 15px; justify-content: flex-end; padding-top: 20px; border-top: 2px solid rgba(212, 175, 55, 0.3); margin-top: 20px; flex-shrink: 0;">
+      <button type="button" class="btn" onclick="closePackageModal()" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white;">
+        <i class="fas fa-times mr-2"></i> Cancel
       </button>
       <button type="submit" form="pkg-form" class="btn btn-accent">
-        <i class="fas fa-save"></i> Save Package
+        <i class="fas fa-save mr-2"></i> Save Package
       </button>
     </div>
   </div>
@@ -561,6 +1061,47 @@
     const res = await fetch('/api/fleet/packages', { headers });
     if (res.ok){ packages = await res.json(); renderPackages(); }
   }
+
+  // Page loader functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const loader = document.querySelector('.page-loader');
+    
+    // Initialize user info
+    const userName = localStorage.getItem('userName') || 'Fleet Manager';
+    const userEmail = localStorage.getItem('userEmail') || 'fleet@velorent.com';
+    const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+    
+    if (document.getElementById('user-name-dropdown')) {
+      document.getElementById('user-name-dropdown').textContent = userName;
+    }
+    if (document.getElementById('user-email-dropdown')) {
+      document.getElementById('user-email-dropdown').textContent = userEmail;
+    }
+    if (document.getElementById('user-initials')) {
+      document.getElementById('user-initials').textContent = userInitials;
+    }
+    
+    // Hide loader after content is loaded
+    setTimeout(() => {
+      if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 500);
+      }
+    }, 1000);
+  });
 </script>
+
+<!-- Luxury Footer -->
+<footer style="margin-top: 60px; background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%); color: var(--text-luxury-light); padding: 40px 0; border-top: 2px solid var(--luxury-gold); text-align: center;">
+  <div class="container">
+    <p style="margin: 0; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px;">
+      <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+      &copy; 2025 <span style="color: var(--luxury-gold); font-weight: 700; font-family: var(--font-luxury-primary);">VeloRent</span> - Luxury Package Management System. All rights reserved.
+      <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+    </p>
+  </div>
+</footer>
 </body>
 </html>

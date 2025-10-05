@@ -9,46 +9,332 @@
     <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
     <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap C                    <!-- Customer Address Section -->
+                    <div th:if="${isCustomer}" class="customer-info-section">
+                        <h4 class="customer-info-title">Address Information</h4>
+                        <div class="profile-fields-grid">
+                            <div class="info-card">
+                                <div class="info-label">Street Address</div>
+                                <input type="text" class="form-control edit-mode-fields d-none" id="addressStreet" name="addressStreet" th:value="${profile.addressStreet}">
+                                <div class="info-value view-mode-fields" th:text="${profile.addressStreet != null ? profile.addressStreet : 'Not provided'}"></div>
+                            </div>
+                            
+                            <div class="info-card">
+                                <div class="info-label">City</div>
+                                <input type="text" class="form-control edit-mode-fields d-none" id="addressCity" name="addressCity" th:value="${profile.addressCity}">
+                                <div class="info-value view-mode-fields" th:text="${profile.addressCity != null ? profile.addressCity : 'Not provided'}"></div>
+                            </div>
+                            
+                            <div class="info-card">
+                                <div class="info-label">Postal Code</div>
+                                <input type="text" class="form-control edit-mode-fields d-none" id="addressPostalCode" name="addressPostalCode" th:value="${profile.addressPostalCode}">
+                                <div class="info-value view-mode-fields" th:text="${profile.addressPostalCode != null ? profile.addressPostalCode : 'Not provided'}"></div>
+                            </div>
+                        </div>
+                    </div>>
     <link rel="stylesheet" th:href="@{/css/bootstrap/css/bootstrap.min.css}">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" th:href="@{/css/fontawesome/css/all.min.css}">
 
+    <!-- Luxury Theme CSS -->
+    <link rel="stylesheet" th:href="@{/css/luxury-theme.css}">
+
     <!-- Custom Styles -->
     <link rel="stylesheet" th:href="@{/css/auth-styles.css}">
 
     <style>
+        /* Luxury Profile Page Styling */
+        body {
+            background: var(--gradient-luxury) !important;
+            color: var(--text-luxury-light) !important;
+            min-height: 100vh;
+            padding-top: 80px;
+            font-family: var(--font-luxury-secondary);
+        }
+
         .profile-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .luxury-card {
+            background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+            border-radius: var(--radius-luxury-large);
+            box-shadow: var(--shadow-luxury);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .luxury-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-gold);
         }
 
         .profile-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 30px;
+            padding: 30px 30px 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+        }
+
+        .profile-title {
+            font-size: 2.5rem;
+            color: var(--luxury-gold);
+            font-family: var(--font-luxury-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-title::before {
+            content: '\f007';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 2rem;
+        }
+
+        .profile-body {
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+        }
+
+        .profile-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile-section {
+            background: rgba(212, 175, 55, 0.05);
+            padding: 25px;
+            border-radius: var(--radius-luxury-medium);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .profile-section-title {
+            color: var(--luxury-gold);
+            font-family: var(--font-luxury-primary);
+            font-weight: 700;
+            font-size: 1.3rem;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
             padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Enhanced form control styling */
+        .form-control {
+            border: 2px solid rgba(212, 175, 55, 0.5) !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            padding: 15px 20px !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+            color: #ffffff !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control:focus {
+            border-color: var(--luxury-gold) !important;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-style: italic;
+        }
+
+        /* Enhanced label styling */
+        .form-group label {
+            font-weight: 700 !important;
+            color: var(--luxury-gold) !important;
+            font-size: 1.1rem !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: block;
+            font-family: var(--font-luxury-primary) !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .form-group label::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--gradient-gold);
+            border-radius: 1px;
         }
 
         .view-mode-fields .form-control-plaintext {
-            padding-top: calc(.375rem + 1px);
-            padding-bottom: calc(.375rem + 1px);
-            margin-bottom: 0;
-            line-height: 1.5;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            line-height: 1.6;
             border: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-radius: var(--radius-luxury-medium);
+            color: #ffffff !important;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            font-weight: 600;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Additional styling for all form-control-plaintext elements */
+        .form-control-plaintext {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid rgba(212, 175, 55, 0.4) !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            padding: 15px 20px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            margin-bottom: 20px;
+        }
+
+        /* Enhanced view mode styling */
+        .view-mode {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid rgba(212, 175, 55, 0.4) !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            padding: 15px 20px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            margin-bottom: 20px;
         }
 
         .password-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            margin-top: 40px;
+            padding: 30px;
+            border-top: 3px solid rgba(212, 175, 55, 0.4);
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.05) 0%, rgba(231, 76, 60, 0.02) 100%);
+            border-radius: var(--radius-luxury-medium);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .password-section h4 {
+            color: #e74c3c;
+            font-family: var(--font-luxury-primary);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .password-section h4::before {
+            content: '\f023';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+        }
+
+        /* Enhanced text visibility for all profile elements */
+        .profile-section p,
+        .profile-section span,
+        .profile-section div:not(.btn):not(.form-control):not(.form-group) {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* Form group spacing and layout */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Enhanced button styling */
+        .btn-primary {
+            background: var(--gradient-gold) !important;
+            border: 2px solid rgba(212, 175, 55, 0.8) !important;
+            color: #1a1a1a !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            padding: 12px 30px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            font-family: var(--font-luxury-primary) !important;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f1c40f 0%, #e6ac00 100%) !important;
+            border-color: #f1c40f !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.8) 0%, rgba(108, 117, 125, 0.6) 100%) !important;
+            border: 2px solid rgba(108, 117, 125, 0.8) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            padding: 12px 30px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-family: var(--font-luxury-primary) !important;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 1) 0%, rgba(108, 117, 125, 0.8) 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .btn-edit {
@@ -63,32 +349,93 @@
     </style>
 </head>
 <body>
-    <div class="profile-container">
-        <div class="profile-header">
-            <h3>User Profile</h3>
-            <div class="btn-group">
-                <button id="editBtn" class="btn btn-edit">
-                    <i class="fas fa-edit"></i> Edit Profile
-                </button>
-                <button id="cancelBtn" class="btn btn-cancel d-none">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <button id="saveBtn" class="btn btn-primary d-none">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">VeloRent Profile</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+        <div class="container">
+            <a class="navbar-brand-luxury" href="/dashboard">
+                <i class="fas fa-crown mr-2"></i> VeloRent
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-luxury" href="/rental-history"><i class="fas fa-history mr-1"></i>Rental History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-luxury" href="/feedback"><i class="fas fa-info-circle mr-1"></i>About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
+                    </li>
+                </ul>
+                <div class="auth-buttons">
+                    <div class="dropdown">
+                        <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
+                            <i class="fas fa-user-circle mr-1"></i>
+                            <span id="user-initials">U</span>
+                        </button>
+                        <div class="dropdown-menu" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
+                            <a class="dropdown-item hover-gold" href="#" id="logout-btn" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </nav>
 
-        <div class="alert alert-success d-none" id="successAlert" role="alert">
-            Profile updated successfully!
-        </div>
+    <div class="profile-container">
+        <div class="luxury-card">
+            <div class="profile-header">
+                <h1 class="profile-title">User Profile</h1>
+                <div class="btn-group">
+                    <button id="editBtn" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                    <button id="cancelBtn" class="btn btn-secondary d-none">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button id="saveBtn" class="btn btn-primary d-none">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+            <div class="profile-body">
+                <!-- Profile Avatar Section -->
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar" id="profile-avatar">U</div>
+                    <div class="profile-welcome">Welcome back!</div>
+                    <div class="profile-email" id="profile-display-email">user@example.com</div>
+                </div>
 
-        <div class="alert alert-danger d-none" id="errorAlert" role="alert">
-            An error occurred. Please try again.
-        </div>
+                <div class="alert alert-success d-none" id="successAlert" role="alert">
+                    Profile updated successfully!
+                </div>
 
-        <!-- Profile Form -->
-        <form id="profileForm">
+                <div class="alert alert-danger d-none" id="errorAlert" role="alert">
+                    An error occurred. Please try again.
+                </div>        <!-- Profile Form -->
+                <form id="profileForm">
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">Personal Information</h3>
+                        <div class="profile-row">
+                    <div class="profile-section">
+                        <h3 class="profile-section-title">Personal Information</h3>
+                        <div class="profile-row">
             <div class="row">
                 <!-- Basic User Information -->
                 <div class="col-md-6 mb-3">
@@ -127,15 +474,14 @@
                     <div class="form-control-plaintext view-mode" th:text="${profile.addressCity != null ? profile.addressCity : 'Not provided'}"></div>
                 </div>
 
-                <div th:if="${isCustomer}" class="col-md-6 mb-3">
-                    <label for="addressPostalCode">Postal Code</label>
-                    <input type="text" class="form-control view-mode-fields d-none" id="addressPostalCode" name="addressPostalCode" th:value="${profile.addressPostalCode}">
-                    <div class="form-control-plaintext view-mode" th:text="${profile.addressPostalCode != null ? profile.addressPostalCode : 'Not provided'}"></div>
-                </div>
-            </div>
-        </form>
-
-        <!-- Password Change Section -->
+                            <div th:if="${isCustomer}" class="form-group">
+                                <label for="addressPostalCode">Postal Code</label>
+                                <input type="text" class="form-control view-mode-fields d-none" id="addressPostalCode" name="addressPostalCode" th:value="${profile.addressPostalCode}">
+                                <div class="form-control-plaintext view-mode" th:text="${profile.addressPostalCode != null ? profile.addressPostalCode : 'Not provided'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>        <!-- Password Change Section -->
         <div class="password-section">
             <h4>Change Password</h4>
             <form id="passwordForm">
@@ -177,8 +523,18 @@
             <a th:href="@{/dashboard}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
+            </div>
         </div>
     </div>
+
+    <!-- Luxury Footer -->
+    <footer style="margin-top: 60px; background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%); color: var(--text-luxury-light); padding: 40px 0; border-top: 2px solid var(--luxury-gold); text-align: center;">
+        <p style="margin: 0; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+            &copy; 2025 <span style="color: var(--luxury-gold); font-weight: 700; font-family: var(--font-luxury-primary);">VeloRent</span> - Luxury Car Rental System. All rights reserved.
+            <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+        </p>
+    </footer>
 
     <!-- jQuery and Bootstrap JS -->
     <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
@@ -186,5 +542,31 @@
 
     <!-- Custom JavaScript -->
     <script th:src="@{/js/profile.js}"></script>
+    <!-- Luxury Theme Scripts -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
+    
+    <script>
+        // Update profile avatar and email display
+        document.addEventListener('DOMContentLoaded', function() {
+            const email = new URLSearchParams(window.location.search).get('email') || 'user@example.com';
+            const firstName = document.querySelector('#firstName')?.value || '';
+            const lastName = document.querySelector('#lastName')?.value || '';
+            
+            // Update email display
+            const emailDisplay = document.getElementById('profile-display-email');
+            if (emailDisplay) {
+                emailDisplay.textContent = email;
+            }
+            
+            // Update avatar initials
+            const avatar = document.getElementById('profile-avatar');
+            if (avatar && firstName && lastName) {
+                avatar.textContent = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+            } else if (avatar && email) {
+                avatar.textContent = email.charAt(0).toUpperCase();
+            }
+        });
+    </script>
 </body>
 </html>

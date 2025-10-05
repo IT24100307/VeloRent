@@ -3,77 +3,142 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard | Car Rental System</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Dashboard | VeloRent - Luxury Car Rental</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+    <!-- Luxury Theme CSS -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
     <style>
-      :root {
-        --primary-color: #2c3e50;
-        --secondary-color: #3498db;
-        --accent-color: #2ecc71;
-        --text-color: #333;
-        --light-text: #666;
-        --background-color: #f8f9fa;
-        --card-background: #fff;
-        --border-color: #e1e1e1;
-        --danger-color: #e74c3c;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
-      }
-
+      /* Luxury Dashboard Enhancements */
       body {
-        background-color: var(--background-color);
-        color: var(--text-color);
-        line-height: 1.6;
+        padding-top: 80px; /* Account for fixed navbar */
+      }
+      
+      /* Dashboard specific luxury styling */
+      .dashboard-wrapper {
+        overflow-x: hidden;
+      }
+      
+      .dashboard-container {
+        min-height: 100vh;
+        background: var(--gradient-luxury);
+      }
+      
+      /* Enhanced Navigation Styling */
+      .navbar-luxury {
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%) !important;
+        border-bottom: 2px solid var(--luxury-gold);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        padding: 1rem 0;
       }
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      header {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
-
-      nav {
+      .navbar-brand-luxury {
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+        color: var(--luxury-gold) !important;
+        font-family: var(--font-luxury-primary) !important;
+        text-decoration: none !important;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        transition: var(--transition-smooth);
       }
 
-      .logo {
-        font-size: 1.5rem;
-        font-weight: bold;
+      .navbar-brand-luxury:hover {
+        color: var(--luxury-gold) !important;
+        transform: scale(1.05);
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
       }
 
-      .nav-links {
+      .nav-link-luxury {
+        color: var(--text-luxury-light) !important;
+        font-weight: 600 !important;
+        padding: 12px 20px !important;
+        margin: 0 5px !important;
+        border-radius: var(--radius-luxury-small) !important;
+        transition: var(--transition-smooth) !important;
+        text-decoration: none !important;
+        border: 1px solid transparent !important;
+        font-size: 0.95rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-link-luxury:hover {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%) !important;
+        color: var(--luxury-gold) !important;
+        border-color: var(--luxury-gold) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+      }
+
+      .auth-buttons {
         display: flex;
-        gap: 20px;
         align-items: center;
+        gap: 15px;
       }
 
-      .nav-links a {
-        color: white;
-        text-decoration: none;
-        padding: 8px 15px;
-        border-radius: 4px;
-        transition: background-color 0.3s;
+      .btn-luxury {
+        background: var(--gradient-gold) !important;
+        color: var(--luxury-black) !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        border-radius: var(--radius-luxury-small) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition-smooth) !important;
+        font-size: 0.9rem !important;
       }
 
-      .nav-links a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+      .btn-luxury:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%) !important;
+        color: var(--luxury-black) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      }
+
+      .btn-luxury-outline {
+        background: transparent !important;
+        color: var(--luxury-gold) !important;
+        border: 2px solid var(--luxury-gold) !important;
+      }
+
+      .btn-luxury-outline:hover {
+        background: var(--gradient-gold) !important;
+        color: var(--luxury-black) !important;
+      }
+      
+      /* Stats cards enhancement */
+      .stats-card {
+        background: var(--luxury-charcoal);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: var(--radius-luxury-large);
+        padding: 2rem;
+        text-align: center;
+        transition: var(--transition-smooth);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--gradient-gold);
+      }
+      
+      .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-luxury);
+        border-color: var(--luxury-gold);
       }
 
       /* Profile dropdown styles */
@@ -147,50 +212,106 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
+        padding: 25px 0;
+        border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+        border-radius: var(--radius-luxury-large) var(--radius-luxury-large) 0 0;
       }
 
       .dashboard-title {
-        font-size: 24px;
-        color: var(--primary-color);
+        font-size: 2.5rem;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .dashboard-title::before {
+        content: '\f3fd';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 20px;
+        font-size: 2rem;
+        background: var(--gradient-gold);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
       .dashboard-actions {
         display: flex;
-        gap: 10px;
+        gap: 15px;
+        align-items: center;
       }
 
       .btn {
-        background-color: var(--primary-color);
-        color: white;
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
         border: none;
-        padding: 10px 15px;
-        border-radius: 4px;
+        padding: 12px 24px;
+        border-radius: var(--radius-luxury-small);
         cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: background-color 0.3s;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition-smooth);
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
       }
 
       .btn:hover {
-        background-color: #34495e;
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
       }
 
       .btn-accent {
-        background-color: var(--accent-color);
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
       }
 
       .btn-accent:hover {
-        background-color: #27ae60;
+        background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
       }
 
       .btn-danger {
-        background-color: var(--danger-color);
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
       }
 
       .btn-danger:hover {
-        background-color: #c0392b;
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .btn i {
+        margin-right: 8px;
+        font-size: 1em;
       }
 
       .dashboard-content {
@@ -224,13 +345,74 @@
         border: 1px solid rgba(46, 204, 113, 0.3);
       }
 
+      /* Enhanced Footer */
       footer {
-        margin-top: 50px;
+        margin-top: 60px;
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%);
+        color: var(--text-luxury-light);
+        font-size: 1rem;
+        padding: 40px 0;
+        border-top: 2px solid var(--luxury-gold);
+        position: relative;
+        overflow: hidden;
+      }
+
+      footer::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 2px;
+        background: var(--gradient-gold);
+        border-radius: 2px;
+      }
+
+      footer p {
+        margin: 0;
+        font-weight: 500;
         text-align: center;
-        color: var(--light-text);
-        font-size: 14px;
-        padding: 20px;
-        border-top: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      footer p::before {
+        content: '\f3fd';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        font-size: 1.2em;
+      }
+
+      footer p::after {
+        content: '\f3fd';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        font-size: 1.2em;
+      }
+
+      .footer-content {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .footer-year {
+        color: var(--luxury-gold);
+        font-weight: 700;
+      }
+
+      .footer-brand {
+        background: var(--gradient-gold);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-family: var(--font-luxury-primary);
       }
 
       /* Vehicle Management Styles */
@@ -361,178 +543,611 @@
         display: block;
       }
 
-      /* Vehicles grid styles */
-      .vehicles-grid {
+      /* Enhanced Full-Width Vehicles Section */
+      .vehicles-section {
+        margin: 40px 0;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(45, 45, 45, 0.95) 100%);
+        position: relative;
+        border-radius: 12px;
+        max-width: 1400px;
+        margin: 40px auto;
+      }
+
+      .vehicles-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0.1;
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20 20h60v60H20z" fill="none" stroke="%23d4af37" stroke-width="0.5"/></svg>');
+        background-size: 50px 50px;
+      }
+
+      .vehicles-section h3 {
+        color: var(--luxury-gold) !important;
+        font-family: var(--font-luxury-primary) !important;
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 30px !important;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .vehicles-section h3::before {
+        content: '🚗';
+        font-size: 2.5rem;
+        margin-right: 20px;
+        filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.5));
+      }
+
+      .vehicles-section h3::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 3px;
+        background: var(--gradient-gold);
+        border-radius: 2px;
+      }
+
+      .vehicles-controls {
+        max-width: 800px;
+        margin: 0 auto 40px auto;
+      }
+      
+      .search-bar {
+        position: relative;
+      }
+      
+      .sort-controls label {
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .sort-controls select {
+        background: var(--luxury-charcoal) !important;
+        border: 2px solid rgba(212, 175, 55, 0.3) !important;
+        color: var(--text-luxury-light) !important;
+        padding: 12px 15px !important;
+        border-radius: var(--radius-luxury-medium) !important;
+        font-size: 0.95rem !important;
+        transition: var(--transition-smooth) !important;
+      }
+      
+      .sort-controls select:focus {
+        border-color: var(--luxury-gold) !important;
+        outline: none !important;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+      }
+
+      .search-bar::before {
+        content: '\f002';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--luxury-gold);
+        z-index: 2;
+        font-size: 1.2rem;
+      }
+
+      .form-control {
+        background: var(--luxury-charcoal) !important;
+        border: 2px solid rgba(212, 175, 55, 0.3) !important;
+        color: var(--text-luxury-light) !important;
+        padding: 18px 20px 18px 55px !important;
+        border-radius: var(--radius-luxury-large) !important;
+        font-size: 1.1rem !important;
+        transition: var(--transition-smooth) !important;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .form-control:focus {
+        border-color: var(--luxury-gold) !important;
+        outline: none !important;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.3) !important;
+        background: var(--luxury-black) !important;
+        transform: translateY(-2px);
+      }
+
+      .form-control::placeholder {
+        color: var(--text-luxury-muted) !important;
+        font-weight: 500;
+      }
+      
+      /* Enhanced Full-Width Vehicles Grid */
+      .vehicles-grid, .vehicles-grid-enhanced {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-top: 30px;
+        position: relative;
+        z-index: 2;
+      }
+      
+      @media (max-width: 1200px) {
+        .vehicles-grid, .vehicles-grid-enhanced {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      
+      @media (max-width: 900px) {
+        .vehicles-grid, .vehicles-grid-enhanced {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      
+      @media (max-width: 600px) {
+        .vehicles-grid, .vehicles-grid-enhanced {
+          grid-template-columns: 1fr;
+        }
       }
 
       .vehicle-card {
-        background-color: var(--card-background);
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        padding: 15px;
+        background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+        border-radius: var(--radius-luxury-large);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        padding: 20px;
         text-align: center;
-        transition: transform 0.3s;
+        transition: var(--transition-smooth);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        min-height: 380px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .vehicle-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+      }
+
+      .vehicle-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 50%, rgba(212, 175, 55, 0.05) 100%);
+        opacity: 0;
+        transition: var(--transition-smooth);
       }
 
       .vehicle-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3);
+        border-color: var(--luxury-gold);
+      }
+
+      .vehicle-card:hover::after {
+        opacity: 1;
+      }
+      
+      .vehicle-card .vehicle-info {
+        position: relative;
+        z-index: 5;
       }
 
       .vehicle-image {
         width: 100%;
-        height: 120px;
+        height: 200px;
         object-fit: cover;
-        border-radius: 4px;
-        margin-bottom: 10px;
+        border-radius: var(--radius-luxury-medium);
+        margin-bottom: 20px;
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        transition: var(--transition-smooth);
+        position: relative;
+        z-index: 2;
+      }
+
+      .vehicle-card:hover .vehicle-image {
+        border-color: var(--luxury-gold);
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
       }
 
       .vehicle-info {
-        font-size: 14px;
-        color: var(--text-color);
+        font-size: 1rem;
+        color: var(--text-luxury-light);
+        margin-bottom: 15px;
       }
 
       .vehicle-info .vehicle-make-model {
-        font-weight: 500;
-        margin-bottom: 5px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--luxury-gold);
+        font-size: 1.3rem;
+        font-family: var(--font-luxury-primary);
       }
 
       .vehicle-info .vehicle-year {
-        color: var(--light-text);
-        font-size: 12px;
+        color: var(--text-luxury-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 8px;
       }
 
       .vehicle-price {
-        font-size: 16px;
-        font-weight: bold;
-        margin: 10px 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 15px 0;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
       }
 
       .vehicle-status {
-        font-size: 14px;
-        margin-bottom: 10px;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        padding: 5px 12px;
+        border-radius: var(--radius-luxury-small);
+        display: inline-block;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(46, 204, 113, 0.1) 100%);
+        color: #27ae60;
+        border: 1px solid rgba(46, 204, 113, 0.3);
       }
 
       .view-details-btn {
-        background-color: var(--primary-color);
-        color: white;
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
         border: none;
-        padding: 10px 15px;
-        border-radius: 4px;
+        padding: 12px 25px;
+        border-radius: var(--radius-luxury-small);
         cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: background-color 0.3s;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition-smooth);
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        z-index: 10;
+        pointer-events: auto;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .view-details-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .view-details-btn:hover::before {
+        left: 100%;
       }
 
       .view-details-btn:hover {
-        background-color: #34495e;
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
       }
 
-      /* Packages slider */
-      .packages-section {
-        margin-bottom: 20px;
+      .view-details-btn i {
+        margin-right: 8px;
       }
+
+      /* Loading states */
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-luxury-muted);
+        font-size: 1.1rem;
+      }
+
+      /* Full-Screen Packages Section */
+      .packages-section {
+        margin: -30px -15px 40px -15px;
+        position: relative;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+
+      .packages-section h3 {
+        position: absolute;
+        top: 30px;
+        left: 50px;
+        z-index: 15;
+        color: var(--luxury-gold) !important;
+        font-family: var(--font-luxury-primary) !important;
+        font-size: 3rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 0 !important;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+      }
+
+      .packages-section h3::before {
+        content: '🎉';
+        font-size: 2.5rem;
+        margin-right: 20px;
+        filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.8));
+      }
+      
       .packages-slider {
         position: relative;
         overflow: hidden;
-        border-radius: 8px;
-        background: var(--card-background);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        height: 60vh;
+        min-height: 500px;
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       }
+      
       .packages-track {
         display: flex;
-        transition: transform 0.6s ease;
+        height: 100%;
+        transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
         will-change: transform;
       }
+      
       .package-slide {
         min-width: 100%;
-        padding: 16px;
-        display: grid;
-        grid-template-columns: 160px 1fr auto;
-        gap: 16px;
+        height: 100%;
+        position: relative;
+        display: flex;
         align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
+
+      .package-slide::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, 
+          rgba(0, 0, 0, 0.7) 0%, 
+          rgba(0, 0, 0, 0.4) 50%, 
+          rgba(0, 0, 0, 0.7) 100%);
+        z-index: 1;
+      }
+      
+      .package-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: white;
+        max-width: 800px;
+        padding: 40px;
+      }
+
       .package-image {
-        width: 160px;
-        height: 110px;
-        object-fit: cover;
-        border-radius: 6px;
-        background: #f0f0f0;
+        display: none; /* Hidden as we use background image */
       }
-      .package-info h4 { margin-bottom: 6px; color: var(--primary-color); }
-      .package-meta { color: var(--light-text); font-size: 14px; }
-      .package-actions { display: flex; gap: 8px; }
+      
+      .package-info h4 {
+        margin-bottom: 20px;
+        color: var(--luxury-gold) !important;
+        font-family: var(--font-luxury-primary) !important;
+        font-size: 4rem !important;
+        font-weight: 700;
+        text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.8);
+        line-height: 1.2;
+      }
+      
+      .package-meta {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-size: 1.5rem !important;
+        margin-bottom: 15px;
+        font-weight: 500;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+      }
+
+      .package-meta strong {
+        color: var(--luxury-gold);
+        font-weight: 700;
+        font-size: 1.8rem;
+      }
+      
+      .package-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 30px;
+      }
+
+      .package-actions .btn {
+        padding: 15px 35px;
+        font-size: 1.1rem;
+        min-width: 160px;
+        justify-content: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid transparent;
+      }
+
+      .package-actions .view-details-btn {
+        background: transparent;
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .package-actions .view-details-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: white;
+        color: var(--luxury-gold);
+      }
+      
       .packages-nav {
-        position: absolute; inset: 0; pointer-events: none;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 10;
       }
+      
       .packages-nav button {
-        position: absolute; top: 50%; transform: translateY(-50%);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
         pointer-events: auto;
-        background: rgba(44,62,80,0.75); color: #fff; border: 0; width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+        background: linear-gradient(135deg, var(--luxury-gold) 0%, #d4af37 100%);
+        color: var(--luxury-black);
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5rem;
+        font-weight: 700;
+        transition: var(--transition-smooth);
+        box-shadow: 0 6px 25px rgba(212, 175, 55, 0.4);
       }
-      .packages-nav .prev { left: 8px; }
-      .packages-nav .next { right: 8px; }
-      .packages-empty { padding: 12px; color: var(--light-text); }
+
+      .packages-nav button:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, var(--luxury-gold) 100%);
+        transform: translateY(-50%) scale(1.15);
+        box-shadow: 0 8px 35px rgba(212, 175, 55, 0.6);
+      }
+      
+      .packages-nav .prev { left: 30px; }
+      .packages-nav .next { right: 30px; }
+
+      /* Package Indicators */
+      .packages-indicators {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        z-index: 10;
+      }
+
+      .package-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        transition: var(--transition-smooth);
+      }
+
+      .package-indicator.active {
+        background: var(--luxury-gold);
+        transform: scale(1.3);
+      }
+      
+      .packages-empty {
+        padding: 100px 40px;
+        color: var(--text-luxury-muted);
+        text-align: center;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+      }
     </style>
   </head>
   <body>
-    <header>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
       <div class="container">
-        <nav>
-          <div class="logo">Car Rental System</div>
-          <div class="nav-links">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/feedback">About Us</a>
-            <a href="/security-settings">Security</a>
-            <a
-              href="/admin/dashboard"
-              id="admin-dashboard-btn"
-              style="display: none; background-color: #e74c3c; font-weight: bold;"
-            >
-              Admin Dashboard
-            </a>
-            <a href="#" id="logout-btn">Logout</a>
-            <!-- Profile dropdown -->
-            <div class="profile-dropdown">
-              <div class="profile-icon" id="profile-icon">
+        <a class="navbar-brand-luxury" href="/dashboard">
+          <i class="fas fa-crown mr-2"></i> VeloRent Dashboard
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/feedback">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/security-settings">Security</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/admin/dashboard" id="admin-dashboard-btn" style="display: none;">
+                <i class="fas fa-shield-alt mr-1"></i>Admin Panel
+              </a>
+            </li>
+          </ul>
+          <div class="auth-buttons">
+            <!-- Profile Dropdown -->
+            <div class="dropdown">
+              <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
+                <i class="fas fa-user-circle mr-1"></i>
                 <span id="user-initials">U</span>
-              </div>
-              <div class="dropdown-content" id="profile-dropdown">
-                <div class="profile-info">
-                  <div id="user-name-dropdown">User Name</div>
-                  <div class="user-email" id="user-email-dropdown">
-                    user@example.com
-                  </div>
+              </button>
+              <div class="dropdown-menu" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
+                <div style="padding: 1rem; border-bottom: 1px solid rgba(212, 175, 55, 0.2); text-align: center;">
+                  <div style="color: var(--luxury-gold); font-weight: 600;" id="user-name-dropdown">User Name</div>
+                  <div style="color: var(--text-luxury-muted); font-size: 0.85rem;" id="user-email-dropdown">user@example.com</div>
                 </div>
-                <a href="/profile" id="profile-dropdown-link"><i class="fas fa-user-circle"></i> My Profile</a>
-                <a href="/logout" id="logout-btn-dropdown">Logout</a>
+                <a class="dropdown-item hover-gold" href="/profile" id="profile-dropdown-link" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
+                  <i class="fas fa-user mr-2"></i>My Profile
+                </a>
+                <div class="dropdown-divider" style="border-color: rgba(212, 175, 55, 0.2);"></div>
+                <a class="dropdown-item hover-gold" href="#" id="logout-btn" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
+                  <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
               </div>
             </div>
           </div>
-        </nav>
+        </div>
       </div>
-    </header>
+    </nav>
 
-    <div class="container">
-      <main>
+    <div class="dashboard-wrapper">
+      <div class="container">
+        <main>
         <div id="message-container"></div>
 
         <div class="dashboard-header">
           <h1 class="dashboard-title">Dashboard</h1>
           <div class="dashboard-actions">
-            <a href="#" class="btn btn-accent" id="rent-car-btn">Rent a Car</a>
-            <a href="/rental-history" class="btn" id="rental-history-btn">Rental History</a>
+            <a href="#" class="btn btn-accent" id="rent-car-btn"><i class="fas fa-car"></i>Rent a Car</a>
+            <a href="/rental-history" class="btn" id="rental-history-btn"><i class="fas fa-history"></i>Rental History</a>
             <!-- Add vehicle button - hidden by default, shown for fleet managers -->
             <button
               id="add-vehicle-btn"
               class="btn btn-accent"
               style="display: none;"
             >
-              Add New Vehicle
+              <i class="fas fa-plus-circle"></i>Add New Vehicle
             </button>
           </div>
         </div>
@@ -551,7 +1166,7 @@
 
           <!-- Packages Slider Section (replaces welcome when packages exist) -->
           <div class="packages-section" id="packages-section" style="display:none;">
-            <h3 style="margin: 0 0 10px 0; color: var(--primary-color);">Active Packages</h3>
+            <h3>🎉 Active Luxury Packages</h3>
             <div class="packages-slider">
               <div class="packages-track" id="packages-track"><!-- slides injected --></div>
               <div class="packages-nav">
@@ -561,22 +1176,100 @@
             </div>
           </div>
 
-          <!-- Available Vehicles Section -->
-          <div class="vehicles-section">
-            <h3 style="margin: 20px 0 10px 0; color: var(--primary-color);">Available Vehicles</h3>
-            <div class="search-bar" style="margin-bottom: 15px;">
-              <input type="text" id="vehicle-search" class="form-control" placeholder="Search vehicles..." aria-label="Search vehicles">
-            </div>
-            <div id="loading-vehicles" class="loading">Loading vehicles...</div>
-            <div id="vehicles-container" style="display: none;">
-              <div id="vehicles-grid" class="vehicles-grid">
-                <!-- Vehicle cards will be populated dynamically -->
+        </div>
+      </main>
+      
+      <!-- Available Vehicles Section - Full Width -->
+      <section class="vehicles-section" style="background: var(--gradient-luxury); padding: 40px 0;">
+        <div class="container-fluid" style="max-width: 1450px; margin: 0 auto; padding: 0 25px;">
+          <div class="section-header" style="text-align: center; margin-bottom: 40px;">
+            <h3 style="font-size: 2.5rem; color: var(--luxury-gold); font-family: var(--font-luxury-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">
+              <i class="fas fa-car-side" style="margin-right: 15px;"></i>Available Luxury Vehicles
+            </h3>
+            <p style="color: var(--text-luxury-muted); font-size: 1.2rem; font-weight: 500;">Discover our premium collection of luxury vehicles</p>
+          </div>
+          
+          <!-- Advanced Filter Section -->
+          <div class="advanced-filters" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); padding: 25px; border-radius: var(--radius-luxury-large); border: 1px solid rgba(212, 175, 55, 0.2); margin-bottom: 30px; box-shadow: var(--shadow-luxury); max-width: 1400px; margin: 0 auto 30px auto;">
+            <div class="filter-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+              <div class="filter-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; color: var(--luxury-gold); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-luxury-primary);">
+                  <i class="fas fa-search mr-2"></i>Search Vehicles
+                </label>
+                <input type="text" id="vehicle-search" class="form-control" placeholder="Search by make, model, or year..." style="padding: 12px 15px; border: 2px solid rgba(212, 175, 55, 0.3); border-radius: var(--radius-luxury-small); background: rgba(0, 0, 0, 0.3); color: var(--text-luxury-light); font-weight: 500;">
               </div>
+              <div class="filter-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; color: var(--luxury-gold); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-luxury-primary);">
+                  <i class="fas fa-building mr-2"></i>Make
+                </label>
+                <select id="make-filter" class="form-control" style="padding: 12px 15px; border: 2px solid rgba(212, 175, 55, 0.3); border-radius: var(--radius-luxury-small); background: rgba(0, 0, 0, 0.3); color: var(--text-luxury-light); font-weight: 500;">
+                  <option value="">All Makes</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; color: var(--luxury-gold); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-luxury-primary);">
+                  <i class="fas fa-car mr-2"></i>Model
+                </label>
+                <select id="model-filter" class="form-control" style="padding: 12px 15px; border: 2px solid rgba(212, 175, 55, 0.3); border-radius: var(--radius-luxury-small); background: rgba(0, 0, 0, 0.3); color: var(--text-luxury-light); font-weight: 500;">
+                  <option value="">All Models</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; color: var(--luxury-gold); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-luxury-primary);">
+                  <i class="fas fa-calendar mr-2"></i>Year
+                </label>
+                <select id="year-filter" class="form-control" style="padding: 12px 15px; border: 2px solid rgba(212, 175, 55, 0.3); border-radius: var(--radius-luxury-small); background: rgba(0, 0, 0, 0.3); color: var(--text-luxury-light); font-weight: 500;">
+                  <option value="">All Years</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; color: var(--luxury-gold); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-luxury-primary);">
+                  <i class="fas fa-dollar-sign mr-2"></i>Price Range
+                </label>
+                <select id="price-filter" class="form-control" style="padding: 12px 15px; border: 2px solid rgba(212, 175, 55, 0.3); border-radius: var(--radius-luxury-small); background: rgba(0, 0, 0, 0.3); color: var(--text-luxury-light); font-weight: 500;">
+                  <option value="">Any Price</option>
+                  <option value="0-50">Under $50/day</option>
+                  <option value="50-100">$50 - $100/day</option>
+                  <option value="100-200">$100 - $200/day</option>
+                  <option value="200+">$200+/day</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; color: var(--luxury-gold); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-luxury-primary);">
+                  <i class="fas fa-sort mr-2"></i>Sort By
+                </label>
+                <select id="sort-select" class="form-control" style="padding: 12px 15px; border: 2px solid rgba(212, 175, 55, 0.3); border-radius: var(--radius-luxury-small); background: rgba(0, 0, 0, 0.3); color: var(--text-luxury-light); font-weight: 500;">
+                  <option value="default">Default</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="year-new">Year: Newest First</option>
+                  <option value="year-old">Year: Oldest First</option>
+                  <option value="make">Make: A-Z</option>
+                </select>
+              </div>
+            </div>
+            <div class="filter-actions" style="margin-top: 25px; text-align: center;">
+              <button id="clear-filters" class="btn" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; padding: 12px 24px; border: none; border-radius: var(--radius-luxury-small); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: var(--transition-smooth);">
+                <i class="fas fa-times mr-2"></i>Clear Filters
+              </button>
+            </div>
+          </div>
+          <div id="loading-vehicles" class="loading" style="text-align: center; padding: 40px; color: var(--luxury-gold); font-size: 1.2rem;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
+            <p>Loading luxury vehicles...</p>
+          </div>
+          <div id="vehicles-container" style="display: none;">
+            <div class="vehicles-results" style="margin-bottom: 20px; text-align: center;">
+              <span id="results-count" style="color: var(--text-luxury-muted); font-size: 1.1rem; font-weight: 500;">Showing all vehicles</span>
+            </div>
+            <div id="vehicles-grid" class="vehicles-grid-enhanced" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; padding: 0 20px; max-width: 1400px; margin: 0 auto;">
+              <!-- Vehicle cards will be populated dynamically -->
             </div>
           </div>
         </div>
-      </main>
-
+      </section>
+      
+      <div class="container">
       <!-- Vehicle Details Modal -->
       <div id="vehicle-details-modal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
@@ -630,33 +1323,33 @@
 
       <!-- Package Details Modal -->
       <div id="package-details-modal" class="modal">
-        <div class="modal-content" style="max-width: 720px;">
-          <div class="modal-header">
-            <h2 class="modal-title"><i class="fa fa-box"></i> <span id="pkg-modal-title">Package Details</span></h2>
-            <span class="close" role="button" tabindex="0" onclick="closePackageDetailsModal()" onkeydown="if(event.key==='Enter'||event.key==='Escape'){closePackageDetailsModal()}">&times;</span>
+        <div class="modal-content" style="max-width: 900px; background: var(--luxury-charcoal); color: var(--text-luxury-light);">
+          <div class="modal-header" style="border-bottom: 2px solid rgba(212, 175, 55, 0.3);">
+            <h2 class="modal-title" style="color: var(--luxury-gold);"><i class="fa fa-gift"></i> <span id="pkg-modal-title">Package Details</span></h2>
+            <span class="close" role="button" tabindex="0" onclick="closePackageDetailsModal()" onkeydown="if(event.key==='Enter'||event.key==='Escape'){closePackageDetailsModal()}" style="color: var(--luxury-gold);">&times;</span>
           </div>
           <div id="package-details-content">
-            <div style="display:flex; gap: 16px; flex-wrap: wrap;">
-              <img id="pkg-modal-image" class="package-image" src="" style="width:220px; height:140px;" alt="Package"/>
-              <div style="flex:1; min-width:260px;">
-                <div style="margin:6px 0;">
-                  <strong>Price:</strong> <span id="pkg-modal-price">Rs. 0.00</span>
+            <div style="display:flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+              <img id="pkg-modal-image" class="package-image" src="" style="width:250px; height:160px; border-radius: 8px; border: 2px solid rgba(212, 175, 55, 0.3);" alt="Package"/>
+              <div style="flex:1; min-width:300px;">
+                <div style="margin:10px 0; padding: 8px; background: rgba(212, 175, 55, 0.1); border-radius: 6px;">
+                  <strong style="color: var(--luxury-gold);">Price:</strong> <span id="pkg-modal-price" style="color: var(--luxury-gold); font-size: 1.2rem; font-weight: 700;">Rs. 0.00</span>
                 </div>
-                <div style="margin:6px 0;">
-                  <strong>Duration:</strong> <span id="pkg-modal-duration">0 days</span>
+                <div style="margin:10px 0; padding: 8px; background: rgba(212, 175, 55, 0.1); border-radius: 6px;">
+                  <strong style="color: var(--luxury-gold);">Duration:</strong> <span id="pkg-modal-duration">0 days</span>
                 </div>
-                <div style="margin:6px 0;">
-                  <strong>Status:</strong> <span id="pkg-modal-status">Activated</span>
+                <div style="margin:10px 0; padding: 8px; background: rgba(212, 175, 55, 0.1); border-radius: 6px;">
+                  <strong style="color: var(--luxury-gold);">Status:</strong> <span id="pkg-modal-status" style="color: #27ae60; font-weight: 600;">Activated</span>
                 </div>
               </div>
             </div>
-            <div style="margin-top: 12px;">
-              <strong>Included Vehicles:</strong>
-              <ul id="pkg-modal-vehicles" style="margin-top:6px; padding-left: 18px;"></ul>
+            <div style="margin-top: 20px;">
+              <h4 style="color: var(--luxury-gold); margin-bottom: 15px; display: flex; align-items: center;"><i class="fas fa-car mr-2"></i>Included Vehicles:</h4>
+              <ul id="pkg-modal-vehicles" style="margin:0; padding:0; list-style: none;"></ul>
             </div>
-            <div class="form-actions" style="margin-top: 16px;">
-              <button type="button" class="btn" onclick="closePackageDetailsModal()">Close</button>
-              <button type="button" class="btn btn-accent" id="pkg-modal-buy">Buy Now</button>
+            <div class="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 15px;">
+              <button type="button" class="btn" onclick="closePackageDetailsModal()" style="background: transparent; border: 2px solid var(--luxury-gold); color: var(--luxury-gold);">Close</button>
+              <button type="button" class="btn btn-accent" id="pkg-modal-buy" style="background: var(--gradient-gold); color: var(--luxury-black);">Book Now</button>
             </div>
           </div>
         </div>
@@ -853,9 +1546,14 @@
           </div>
         </div>
       </div>
+      </div>
 
+      </div>
+      
       <footer>
-        <p>&copy; 2025 Car Rental System. All rights reserved.</p>
+        <div class="footer-content">
+          <p>&copy; <span class="footer-year">2025</span> <span class="footer-brand">VeloRent</span> - Luxury Car Rental System. All rights reserved.</p>
+        </div>
       </footer>
     </div>
 
@@ -948,11 +1646,17 @@
         // Update profile links to include user email
         const profileNavLink = document.getElementById("profile-nav-link");
         const profileDropdownLink = document.getElementById("profile-dropdown-link");
+        console.log("Profile link update - userEmail:", userEmail);
+        console.log("Profile nav link found:", !!profileNavLink);
+        console.log("Profile dropdown link found:", !!profileDropdownLink);
+        
         if (profileNavLink && userEmail) {
           profileNavLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+          console.log("Updated profile nav link href:", profileNavLink.href);
         }
         if (profileDropdownLink && userEmail) {
           profileDropdownLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+          console.log("Updated profile dropdown link href:", profileDropdownLink.href);
         }
 
         // Setup logout button in dropdown
@@ -976,11 +1680,185 @@
         // Load available vehicles for customers
         loadAvailableVehicles();
 
-        // Setup search functionality for vehicles
+        // Setup advanced filtering functionality for vehicles
         const vehicleSearch = document.getElementById("vehicle-search");
-        if (vehicleSearch) {
-          vehicleSearch.addEventListener("input", filterVehicles);
+        const makeFilter = document.getElementById("make-filter");
+        const modelFilter = document.getElementById("model-filter");
+        const yearFilter = document.getElementById("year-filter");
+        const priceFilter = document.getElementById("price-filter");
+        const sortSelect = document.getElementById("sort-select");
+        const clearFiltersBtn = document.getElementById("clear-filters");
+        
+        // Add event listeners for all filters
+        if (vehicleSearch) vehicleSearch.addEventListener("input", filterAndSortVehicles);
+        if (makeFilter) makeFilter.addEventListener("change", filterAndSortVehicles);
+        if (modelFilter) modelFilter.addEventListener("change", filterAndSortVehicles);
+        if (yearFilter) yearFilter.addEventListener("change", filterAndSortVehicles);
+        if (priceFilter) priceFilter.addEventListener("change", filterAndSortVehicles);
+        if (sortSelect) sortSelect.addEventListener("change", filterAndSortVehicles);
+        if (clearFiltersBtn) clearFiltersBtn.addEventListener("click", clearAllFilters);
+
+        // Initial filter setup
+        setTimeout(() => {
+          if (window.populateFilterDropdowns) {
+            window.populateFilterDropdowns();
+          }
+        }, 1000);
+        
+        // Populate filter dropdowns
+        function populateFilterDropdowns() {
+          if (!allVehicles || allVehicles.length === 0) return;
+          
+          // Get unique values
+          const makes = [...new Set(allVehicles.map(v => v.make).filter(Boolean))].sort();
+          const models = [...new Set(allVehicles.map(v => v.model).filter(Boolean))].sort();
+          const years = [...new Set(allVehicles.map(v => v.year).filter(Boolean))].sort((a, b) => b - a);
+          
+          // Populate make filter
+          if (makeFilter) {
+            makeFilter.innerHTML = '<option value="">All Makes</option>';
+            makes.forEach(make => {
+              makeFilter.innerHTML += `<option value="${make}">${make}</option>`;
+            });
+          }
+          
+          // Populate model filter
+          if (modelFilter) {
+            modelFilter.innerHTML = '<option value="">All Models</option>';
+            models.forEach(model => {
+              modelFilter.innerHTML += `<option value="${model}">${model}</option>`;
+            });
+          }
+          
+          // Populate year filter
+          if (yearFilter) {
+            yearFilter.innerHTML = '<option value="">All Years</option>';
+            years.forEach(year => {
+              yearFilter.innerHTML += `<option value="${year}">${year}</option>`;
+            });
+          }
         }
+        
+        // Clear all filters
+        function clearAllFilters() {
+          if (vehicleSearch) vehicleSearch.value = '';
+          if (makeFilter) makeFilter.value = '';
+          if (modelFilter) modelFilter.value = '';
+          if (yearFilter) yearFilter.value = '';
+          if (priceFilter) priceFilter.value = '';
+          if (sortSelect) sortSelect.value = 'default';
+          filterAndSortVehicles();
+        }
+        
+        // Enhanced filter and sort function
+        function filterAndSortVehicles() {
+          const searchTerm = vehicleSearch ? vehicleSearch.value.toLowerCase() : '';
+          const makeValue = makeFilter ? makeFilter.value : '';
+          const modelValue = modelFilter ? modelFilter.value : '';
+          const yearValue = yearFilter ? yearFilter.value : '';
+          const priceValue = priceFilter ? priceFilter.value : '';
+          const sortValue = sortSelect ? sortSelect.value : 'default';
+          
+          let filteredVehicles = allVehicles.filter(vehicle => {
+            // Search filter
+            if (searchTerm) {
+              const searchableText = `
+                ${vehicle.make || ''} 
+                ${vehicle.model || ''} 
+                ${vehicle.year || ''} 
+                ${vehicle.status || ''}
+              `.toLowerCase();
+              
+              if (!searchableText.includes(searchTerm)) return false;
+            }
+            
+            // Make filter
+            if (makeValue && vehicle.make !== makeValue) return false;
+            
+            // Model filter
+            if (modelValue && vehicle.model !== modelValue) return false;
+            
+            // Year filter
+            if (yearValue && vehicle.year != yearValue) return false;
+            
+            // Price filter
+            if (priceValue) {
+              const price = vehicle.has_discount ? vehicle.discountedRatePerDay : vehicle.rentalRatePerDay;
+              switch(priceValue) {
+                case '0-50':
+                  if (price >= 50) return false;
+                  break;
+                case '50-100':
+                  if (price < 50 || price >= 100) return false;
+                  break;
+                case '100-200':
+                  if (price < 100 || price >= 200) return false;
+                  break;
+                case '200+':
+                  if (price < 200) return false;
+                  break;
+              }
+            }
+            
+            return true;
+          });
+          
+          // Apply sorting
+          switch(sortValue) {
+            case 'price-low':
+              filteredVehicles.sort((a, b) => {
+                const priceA = a.has_discount ? a.discountedRatePerDay : a.rentalRatePerDay;
+                const priceB = b.has_discount ? b.discountedRatePerDay : b.rentalRatePerDay;
+                return priceA - priceB;
+              });
+              break;
+            case 'price-high':
+              filteredVehicles.sort((a, b) => {
+                const priceA = a.has_discount ? a.discountedRatePerDay : a.rentalRatePerDay;
+                const priceB = b.has_discount ? b.discountedRatePerDay : b.rentalRatePerDay;
+                return priceB - priceA;
+              });
+              break;
+            case 'year-new':
+              filteredVehicles.sort((a, b) => (b.year || 0) - (a.year || 0));
+              break;
+            case 'year-old':
+              filteredVehicles.sort((a, b) => (a.year || 0) - (b.year || 0));
+              break;
+            case 'make':
+              filteredVehicles.sort((a, b) => (a.make || '').localeCompare(b.make || ''));
+              break;
+            default:
+              // Keep original order
+              break;
+          }
+          
+          // Update results count
+          const resultsCount = document.getElementById('results-count');
+          if (resultsCount) {
+            const total = allVehicles.length;
+            const filtered = filteredVehicles.length;
+            if (filtered === total) {
+              resultsCount.textContent = `Showing all ${total} vehicles`;
+            } else {
+              resultsCount.textContent = `Showing ${filtered} of ${total} vehicles`;
+            }
+          }
+          
+          displayVehicles(filteredVehicles);
+        }
+        
+        // Make function available globally
+        window.filterAndSortVehicles = filterAndSortVehicles;
+        
+        // Test function
+        window.testFilters = function() {
+          console.log('Testing filters...');
+          console.log('allVehicles:', allVehicles?.length || 0);
+          console.log('Search input:', document.getElementById('vehicle-search')?.value);
+          console.log('Make filter:', document.getElementById('make-filter')?.value);
+          filterAndSortVehicles();
+        };
 
 
         function loadActivePackages() {
@@ -996,41 +1874,94 @@
             if (!Array.isArray(list)) return;
             const active = list.filter(p => (p.status || '').toLowerCase() === 'activated');
             if (active.length === 0) return;
-            // Hide welcome, show section
+            // Hide welcome, show section with luxury title
             if (welcome) welcome.style.display = 'none';
             section.style.display = 'block';
+            
+            // Update section title dynamically
+            const sectionTitle = section.querySelector('h3');
+            if (sectionTitle && !sectionTitle.innerHTML.includes('🎉')) {
+              sectionTitle.innerHTML = `🎉 Active Luxury Packages (${active.length})`;
+            }
             // Build slides
             track.innerHTML = '';
+            const indicators = document.createElement('div');
+            indicators.className = 'packages-indicators';
+            
             active.forEach((p, idx) => {
               const slide = document.createElement('div');
               slide.className = 'package-slide';
-              const imgSrc = p.imageUrl || 'https://via.placeholder.com/320x200?text=Package';
+              const imgSrc = p.imageUrl || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
+              
+              // Set background image
+              slide.style.backgroundImage = `url(${imgSrc})`;
+              
               slide.innerHTML = `
-                <img class="package-image" src="${imgSrc}" alt="${p.packageName || 'Package'}"/>
-                <div class="package-info">
-                  <h4>${p.packageName || 'Package'}</h4>
-                  <div class="package-meta">Duration: ${p.duration || 0} days</div>
-                  <div class="package-meta">Price: <strong>Rs. ${p.price || 0}</strong></div>
-                </div>
-                <div class="package-actions">
-                  <button class="btn view-details-btn" data-pkg-idx="${idx}">Details</button>
-                  <button class="btn btn-accent" data-pkg-buy-idx="${idx}">Buy Now</button>
+                <div class="package-content">
+                  <div class="package-info">
+                    <h4>${p.packageName || 'Luxury Package'}</h4>
+                    <div class="package-meta">Duration: <strong>${p.duration || 0} days</strong></div>
+                    <div class="package-meta">Starting from: <strong>Rs. ${p.price || 0}</strong></div>
+                  </div>
+                  <div class="package-actions">
+                    <button class="btn view-details-btn" data-pkg-idx="${idx}">View Details</button>
+                    <button class="btn btn-accent" data-pkg-buy-idx="${idx}">Book Now</button>
+                  </div>
                 </div>`;
               track.appendChild(slide);
+              
+              // Create indicator
+              const indicator = document.createElement('div');
+              indicator.className = `package-indicator ${idx === 0 ? 'active' : ''}`;
+              indicator.onclick = () => goToSlide(idx);
+              indicators.appendChild(indicator);
             });
+            
+            // Add indicators to slider
+            const packageSlider = document.querySelector('.packages-slider');
+            packageSlider.appendChild(indicators);
 
-            // Controls
+            // Enhanced Controls with Indicators
             let current = 0; const total = active.length;
-            function go(i){ current = (i + total) % total; track.style.transform = `translateX(-${current*100}%)`; }
+            
+            function updateIndicators() {
+              document.querySelectorAll('.package-indicator').forEach((ind, i) => {
+                ind.classList.toggle('active', i === current);
+              });
+            }
+            
+            function go(i){ 
+              current = (i + total) % total; 
+              track.style.transform = `translateX(-${current*100}%)`;
+              updateIndicators();
+            }
+            
+            function goToSlide(i) {
+              current = i;
+              track.style.transform = `translateX(-${current*100}%)`;
+              updateIndicators();
+              // Reset timer
+              clearInterval(timer);
+              timer = setInterval(() => go(current+1), 6000);
+            }
+            
             const prev = document.getElementById('pkg-prev');
             const next = document.getElementById('pkg-next');
-            prev.onclick = () => go(current-1);
-            next.onclick = () => go(current+1);
-            let timer = setInterval(() => go(current+1), 5000);
-            [prev, next, track].forEach(el => {
-              el.addEventListener('mouseenter', () => clearInterval(timer));
-              el.addEventListener('mouseleave', () => { timer = setInterval(() => go(current+1), 5000); });
-            });
+            prev.onclick = () => { clearInterval(timer); go(current-1); timer = setInterval(() => go(current+1), 6000); };
+            next.onclick = () => { clearInterval(timer); go(current+1); timer = setInterval(() => go(current+1), 6000); };
+            
+            let timer = setInterval(() => go(current+1), 6000);
+            
+            // Pause on hover
+            const packageSliderElement = document.querySelector('.packages-slider');
+            packageSliderElement.addEventListener('mouseenter', () => clearInterval(timer));
+            packageSliderElement.addEventListener('mouseleave', () => { timer = setInterval(() => go(current+1), 6000); });
+            
+            // Make goToSlide available globally for indicators
+            window.goToSlide = goToSlide;
+            
+            // Initialize first slide
+            updateIndicators();
 
             // Wire buttons
             track.querySelectorAll('[data-pkg-idx]').forEach(btn => {
@@ -1056,17 +1987,43 @@
           document.getElementById('pkg-modal-price').textContent = `Rs. ${pkg.price || 0}`;
           document.getElementById('pkg-modal-duration').textContent = `${pkg.duration || 0} days`;
           document.getElementById('pkg-modal-status').textContent = pkg.status || 'Activated';
+          
+          // Enhanced vehicle display
           const ul = document.getElementById('pkg-modal-vehicles');
           ul.innerHTML = '';
+          
           if (Array.isArray(pkg.vehicles) && pkg.vehicles.length){
             pkg.vehicles.forEach(v => {
               const li = document.createElement('li');
-              li.textContent = `${v.make || ''} ${v.model || ''} (${v.year || ''})`;
+              li.style.cssText = 'margin-bottom: 12px; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 6px; border-left: 3px solid var(--luxury-gold);';
+              
+              const vehicleInfo = document.createElement('div');
+              vehicleInfo.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="flex: 1;">
+                    <strong style="color: var(--luxury-gold);">${v.make || 'Unknown'} ${v.model || 'Model'}</strong>
+                    <div style="color: var(--text-luxury-muted); font-size: 0.9rem;">
+                      Year: ${v.year || 'N/A'} | 
+                      Rate: Rs. ${v.rentalRatePerDay || 0}/day |
+                      Status: <span style="color: ${v.status === 'AVAILABLE' ? '#27ae60' : '#e74c3c'};">${v.status || 'Unknown'}</span>
+                    </div>
+                  </div>
+                  <button onclick="viewVehicleDetails(${v.vehicleId})" 
+                          style="background: var(--gradient-gold); color: var(--luxury-black); border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                    View Details
+                  </button>
+                </div>
+              `;
+              li.appendChild(vehicleInfo);
               ul.appendChild(li);
             });
           } else {
-            const li = document.createElement('li'); li.textContent = 'No vehicles listed'; ul.appendChild(li);
+            const li = document.createElement('li');
+            li.style.cssText = 'color: var(--text-luxury-muted); font-style: italic; text-align: center; padding: 20px;';
+            li.textContent = 'No vehicles available in this package';
+            ul.appendChild(li);
           }
+          
           const buyBtn = document.getElementById('pkg-modal-buy');
           buyBtn.onclick = () => buyPackage(pkg);
           document.getElementById('package-details-modal').style.display = 'block';
@@ -1474,5 +2431,9 @@
         // Removed: All payment-related functions (showPaymentModal, handlePaymentSubmission, card validation, etc.)
       });
     </script>
+
+    <!-- Luxury Theme Scripts -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
   </body>
 </html>
