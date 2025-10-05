@@ -199,6 +199,414 @@
         font-size: 1.5rem;
         margin-right: 15px;
       }
+
+      /* Packages Slideshow Styles */
+      .packages-slider-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .packages-slider {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        will-change: transform;
+      }
+
+      .package-slide {
+        min-width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .package-slide::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .package-content {
+        flex: 1;
+        z-index: 2;
+        position: relative;
+      }
+
+      .package-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .package-description {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        opacity: 0.9;
+      }
+
+      .package-details {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .package-detail-item {
+        text-align: center;
+      }
+
+      .package-detail-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        display: block;
+      }
+
+      .package-detail-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .package-price {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #ffd700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        margin-bottom: 10px;
+      }
+
+      .package-rent-btn {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        border: none;
+        padding: 15px 35px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 50px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .package-rent-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+      }
+
+      .package-rent-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+      }
+
+      .package-rent-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .package-rent-btn:hover::before {
+        left: 100%;
+      }
+
+      .package-image {
+        flex: 0 0 300px;
+        z-index: 2;
+        position: relative;
+      }
+
+      .package-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .slider-controls {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 3;
+      }
+
+      .slider-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .slider-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.1);
+      }
+
+      .slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .dot.active {
+        background: var(--primary-color);
+        transform: scale(1.2);
+      }
+
+      @media (max-width: 768px) {
+        .package-slide {
+          flex-direction: column;
+          text-align: center;
+          padding: 40px 20px;
+        }
+
+        .package-image {
+          flex: none;
+          margin-top: 30px;
+        }
+
+        .package-title {
+          font-size: 2rem;
+        }
+
+        .package-price {
+          font-size: 2.5rem;
+        }
+
+        .package-details {
+          justify-content: center;
+        }
+      }
+
+      /* Customer Feedback Section Styles */
+      .feedback-section {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feedback-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+        opacity: 0.3;
+        z-index: 1;
+      }
+
+      .feedback-section .container {
+        position: relative;
+        z-index: 2;
+      }
+
+      .feedback-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feedback-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      }
+
+      .feedback-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .feedback-rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .feedback-rating .stars {
+        display: flex;
+        margin-right: 10px;
+      }
+
+      .feedback-rating .star {
+        color: #ffd700;
+        font-size: 1.2rem;
+        margin-right: 2px;
+      }
+
+      .feedback-rating .star.empty {
+        color: #ddd;
+      }
+
+      .feedback-rating .rating-text {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .feedback-comment {
+        font-style: italic;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #444;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .feedback-comment::before {
+        content: '"';
+        font-size: 3rem;
+        color: var(--primary-color);
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        opacity: 0.3;
+        font-family: Georgia, serif;
+      }
+
+      .feedback-comment::after {
+        content: '"';
+        font-size: 3rem;
+        color: var(--primary-color);
+        position: absolute;
+        bottom: -40px;
+        right: 10px;
+        opacity: 0.3;
+        font-family: Georgia, serif;
+      }
+
+      .feedback-customer {
+        display: flex;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+      }
+
+      .feedback-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+
+      .feedback-customer-info h6 {
+        margin: 0;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .feedback-customer-info small {
+        color: #666;
+        font-size: 0.85rem;
+      }
+
+      .feedback-loading {
+        padding: 40px;
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+      }
+
+      .feedback-loading i {
+        margin-right: 10px;
+        color: var(--primary-color);
+      }
+
+      .feedback-error {
+        padding: 40px;
+        text-align: center;
+        color: #dc3545;
+        font-size: 1.1rem;
+      }
+
+      .feedback-empty {
+        padding: 40px;
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+      }
+
+      @media (max-width: 768px) {
+        .feedback-card {
+          padding: 20px;
+          margin-bottom: 20px;
+        }
+
+        .feedback-comment {
+          font-size: 1rem;
+        }
+
+        .feedback-avatar {
+          width: 40px;
+          height: 40px;
+          font-size: 1rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -245,6 +653,29 @@
         <a href="#vehicles" class="btn btn-primary btn-lg">
           <i class="fas fa-search mr-2"></i> Browse Vehicles
         </a>
+      </div>
+    </section>
+
+    <!-- Packages Slideshow Section -->
+    <section id="packages-slideshow" class="py-5" style="background-color: #f8f9fa;">
+      <div class="container">
+        <h2 class="section-title">Featured Rental Packages</h2>
+        <div class="packages-slider-container">
+          <div class="packages-slider" id="packages-slider">
+            <!-- Package slides will be dynamically inserted here -->
+          </div>
+          <div class="slider-controls">
+            <button class="slider-btn prev-btn" id="prev-btn">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-btn next-btn" id="next-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="slider-dots" id="slider-dots">
+            <!-- Dots will be dynamically inserted here -->
+          </div>
+        </div>
       </div>
     </section>
 
@@ -315,6 +746,29 @@
         <!-- Vehicles Grid -->
         <div class="row" id="vehicles-container">
           <!-- Vehicle cards will be dynamically inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Customer Feedback Section -->
+    <section class="feedback-section py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title" style="color: #333; margin-bottom: 20px;">What Our Customers Say</h2>
+          <p class="section-subtitle" style="color: #666; font-size: 1.1rem;">Real experiences from our valued customers</p>
+        </div>
+        
+        <div class="row" id="feedback-container">
+          <!-- Feedback cards will be dynamically inserted here -->
+          <div class="col-12 text-center">
+            <div class="feedback-loading">
+              <i class="fas fa-spinner fa-spin"></i> Loading feedback...
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-4">
+          <a href="/feedback" class="btn btn-primary">View All Feedback</a>
         </div>
       </div>
     </section>
@@ -537,6 +991,358 @@
           // Redirect to login for now, can be enhanced to show modal with details
           window.location.href = `/login?vehicleId=${vehicleId}`;
         };
+
+        // Packages Slideshow Functionality
+        const packagesSlider = document.querySelector('.packages-slider');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        let currentSlide = 0;
+        let slideInterval;
+        let totalSlides = 0;
+
+        // Packages data will be fetched from API
+        let packagesData = [];
+
+        // Fetch packages from API
+        function fetchPackagesData() {
+          fetch('/api/public/packages')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch packages');
+              }
+              return response.json();
+            })
+            .then(data => {
+              packagesData = data.map(pkg => ({
+                id: pkg.packageId,
+                title: pkg.packageName,
+                description: `${pkg.packageName} - Duration: ${pkg.duration} days`,
+                duration: `${pkg.duration} Days`,
+                mileage: pkg.vehicles && pkg.vehicles.length > 0 ? `${pkg.vehicles.length} Vehicle${pkg.vehicles.length > 1 ? 's' : ''}` : 'Multiple Vehicles',
+                fuel: 'Full Tank',
+                price: `Rs. ${pkg.price}`,
+                image: pkg.imageUrl || '/images/default-package.jpg'
+              }));
+              
+              if (packagesData.length > 0) {
+                initializeSlideshow();
+              } else {
+                // Hide slideshow section if no packages available
+                const slideshowSection = document.getElementById('packages-slideshow');
+                if (slideshowSection) {
+                  slideshowSection.style.display = 'none';
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching packages:', error);
+              // Hide slideshow section on error
+              const slideshowSection = document.getElementById('packages-slideshow');
+              if (slideshowSection) {
+                slideshowSection.style.display = 'none';
+              }
+            });
+        }
+
+        // Initialize slideshow with data
+        function initializeSlideshow() {
+          if (packagesSlider && packagesData.length > 0) {
+            totalSlides = packagesData.length;
+            
+            // Clear existing slides
+            packagesSlider.innerHTML = '';
+            
+            // Create slides from data
+            packagesData.forEach((pkg, index) => {
+              const slide = document.createElement('div');
+              slide.className = 'package-slide';
+              slide.innerHTML = `
+                <div class="package-content">
+                  <h2 class="package-title">${pkg.title}</h2>
+                  <p class="package-description">${pkg.description}</p>
+                  <div class="package-details">
+                    <div class="package-detail-item">
+                      <span class="package-detail-value">${pkg.duration}</span>
+                      <span class="package-detail-label">Duration</span>
+                    </div>
+                    <div class="package-detail-item">
+                      <span class="package-detail-value">${pkg.mileage}</span>
+                      <span class="package-detail-label">Vehicles</span>
+                    </div>
+                    <div class="package-detail-item">
+                      <span class="package-detail-value">${pkg.fuel}</span>
+                      <span class="package-detail-label">Fuel</span>
+                    </div>
+                  </div>
+                  <div class="package-price">${pkg.price}</div>
+                  <button class="package-rent-btn" onclick="rentPackage(${pkg.id})" title="Click to login and book this package">
+                    🔒 Rent Now
+                  </button>
+                </div>
+                <div class="package-image">
+                  <img src="${pkg.image}" alt="${pkg.title}" class="package-img" 
+                       onerror="this.src='/images/default-package.jpg'">
+                </div>
+              `;
+              packagesSlider.appendChild(slide);
+            });
+
+            // Create dots
+            createDots();
+            
+            // Update dots
+            updateDots();
+            
+            // Start auto-slide
+            startAutoSlide();
+          }
+        }
+
+        // Create dots based on number of packages
+        function createDots() {
+          const sliderDots = document.getElementById('slider-dots');
+          if (sliderDots) {
+            sliderDots.innerHTML = '';
+            packagesData.forEach((_, index) => {
+              const dot = document.createElement('span');
+              dot.className = 'dot';
+              dot.addEventListener('click', () => {
+                stopAutoSlide();
+                goToSlide(index);
+                startAutoSlide();
+              });
+              sliderDots.appendChild(dot);
+            });
+          }
+        }
+
+        // Update slide position
+        function updateSlidePosition() {
+          if (packagesSlider) {
+            packagesSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+          }
+        }
+
+        // Update dots
+        function updateDots() {
+          const dots = document.querySelectorAll('.dot');
+          dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+          });
+        }
+
+        // Go to next slide
+        function nextSlide() {
+          currentSlide = (currentSlide + 1) % totalSlides;
+          updateSlidePosition();
+        }
+
+        // Go to previous slide
+        function prevSlide() {
+          currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+          updateSlidePosition();
+        }
+
+        // Go to specific slide
+        function goToSlide(slideIndex) {
+          currentSlide = slideIndex;
+          updateSlidePosition();
+        }
+
+        // Start auto-slide (every 5 seconds)
+        function startAutoSlide() {
+          slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        // Stop auto-slide
+        function stopAutoSlide() {
+          clearInterval(slideInterval);
+        }
+
+        // Event listeners for navigation
+        if (prevBtn) {
+          prevBtn.addEventListener('click', () => {
+            stopAutoSlide();
+            prevSlide();
+            startAutoSlide();
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            stopAutoSlide();
+            nextSlide();
+            startAutoSlide();
+          });
+        }
+
+        // Event listeners for dots are now handled in createDots function
+
+        // Pause auto-slide on hover
+        if (packagesSlider) {
+          packagesSlider.addEventListener('mouseenter', stopAutoSlide);
+          packagesSlider.addEventListener('mouseleave', startAutoSlide);
+        }
+
+        // Fetch packages and initialize slideshow
+        fetchPackagesData();
+
+        // Fetch and display customer feedback
+        fetchCustomerFeedback();
+
+        // Rent package function (requires login)
+        window.rentPackage = function(packageId) {
+          console.log('Rent package clicked for ID:', packageId);
+          
+          // Check if user is logged in by checking for token
+          const token = localStorage.getItem('token');
+          const userEmail = localStorage.getItem('userEmail');
+          
+          console.log('Token exists:', !!token);
+          console.log('User email exists:', !!userEmail);
+          
+          if (!token || !userEmail) {
+            // User is not logged in, redirect to login page with return URL
+            const returnUrl = encodeURIComponent(`/dashboard?packageId=${packageId}`);
+            const loginUrl = `/login?returnUrl=${returnUrl}&message=Please login to book this package`;
+            console.log('Redirecting to login:', loginUrl);
+            window.location.href = loginUrl;
+          } else {
+            // User is logged in, redirect to dashboard with package pre-selected
+            const dashboardUrl = `/dashboard?packageId=${packageId}`;
+            console.log('Redirecting to dashboard:', dashboardUrl);
+            window.location.href = dashboardUrl;
+          }
+        };
+
+        // Fetch customer feedback from API
+        function fetchCustomerFeedback() {
+          const feedbackContainer = document.getElementById('feedback-container');
+          
+          if (!feedbackContainer) return;
+
+          fetch('/api/public/feedback?page=0&size=6')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch feedback');
+              }
+              return response.json();
+            })
+            .then(feedbacks => {
+              if (feedbacks && feedbacks.length > 0) {
+                displayFeedback(feedbacks);
+              } else {
+                feedbackContainer.innerHTML = `
+                  <div class="col-12">
+                    <div class="feedback-empty">
+                      <i class="fas fa-comments"></i>
+                      <p>No customer feedback available yet.</p>
+                    </div>
+                  </div>
+                `;
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching feedback:', error);
+              feedbackContainer.innerHTML = `
+                <div class="col-12">
+                  <div class="feedback-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Unable to load customer feedback at this time.</p>
+                  </div>
+                </div>
+              `;
+            });
+        }
+
+        // Display feedback in cards
+        function displayFeedback(feedbacks) {
+          const feedbackContainer = document.getElementById('feedback-container');
+          if (!feedbackContainer) return;
+
+          feedbackContainer.innerHTML = '';
+
+          feedbacks.forEach(feedback => {
+            const feedbackCard = createFeedbackCard(feedback);
+            feedbackContainer.appendChild(feedbackCard);
+          });
+        }
+
+        // Create a feedback card element
+        function createFeedbackCard(feedback) {
+          const col = document.createElement('div');
+          col.className = 'col-lg-4 col-md-6 mb-4';
+
+          // Generate star rating
+          const stars = generateStarRating(feedback.rating);
+          
+          // Get customer initials for avatar
+          const initials = getCustomerInitials(feedback.customerName);
+          
+          // Format date
+          const feedbackDate = formatFeedbackDate(feedback.feedbackDate);
+
+          col.innerHTML = `
+            <div class="feedback-card">
+              <div class="feedback-rating">
+                <div class="stars">${stars}</div>
+                <span class="rating-text">${feedback.rating}/5</span>
+              </div>
+              <div class="feedback-comment">
+                ${feedback.comments}
+              </div>
+              <div class="feedback-customer">
+                <div class="feedback-avatar">${initials}</div>
+                <div class="feedback-customer-info">
+                  <h6>${feedback.customerName}</h6>
+                  <small>${feedbackDate}</small>
+                </div>
+              </div>
+            </div>
+          `;
+
+          return col;
+        }
+
+        // Generate star rating HTML
+        function generateStarRating(rating) {
+          let stars = '';
+          for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+              stars += '<i class="fas fa-star star"></i>';
+            } else {
+              stars += '<i class="far fa-star star empty"></i>';
+            }
+          }
+          return stars;
+        }
+
+        // Get customer initials for avatar
+        function getCustomerInitials(name) {
+          if (!name) return '?';
+          const names = name.split(' ');
+          if (names.length >= 2) {
+            return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase();
+          }
+          return name.charAt(0).toUpperCase();
+        }
+
+        // Format feedback date
+        function formatFeedbackDate(dateString) {
+          if (!dateString) return '';
+          try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          } catch (e) {
+            return dateString;
+          }
+        }
       });
     </script>
   </body>

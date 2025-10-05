@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/api/fleet/**").permitAll() // Allow access to fleet manager package APIs
+                        .requestMatchers("/api/public/**").permitAll() // Allow access to public endpoints
 
                         .requestMatchers("/api/payments/**").permitAll() // Allow access to payment endpoints
                         .requestMatchers("/api/bookings/**").authenticated() // Require authentication for booking endpoints

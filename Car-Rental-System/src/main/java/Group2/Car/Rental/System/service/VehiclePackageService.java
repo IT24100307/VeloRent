@@ -29,6 +29,10 @@ public class VehiclePackageService {
         return vehiclePackageRepository.findAll();
     }
 
+    public List<VehiclePackage> getActivatedPackages() {
+        return vehiclePackageRepository.findByStatus("Activated");
+    }
+
     public Optional<VehiclePackage> getById(Integer id) {
         return vehiclePackageRepository.findById(id);
     }
