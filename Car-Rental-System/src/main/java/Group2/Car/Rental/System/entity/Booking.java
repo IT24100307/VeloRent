@@ -27,23 +27,33 @@ public class Booking {
     @Column(name = "booking_status")
     private String bookingStatus = "Confirmed";
 
+    @Column(name = "booking_type")
+    private String bookingType = "VEHICLE"; // VEHICLE or PACKAGE
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id", nullable = true)
     private Vehicle vehicle;
 
     @ManyToOne
-    @JoinColumn(name = "managed_by_staff_id")
+    @JoinColumn(name = "package_id", nullable = true)
+    private VehiclePackage vehiclePackage;
+
+    @ManyToOne
+    @JoinColumn(name = "managed_by_staff_id", nullable = true)
     private Staff managedByStaff;
 
     // Default constructor
     public Booking() {
     }
 
-    // Constructor with parameters
+    // Constructor for vehicle booking
     public Booking(LocalDateTime startDate, LocalDateTime endDate, BigDecimal totalCost,
                   Customer customer, Vehicle vehicle) {
         this.startDate = startDate;
@@ -51,6 +61,20 @@ public class Booking {
         this.totalCost = totalCost;
         this.customer = customer;
         this.vehicle = vehicle;
+        this.bookingType = "VEHICLE";
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // Constructor for package booking
+    public Booking(LocalDateTime startDate, LocalDateTime endDate, BigDecimal totalCost,
+                  Customer customer, VehiclePackage vehiclePackage) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalCost = totalCost;
+        this.customer = customer;
+        this.vehiclePackage = vehiclePackage;
+        this.bookingType = "PACKAGE";
+        this.createdAt = LocalDateTime.now();
     }
 
     // Getters and setters
@@ -94,6 +118,22 @@ public class Booking {
         this.bookingStatus = bookingStatus;
     }
 
+    public String getBookingType() {
+        return bookingType;
+    }
+
+    public void setBookingType(String bookingType) {
+        this.bookingType = bookingType;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Customer getCustomer() {
         return customer;
     }
@@ -108,6 +148,14 @@ public class Booking {
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
+    }
+
+    public VehiclePackage getVehiclePackage() {
+        return vehiclePackage;
+    }
+
+    public void setVehiclePackage(VehiclePackage vehiclePackage) {
+        this.vehiclePackage = vehiclePackage;
     }
 
     public Staff getManagedByStaff() {

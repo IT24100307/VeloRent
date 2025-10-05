@@ -718,14 +718,152 @@
         </div>
       </div>
 
+      <!-- Package Booking Modal -->
+      <div id="package-booking-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+          <div class="modal-header">
+            <h2 class="modal-title"><i class="fa fa-calendar"></i> Book Package</h2>
+            <span class="close" role="button" tabindex="0" onclick="closePackageBookingModal()" onkeydown="if(event.key==='Enter'||event.key==='Escape'){closePackageBookingModal()}">&times;</span>
+          </div>
+          <div id="package-booking-content">
+            <form id="package-booking-form">
+              <input type="hidden" id="package-booking-id" name="packageId">
+
+              <div class="package-info-summary" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px;">
+                  <img id="package-booking-image" src="" alt="Package" style="width: 100px; height: 80px; object-fit: cover; border-radius: 4px;">
+                  <div>
+                    <h4 id="package-booking-name" style="margin: 0 0 8px 0; color: var(--primary-color);"></h4>
+                    <div id="package-booking-duration" style="color: var(--light-text); margin-bottom: 4px;"></div>
+                    <div id="package-booking-price" style="font-weight: bold; color: var(--accent-color); font-size: 1.1em;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="package-start-date">Start Date</label>
+                <input type="date" id="package-start-date" class="form-control" required min="">
+              </div>
+
+              <div class="form-group">
+                <label for="package-end-date">End Date</label>
+                <input type="date" id="package-end-date" class="form-control" required min="">
+              </div>
+
+              <div class="form-group">
+                <label>Booking Duration</label>
+                <div id="package-rental-duration">0 days</div>
+              </div>
+
+              <div class="form-group">
+                <label>Cost Calculation</label>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                  <tr>
+                    <td>Package Price:</td>
+                    <td id="package-price-display" style="text-align: right;">Rs. 0.00</td>
+                  </tr>
+                  <tr>
+                    <td>Duration:</td>
+                    <td id="package-days-display" style="text-align: right;">0 days</td>
+                  </tr>
+                  <tr style="border-top: 1px solid #ddd; font-weight: bold;">
+                    <td>Total Cost:</td>
+                    <td id="package-total-cost" style="text-align: right;">Rs. 0.00</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn" onclick="closePackageBookingModal()">Cancel</button>
+                <button type="submit" class="btn btn-accent">Proceed to Payment</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Processing Modal -->
+      <div id="payment-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header">
+            <h2 class="modal-title"><i class="fa fa-credit-card"></i> Payment</h2>
+            <span class="close" role="button" tabindex="0" onclick="closePaymentModal()" onkeydown="if(event.key==='Enter'||event.key==='Escape'){closePaymentModal()}">&times;</span>
+          </div>
+          <div id="payment-content">
+            <div class="payment-summary" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 10px 0;">Booking Summary</h4>
+              <div id="payment-booking-details"></div>
+            </div>
+
+            <form id="payment-form">
+              <input type="hidden" id="payment-booking-id">
+
+              <div class="form-group">
+                <label>Payment Method</label>
+                <div class="payment-methods">
+                  <label class="payment-method-option">
+                    <input type="radio" name="paymentMethod" value="credit_card" checked>
+                    <span class="payment-method-label">
+                      <i class="fa fa-credit-card"></i> Credit Card
+                    </span>
+                  </label>
+                  <label class="payment-method-option">
+                    <input type="radio" name="paymentMethod" value="debit_card">
+                    <span class="payment-method-label">
+                      <i class="fa fa-credit-card"></i> Debit Card
+                    </span>
+                  </label>
+                  <label class="payment-method-option">
+                    <input type="radio" name="paymentMethod" value="upi">
+                    <span class="payment-method-label">
+                      <i class="fa fa-mobile"></i> UPI
+                    </span>
+                  </label>
+                  <label class="payment-method-option">
+                    <input type="radio" name="paymentMethod" value="cash">
+                    <span class="payment-method-label">
+                      <i class="fa fa-money"></i> Cash
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn" onclick="closePaymentModal()">Cancel</button>
+                <button type="submit" class="btn btn-accent">
+                  <i class="fa fa-check"></i> Complete Payment
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div id="payment-processing" style="display: none; text-align: center; padding: 40px;">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 15px;">Processing your payment...</p>
+          </div>
+
+          <div id="payment-success" style="display: none; text-align: center; padding: 40px;">
+            <div style="color: var(--accent-color); font-size: 48px; margin-bottom: 15px;">
+              <i class="fa fa-check-circle"></i>
+            </div>
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">Payment Successful!</h3>
+            <p style="margin-bottom: 20px;">Your package has been booked successfully.</p>
+            <div id="booking-confirmation-details"></div>
+            <button class="btn btn-accent" onclick="closePaymentModal(); loadDashboard();">Continue</button>
+          </div>
+        </div>
+      </div>
+
       <footer>
         <p>&copy; 2025 Car Rental System. All rights reserved.</p>
       </footer>
     </div>
 
     <!-- Scripts -->
+    <script th:src="@{/js/package-booking-fix.js}"></script>
     <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/dashboard-vehicles.js}"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // Check if user is logged in
@@ -847,8 +985,6 @@
           vehicleSearch.addEventListener("input", filterVehicles);
         }
 
-        // Global vehicles array to hold all vehicles
-        let allVehicles = [];
 
         function loadActivePackages() {
           const track = document.getElementById('packages-track');
@@ -949,122 +1085,166 @@
             duration: pkg.duration,
             imageUrl: pkg.imageUrl
           }));
-          window.location.href = '/payment?mode=package';
+          // Open package booking modal
+          openPackageBookingModal(pkg);
         }
 
-        function loadAvailableVehicles() {
-          const vehiclesContainer = document.getElementById("vehicles-container");
-          const loadingVehicles = document.getElementById("loading-vehicles");
+        function openPackageBookingModal(pkg) {
+          // Populate package details in the booking modal
+          document.getElementById("package-booking-id").value = pkg.packageId;
+          document.getElementById("package-booking-name").textContent = pkg.packageName || 'Package';
+          document.getElementById("package-booking-image").src = pkg.imageUrl || 'https://via.placeholder.com/100x80?text=Package';
+          document.getElementById("package-booking-duration").textContent = `${pkg.duration || 0} days`;
+          document.getElementById("package-booking-price").textContent = `Rs. ${pkg.price || 0}`;
 
-          // Show loading state
-          loadingVehicles.style.display = "flex";
-          vehiclesContainer.style.display = "none";
+          // Set minimum date to today
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById("package-start-date").min = today;
+          document.getElementById("package-end-date").min = today;
 
-          // Fetch vehicles from the API
-          fetch('/api/vehicles', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-cache'
+          // Clear previous values
+          document.getElementById("package-start-date").value = "";
+          document.getElementById("package-end-date").value = "";
+          document.getElementById("package-rental-duration").textContent = "0 days";
+
+          // Hide any previous messages
+          document.getElementById("booking-message").style.display = "none";
+
+          // Close the package details modal and open booking modal
+          closePackageDetailsModal();
+          document.getElementById("package-booking-modal").style.display = "block";
+        }
+
+        window.closePackageBookingModal = function() {
+          document.getElementById("package-booking-modal").style.display = "none";
+        };
+
+        // Calculate package duration when dates change
+        document.getElementById("package-start-date").addEventListener("change", calculatePackageBookingDetails);
+        document.getElementById("package-end-date").addEventListener("change", calculatePackageBookingDetails);
+
+        function calculatePackageBookingDetails() {
+          const startDateInput = document.getElementById("package-start-date");
+          const endDateInput = document.getElementById("package-end-date");
+
+          // Only calculate if both dates are selected
+          if (!startDateInput.value || !endDateInput.value) return;
+
+          const startDate = new Date(startDateInput.value);
+          const endDate = new Date(endDateInput.value);
+
+          // Set minimum end date based on start date
+          const nextDay = new Date(startDate);
+          nextDay.setDate(nextDay.getDate() + 1);
+          endDateInput.min = nextDay.toISOString().split('T')[0];
+
+          // Reset end date if it's before start date
+          if (endDate <= startDate) {
+            endDateInput.value = nextDay.toISOString().split('T')[0];
+            endDate.setTime(nextDay.getTime());
+          }
+
+          // Calculate duration in days
+          const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+          document.getElementById("package-rental-duration").textContent = `${duration} day${duration !== 1 ? 's' : ''}`;
+
+          // Get package price from the booking modal display
+          const packagePriceText = document.getElementById("package-booking-price").textContent;
+          const packagePrice = parseInt(packagePriceText.replace(/\D/g, '')) || 0;
+
+          // Update cost calculation display
+          document.getElementById("package-price-display").textContent = `Rs. ${packagePrice.toFixed(2)}`;
+          document.getElementById("package-days-display").textContent = `${duration} day${duration !== 1 ? 's' : ''}`;
+
+          // Calculate and display total cost - FIXED: multiply package price by duration
+          const totalCost = duration * packagePrice;
+          document.getElementById("package-total-cost").textContent = `Rs. ${totalCost.toFixed(2)}`;
+        }
+
+        // Package booking form submission
+        const packageBookingForm = document.getElementById("package-booking-form");
+        if (packageBookingForm) {
+          packageBookingForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const startDate = document.getElementById("package-start-date").value;
+            const endDate = document.getElementById("package-end-date").value;
+            const packageId = document.getElementById("package-booking-id").value;
+            const totalCost = document.getElementById("package-total-cost").textContent.replace(/[^0-9.-]+/g,"");
+
+            if (!startDate || !endDate) {
+                showBookingMessage("Please select both start and end dates.", "error");
+                return;
             }
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Failed to fetch vehicles');
-            }
-            return response.json();
-          })
-          .then(data => {
-            // Store vehicles in global array
-            allVehicles = Array.isArray(data) ? data : [];
 
-            // Only show available vehicles to customers
-            const availableVehicles = allVehicles.filter(v => v.status === "Available");
+            // Build booking request (no payments)
+            const bookingData = {
+              startDate: startDate,
+              endDate: endDate,
+              packageId: packageId,
+              totalCost: totalCost
+            };
 
-            // Render the vehicles
-            renderVehicles(availableVehicles);
+            // Get package details for payment page
+            const packageName = document.getElementById("package-booking-name").textContent;
+            const packagePriceText = document.getElementById("package-booking-price").textContent;
+            const totalCostText = document.getElementById("package-total-cost").textContent;
+            const duration = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
 
-            // Hide loading, show vehicles
-            loadingVehicles.style.display = "none";
-            vehiclesContainer.style.display = "block";
-          })
-          .catch(error => {
-            console.error('Error fetching vehicles:', error);
-            loadingVehicles.innerHTML = `
-              <div style="text-align: center;">
-                <i class="fa fa-exclamation-circle" style="color: var(--danger-color); font-size: 24px; margin-bottom: 10px;"></i>
-                <div>Failed to load vehicles. Please try again later.</div>
-              </div>
-            `;
+            // Debug logging to see what we're working with
+            console.log("DEBUG - packagePriceText:", packagePriceText);
+            console.log("DEBUG - totalCostText:", totalCostText);
+
+            // Extract clean numeric values - improved logic
+            const cleanPackagePrice = extractPriceFromText(packagePriceText);
+            const cleanTotalCost = extractPriceFromText(totalCostText);
+
+            console.log("DEBUG - cleanPackagePrice:", cleanPackagePrice);
+            console.log("DEBUG - cleanTotalCost:", cleanTotalCost);
+
+            // Store package booking data in localStorage for payment page
+            localStorage.setItem("pendingPackageBooking", JSON.stringify(bookingData));
+            localStorage.setItem("selectedPackage", JSON.stringify({
+              packageId: packageId,
+              packageName: packageName,
+              price: cleanPackagePrice,  // Store as clean number
+              duration: duration,
+              totalCost: cleanTotalCost,  // Store as clean number
+              startDate: startDate,
+              endDate: endDate
+            }));
+
+            // Close the booking modal and redirect to payment page
+            closePackageBookingModal();
+            window.location.href = "/payment?mode=package";
           });
         }
 
-        function renderVehicles(vehiclesToRender) {
-          const vehiclesGrid = document.getElementById("vehicles-grid");
-          vehiclesGrid.innerHTML = ""; // Clear existing cards
+        // Payment form submission
+        const paymentForm = document.getElementById("payment-form");
+        if (paymentForm) {
+          paymentForm.addEventListener("submit", function(e) {
+            e.preventDefault();
 
-          if (vehiclesToRender.length === 0) {
-            vehiclesGrid.innerHTML = `
-              <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 16px; color: var(--light-text); margin-bottom: 10px;">No vehicles available at the moment.</div>
-                <a href="#" class="btn btn-accent" id="refresh-vehicles-btn">Refresh</a>
-              </div>
-            `;
-            return;
-          }
+            const bookingId = document.getElementById("payment-booking-id").value;
+            const paymentMethod = paymentForm.paymentMethod.value;
 
-          vehiclesToRender.forEach(vehicle => {
-            const card = document.createElement("div");
-            card.className = "vehicle-card";
+            // Payment processing logic here
+            // For now, just simulate success
+            setTimeout(() => {
+              document.getElementById("payment-processing").style.display = "none";
+              document.getElementById("payment-success").style.display = "block";
+            }, 2000);
 
-            // Create image element
-            let imageHtml = vehicle.imageUrl
-              ? `<img src="${vehicle.imageUrl}" alt="${vehicle.make} ${vehicle.model}" class="vehicle-image">`
-              : `<div style="width: 100%; height: 120px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa fa-car" style="font-size: 24px; color: #aaa;"></i></div>`;
-
-            card.innerHTML = `
-              ${imageHtml}
-              <div class="vehicle-info">
-                <div class="vehicle-make-model">${vehicle.make || 'N/A'} ${vehicle.model || 'N/A'}</div>
-                <div class="vehicle-year">${vehicle.year || 'N/A'}</div>
-                <div class="vehicle-price">
-                  ${vehicle.has_discount ?
-                    `<span style="text-decoration: line-through;">Rs. ${vehicle.rentalRatePerDay || '0.00'}/day</span>
-                     <span style="color: #e74c3c; font-weight: bold;">Rs. ${vehicle.discountedRatePerDay || '0.00'}/day</span>`
-                    :
-                    `Rs. ${vehicle.rentalRatePerDay || '0.00'}/day`}
-                </div>
-                <div class="vehicle-status">${vehicle.status || 'Unknown'}</div>
-                <a href="#" class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})">View Details</a>
-              </div>
-            `;
-
-            vehiclesGrid.appendChild(card);
+            // Show processing state
+            document.getElementById("payment-content").style.display = "none";
+            document.getElementById("payment-processing").style.display = "flex";
           });
         }
 
-        function filterVehicles() {
-          const searchTerm = document.getElementById("vehicle-search").value.toLowerCase();
-
-          if (!searchTerm) {
-            // If search is empty, only show available vehicles
-            const availableVehicles = allVehicles.filter(v => v.status === "Available");
-            renderVehicles(availableVehicles);
-            return;
-          }
-
-          // Filter available vehicles that match search term
-          const filteredVehicles = allVehicles.filter(vehicle =>
-            vehicle.status === "Available" && (
-              (vehicle.make && vehicle.make.toLowerCase().includes(searchTerm)) ||
-              (vehicle.model && vehicle.model.toLowerCase().includes(searchTerm)) ||
-              (vehicle.year && vehicle.year.toString().includes(searchTerm))
-            )
-          );
-
-          renderVehicles(filteredVehicles);
-        }
+        window.closePaymentModal = function() {
+          document.getElementById("payment-modal").style.display = "none";
+        };
 
         // Make this function available globally
         window.viewVehicleDetails = function(vehicleId) {
@@ -1278,6 +1458,20 @@
           el.textContent = text;
           el.className = 'message ' + (type || 'info');
           el.style.display = 'block';
+        }
+
+        // Add price extraction function
+        function extractPriceFromText(text) {
+          if (!text) return 0;
+
+          // Remove all non-digit and non-decimal characters, but keep dots for decimals
+          const cleanText = text.toString().replace(/[^\d.]/g, '');
+
+          // Parse as float to handle decimals properly
+          const parsed = parseFloat(cleanText);
+
+          // Return 0 if parsing failed
+          return isNaN(parsed) ? 0 : parsed;
         }
 
         // Removed: All payment-related functions (showPaymentModal, handlePaymentSubmission, card validation, etc.)
