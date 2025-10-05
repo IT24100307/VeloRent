@@ -1,6 +1,7 @@
 package Group2.Car.Rental.System.config;
 
 import Group2.Car.Rental.System.repository.UserRepository;
+import Group2.Car.Rental.System.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -49,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/fleet/**").permitAll() // Allow access to fleet manager package APIs
 
                         .requestMatchers("/api/payments/**").permitAll() // Allow access to payment endpoints
-                        .requestMatchers("/api/bookings/**").permitAll() // Allow access to booking endpoints
+                        .requestMatchers("/api/bookings/**").authenticated() // Require authentication for booking endpoints
 
                         .requestMatchers("/api/profile/**").permitAll()
 
@@ -62,9 +64,10 @@ public class SecurityConfig {
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )
-                // Use session when required so authenticated users remain logged in for API calls
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authenticationProvider(authenticationProvider());
+                // Use stateless session for JWT
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -95,5 +98,17 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // Create JWT Authentication Filter bean
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService(), userDetailsService());
+    }
+
+    // Create JWT Service bean
+    @Bean
+    public Group2.Car.Rental.System.service.JwtService jwtService() {
+        return new Group2.Car.Rental.System.service.JwtService();
     }
 }

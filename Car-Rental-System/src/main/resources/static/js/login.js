@@ -70,6 +70,9 @@ async function handleLogin(event) {
                 // Regular login success
                 showMessage(response.data.message || 'Login successful!', 'success');
                 
+                // Clear any existing user data to prevent conflicts between different accounts
+                localStorage.clear();
+                
                 // Save the token and user role
                 if (response.data.token) {
                     localStorage.setItem('token', response.data.token);

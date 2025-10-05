@@ -948,10 +948,7 @@
         // Setup logout button
         document.getElementById("logout-btn").addEventListener("click", (e) => {
           e.preventDefault();
-          localStorage.removeItem("token");
-          localStorage.removeItem("userRole");
-          localStorage.removeItem("userEmail");
-          localStorage.removeItem("userName");
+          localStorage.clear();
           window.location.href = "/login?message=" + encodeURIComponent("You have been logged out") + "&type=success";
         });
       });

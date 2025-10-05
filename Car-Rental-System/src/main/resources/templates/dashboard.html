@@ -910,10 +910,7 @@
             e.preventDefault();
 
             // Clear all authentication data
-            localStorage.removeItem("token");
-            localStorage.removeItem("userRole");
-            localStorage.removeItem("userEmail");
-            localStorage.removeItem("userName");
+            localStorage.clear();
 
             // Redirect to login
             window.location.href =

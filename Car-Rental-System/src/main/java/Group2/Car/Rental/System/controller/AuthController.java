@@ -150,7 +150,14 @@ public class AuthController {
             String role = verificationResult.get("role");
             String redirect = verificationResult.get("redirect");
 
-            return ResponseEntity.ok(new AuthResponseDto("Login successful!", token, true, role, redirect));
+            AuthResponseDto dto = new AuthResponseDto("Login successful!", token, true, role, redirect);
+            // enrich with user info if available
+            if (verificationResult.get("userId") != null) dto.setUserId(verificationResult.get("userId"));
+            if (verificationResult.get("userName") != null) dto.setUserName(verificationResult.get("userName"));
+            if (verificationResult.get("userEmail") != null) dto.setUserEmail(verificationResult.get("userEmail"));
+            if (verificationResult.get("customerId") != null) dto.setCustomerId(verificationResult.get("customerId"));
+
+            return ResponseEntity.ok(dto);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new AuthResponseDto(e.getMessage(), null, false));
         }

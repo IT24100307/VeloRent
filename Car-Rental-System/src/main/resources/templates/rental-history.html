@@ -539,22 +539,34 @@
 
     // Ensure we have user identifiers
     async function ensureIds() {
-      let userId = localStorage.getItem('userId');
-      let customerId = localStorage.getItem('customerId');
-      if (userId && customerId) return { userId, customerId };
+      // Always fetch fresh user data from the server to ensure consistency
       try {
         const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` }});
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {
-            if (json.data.userId) localStorage.setItem('userId', json.data.userId);
-            if (json.data.customerId) localStorage.setItem('customerId', json.data.customerId);
-            userId = json.data.userId || userId;
-            customerId = json.data.customerId || customerId;
+            // Clear and update localStorage with fresh data
+            if (json.data.userId) {
+              localStorage.setItem('userId', json.data.userId);
+            }
+            if (json.data.customerId) {
+              localStorage.setItem('customerId', json.data.customerId);
+            }
+            return { 
+              userId: json.data.userId, 
+              customerId: json.data.customerId 
+            };
           }
         }
-      } catch {}
-      return { userId: localStorage.getItem('userId'), customerId: localStorage.getItem('customerId') };
+      } catch (e) {
+        console.error('Failed to fetch user info:', e);
+      }
+      
+      // Fallback to localStorage values if API call fails
+      return { 
+        userId: localStorage.getItem('userId'), 
+        customerId: localStorage.getItem('customerId') 
+      };
     }
 
     // Load bookings
