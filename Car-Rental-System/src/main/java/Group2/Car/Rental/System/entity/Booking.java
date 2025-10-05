@@ -38,15 +38,15 @@ public class Booking {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id")
+    @JoinColumn(name = "vehicle_id", nullable = true)
     private Vehicle vehicle;
 
     @ManyToOne
-    @JoinColumn(name = "package_id")
+    @JoinColumn(name = "package_id", nullable = true)
     private VehiclePackage vehiclePackage;
 
     @ManyToOne
-    @JoinColumn(name = "managed_by_staff_id")
+    @JoinColumn(name = "managed_by_staff_id", nullable = true)
     private Staff managedByStaff;
 
     // Default constructor

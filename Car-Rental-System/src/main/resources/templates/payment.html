@@ -516,14 +516,120 @@
             return;
           }
 
+          // Debug logging to see what we received
+          console.log("PAYMENT DEBUG - pkg object:", pkg);
+          console.log("PAYMENT DEBUG - pkg.price:", pkg.price);
+          console.log("PAYMENT DEBUG - pkg.totalCost:", pkg.totalCost);
+
           // Fill in summary
           document.getElementById('vehicle-name').textContent = `${pkg.packageName} (${pkg.duration} days)`;
           // Hide irrelevant rows
           ['booking-id-row','start-date-row','end-date-row','duration-row','rate-row'].forEach(id => {
             const el = document.getElementById(id); if (el) el.style.display = 'none';
           });
+
+          // Fix the price calculation - extract numeric value properly
+          let finalAmount = 0;
+
+          // First try to get the total cost from pending package booking
+          const packageBookingData = JSON.parse(localStorage.getItem('pendingPackageBooking') || '{}');
+          console.log("PAYMENT DEBUG - packageBookingData:", packageBookingData);
+
+          if (packageBookingData && packageBookingData.totalCost) {
+            finalAmount = Number(packageBookingData.totalCost);
+            console.log("PAYMENT DEBUG - Using totalCost from packageBookingData:", finalAmount);
+          }
+          // If not available, try from selectedPackage totalCost (duration-calculated)
+          else if (pkg && pkg.totalCost && pkg.totalCost > 0) {
+            finalAmount = Number(pkg.totalCost);
+            console.log("PAYMENT DEBUG - Using totalCost from pkg:", finalAmount);
+          }
+          // Only fall back to base price if no total cost is available
+          else if (pkg && pkg.price) {
+            // Handle different price formats
+            let priceValue = pkg.price;
+            console.log("PAYMENT DEBUG - Raw price value:", priceValue, "Type:", typeof priceValue);
+
+            if (typeof priceValue === 'string') {
+              // Remove any currency symbols and extract numbers
+              const cleanPrice = priceValue.replace(/[^\d.]/g, '');
+              console.log("PAYMENT DEBUG - Cleaned price string:", cleanPrice);
+              finalAmount = Number(cleanPrice);
+            } else if (typeof priceValue === 'number') {
+              finalAmount = priceValue;
+            }
+
+            // If we're using base price, multiply by duration to get total cost
+            if (pkg.duration && pkg.duration > 0) {
+              finalAmount = finalAmount * Number(pkg.duration);
+              console.log("PAYMENT DEBUG - Multiplied by duration:", pkg.duration, "Result:", finalAmount);
+            }
+
+            console.log("PAYMENT DEBUG - Using calculated price from pkg:", finalAmount);
+          }
+          else {
+            // Try to extract from package name or other fields
+            console.log("PAYMENT DEBUG - No price found, checking package name:", pkg.packageName);
+
+            // Look for any numeric values in the package object that could be total costs
+            const packageKeys = Object.keys(pkg);
+            for (let key of packageKeys) {
+              const value = pkg[key];
+              // Prioritize larger values that could be total costs
+              if (typeof value === 'number' && value > 50000 && value < 1000000) {
+                console.log(`PAYMENT DEBUG - Found potential total cost in ${key}:`, value);
+                finalAmount = value;
+                break;
+              }
+            }
+
+            // If still no value, look for smaller values and multiply by duration
+            if (finalAmount === 0) {
+              for (let key of packageKeys) {
+                const value = pkg[key];
+                if (typeof value === 'number' && value > 1000 && value < 50000) {
+                  console.log(`PAYMENT DEBUG - Found potential base price in ${key}:`, value);
+                  finalAmount = value * (pkg.duration || 5); // Default to 5 days if duration missing
+                  break;
+                }
+                if (typeof value === 'string') {
+                  const numMatch = value.match(/\d+/);
+                  if (numMatch && Number(numMatch[0]) > 1000) {
+                    console.log(`PAYMENT DEBUG - Found potential price in ${key}:`, numMatch[0]);
+                    finalAmount = Number(numMatch[0]) * (pkg.duration || 5);
+                    break;
+                  }
+                }
+              }
+            }
+
+            // Last resort - set default based on package type and multiply by duration
+            if (finalAmount === 0) {
+              const duration = pkg.duration || 5;
+              if (pkg.packageName && pkg.packageName.toLowerCase().includes('wedding')) {
+                finalAmount = 25000 * duration;
+                console.log("PAYMENT DEBUG - Using wedding package default with duration:", finalAmount);
+              } else if (pkg.packageName && pkg.packageName.toLowerCase().includes('business')) {
+                finalAmount = 15000 * duration;
+                console.log("PAYMENT DEBUG - Using business package default with duration:", finalAmount);
+              } else {
+                finalAmount = 10000 * duration;
+                console.log("PAYMENT DEBUG - Using generic package default with duration:", finalAmount);
+              }
+            }
+          }
+
+          // Final validation - ensure we have a reasonable amount
+          if (isNaN(finalAmount) || finalAmount <= 0) {
+            console.error("PAYMENT ERROR - finalAmount is invalid:", finalAmount);
+            const duration = pkg.duration || 5;
+            finalAmount = 25000 * duration; // Safe default with duration
+          }
+
+          console.log("PAYMENT DEBUG - Final calculated amount:", finalAmount);
+
           // Totals from package price
-          const totalAmount = setTotals(pkg.price || 0);
+          const totalAmount = setTotals(finalAmount);
 
           document.getElementById('confirm-payment-btn').addEventListener('click', async () => {
             // Get selected payment method
@@ -554,27 +660,74 @@
               }
             }
 
-            // Simulate successful purchase (no backend endpoint yet for packages)
-            const confirmBtn = document.getElementById('confirm-payment-btn');
-            confirmBtn.disabled = true; confirmBtn.textContent = 'Processing...';
+            try {
+              // Disable button to prevent multiple submissions
+              const confirmBtn = document.getElementById('confirm-payment-btn');
+              confirmBtn.disabled = true;
+              confirmBtn.textContent = 'Processing...';
 
-            // Optionally record a simple client-side receipt
-            const receipt = {
-              type: 'PACKAGE',
-              packageId: pkg.packageId,
-              packageName: pkg.packageName,
-              amount: Number(pkg.price || 0),
-              duration: pkg.duration,
-              paidAt: new Date().toISOString(),
-              method: paymentMethod
-            };
-            localStorage.setItem('lastPackageReceipt', JSON.stringify(receipt));
-            localStorage.removeItem('selectedPackage');
+              // Get package booking data from localStorage
+              const packageBookingData = JSON.parse(localStorage.getItem('pendingPackageBooking'));
+              if (!packageBookingData) {
+                showMessage("Package booking data not found. Please try again.", "error");
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirm Payment';
+                return;
+              }
 
-            showMessage("Package purchase successful! Redirecting to dashboard...", "success");
-            setTimeout(() => {
-              window.location.href = "/dashboard?message=" + encodeURIComponent("Your package purchase is confirmed.") + "&type=success";
-            }, 1500);
+              // Create package booking with payment in a single transaction
+              console.log("Creating package booking with payment:", JSON.stringify(packageBookingData));
+              const response = await fetch('/api/bookings/package/with-payment', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                  packageId: parseInt(packageBookingData.packageId),
+                  startDate: packageBookingData.startDate + 'T00:00:00',
+                  endDate: packageBookingData.endDate + 'T00:00:00',
+                  paymentMethod: paymentMethod
+                })
+              });
+
+              // Parse response
+              const responseText = await response.text();
+              console.log("Raw unified response:", responseText);
+
+              let result;
+              try {
+                result = JSON.parse(responseText);
+              } catch (e) {
+                console.error("Error parsing response:", e);
+                throw new Error("Invalid response format");
+              }
+
+              if (!response.ok) {
+                throw new Error('Package booking failed: ' + (result.message || 'Unknown error'));
+              }
+
+              // Handle successful booking and payment
+              showMessage("Package purchase successful! Redirecting to dashboard...", "success");
+
+              // Clear package data from localStorage
+              localStorage.removeItem('selectedPackage');
+              localStorage.removeItem('pendingPackageBooking');
+
+              // Redirect after a short delay
+              setTimeout(() => {
+                window.location.href = "/dashboard?message=" +
+                  encodeURIComponent("Your package has been purchased successfully!") +
+                  "&type=success";
+              }, 2000);
+
+            } catch (error) {
+              console.error('Error during package booking/payment:', error);
+              showMessage(error.message || "An error occurred. Please try again later.", "error");
+              document.getElementById('confirm-payment-btn').disabled = false;
+              document.getElementById('confirm-payment-btn').textContent = 'Confirm Payment';
+            }
           });
 
           // Done setting up package mode

@@ -5,10 +5,12 @@ import Group2.Car.Rental.System.dto.PackageBookingRequest;
 import Group2.Car.Rental.System.dto.BookingResponse;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Customer;
+import Group2.Car.Rental.System.entity.Payment;
 import Group2.Car.Rental.System.entity.Vehicle;
 import Group2.Car.Rental.System.entity.VehiclePackage;
 import Group2.Car.Rental.System.repository.BookingRepository;
 import Group2.Car.Rental.System.repository.CustomerRepository;
+import Group2.Car.Rental.System.repository.PaymentRepository;
 import Group2.Car.Rental.System.repository.VehicleRepository;
 import Group2.Car.Rental.System.repository.VehiclePackageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class BookingService {
 
     @Autowired
     private VehiclePackageRepository vehiclePackageRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     /**
      * Create a new booking
@@ -171,7 +176,8 @@ public class BookingService {
                 return response;
             }
 
-            if (packageBookingRequest.getStartDate().isBefore(LocalDateTime.now())) {
+            // Compare only the date part, not the time, to allow bookings for today
+            if (packageBookingRequest.getStartDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())) {
                 response.put("success", false);
                 response.put("message", "Start date cannot be in the past");
                 return response;
@@ -202,8 +208,19 @@ public class BookingService {
                 vehiclePackage
             );
 
+            // Set initial status to "Pending Payment" for package bookings
+            booking.setBookingStatus("Pending Payment");
+
             // Save the booking
             Booking savedBooking = bookingRepository.save(booking);
+
+            // Mark all vehicles in the package as "Rented" to remove them from available vehicles list
+            if (vehiclePackage.getVehicles() != null && !vehiclePackage.getVehicles().isEmpty()) {
+                for (Vehicle packageVehicle : vehiclePackage.getVehicles()) {
+                    packageVehicle.setStatus("Rented");
+                    vehicleRepository.save(packageVehicle);
+                }
+            }
 
             // Create response
             BookingResponse bookingResponse = new BookingResponse(
@@ -227,6 +244,144 @@ public class BookingService {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Error creating booking: " + e.getMessage());
+            return response;
+        }
+    }
+
+    /**
+     * Create a package booking with payment in a single transaction
+     * @param packageBookingRequest the package booking request DTO
+     * @param customerId the customer ID from authentication
+     * @param paymentMethod the payment method selected
+     * @return a map containing success status and the created booking with payment details
+     */
+    @Transactional
+    public Map<String, Object> createPackageBookingWithPayment(PackageBookingRequest packageBookingRequest,
+                                                              Integer customerId, String paymentMethod) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Get the package
+            Optional<VehiclePackage> packageOptional = vehiclePackageRepository.findById(packageBookingRequest.getPackageId());
+            if (!packageOptional.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Package not found");
+                return response;
+            }
+
+            VehiclePackage vehiclePackage = packageOptional.get();
+
+            // Check if package is active
+            if (!"Activated".equalsIgnoreCase(vehiclePackage.getStatus())) {
+                response.put("success", false);
+                response.put("message", "Package is not available for booking");
+                return response;
+            }
+
+            // Get the customer
+            Optional<Customer> customerOptional = customerRepository.findByUserId(customerId.longValue());
+            if (!customerOptional.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Customer not found");
+                return response;
+            }
+
+            Customer customer = customerOptional.get();
+
+            // Validate dates
+            if (packageBookingRequest.getStartDate().isAfter(packageBookingRequest.getEndDate())) {
+                response.put("success", false);
+                response.put("message", "Start date must be before end date");
+                return response;
+            }
+
+            // Compare only the date part, not the time, to allow bookings for today
+            if (packageBookingRequest.getStartDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())) {
+                response.put("success", false);
+                response.put("message", "Start date cannot be in the past");
+                return response;
+            }
+
+            // Calculate total cost based on package duration and price
+            long daysBetween = ChronoUnit.DAYS.between(
+                packageBookingRequest.getStartDate().toLocalDate(),
+                packageBookingRequest.getEndDate().toLocalDate()
+            );
+
+            // For packages, we can either charge per day or use the fixed package price
+            BigDecimal totalCost = vehiclePackage.getPrice();
+            if (daysBetween > vehiclePackage.getDuration()) {
+                // If booking is longer than package duration, calculate additional cost
+                BigDecimal dailyRate = vehiclePackage.getPrice().divide(BigDecimal.valueOf(vehiclePackage.getDuration()));
+                BigDecimal additionalDays = BigDecimal.valueOf(daysBetween - vehiclePackage.getDuration());
+                totalCost = totalCost.add(dailyRate.multiply(additionalDays));
+            }
+
+            // Create the booking with final status based on payment method
+            Booking booking = new Booking(
+                packageBookingRequest.getStartDate(),
+                packageBookingRequest.getEndDate(),
+                totalCost,
+                customer,
+                vehiclePackage
+            );
+
+            // Set appropriate status based on payment method
+            if ("cash".equalsIgnoreCase(paymentMethod)) {
+                booking.setBookingStatus("Payment Pending");
+            } else {
+                booking.setBookingStatus("Confirmed");
+            }
+
+            // Save the booking first
+            Booking savedBooking = bookingRepository.save(booking);
+
+            // Create and save the payment in the same transaction
+            Payment payment = new Payment();
+            payment.setPaymentDate(LocalDateTime.now());
+            payment.setAmount(totalCost);
+            payment.setPaymentMethod(paymentMethod);
+            payment.setPaymentStatus("Completed");
+            payment.setBooking(savedBooking);
+
+            Payment savedPayment = paymentRepository.save(payment);
+
+            // Mark all vehicles in the package as "Rented" to remove them from available vehicles list
+            if (vehiclePackage.getVehicles() != null && !vehiclePackage.getVehicles().isEmpty()) {
+                for (Vehicle packageVehicle : vehiclePackage.getVehicles()) {
+                    packageVehicle.setStatus("Rented");
+                    vehicleRepository.save(packageVehicle);
+                }
+            }
+
+            // Create response with both booking and payment details
+            Map<String, Object> bookingPayload = new HashMap<>();
+            bookingPayload.put("bookingId", savedBooking.getBookingId());
+            bookingPayload.put("startDate", savedBooking.getStartDate());
+            bookingPayload.put("endDate", savedBooking.getEndDate());
+            bookingPayload.put("bookingStatus", savedBooking.getBookingStatus());
+            bookingPayload.put("totalCost", savedBooking.getTotalCost());
+            bookingPayload.put("packageId", vehiclePackage.getPackageId());
+            bookingPayload.put("packageName", vehiclePackage.getPackageName());
+            bookingPayload.put("customerId", customer.getUserId());
+
+            Map<String, Object> paymentDetails = new HashMap<>();
+            paymentDetails.put("paymentId", savedPayment.getPaymentId());
+            paymentDetails.put("amount", savedPayment.getAmount());
+            paymentDetails.put("paymentMethod", savedPayment.getPaymentMethod());
+            paymentDetails.put("paymentDate", savedPayment.getPaymentDate());
+
+            response.put("success", true);
+            response.put("message", "Package booking and payment processed successfully");
+            response.put("booking", bookingPayload);
+            response.put("payment", paymentDetails);
+
+            return response;
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error creating package booking: " + e.getMessage());
+            e.printStackTrace();
             return response;
         }
     }
@@ -330,14 +485,7 @@ public class BookingService {
 
             if ("Returned".equalsIgnoreCase(booking.getBookingStatus())) {
                 response.put("success", true);
-                response.put("message", "Vehicle already returned");
-                // return lightweight payload
-                Map<String, Object> retPayload = new HashMap<>();
-                retPayload.put("bookingId", booking.getBookingId());
-                retPayload.put("bookingStatus", booking.getBookingStatus());
-                Vehicle v = booking.getVehicle();
-                retPayload.put("vehicleId", v != null ? v.getVehicleId() : null);
-                response.put("booking", retPayload);
+                response.put("message", "Booking already returned");
                 return response;
             }
 
@@ -345,25 +493,38 @@ public class BookingService {
             booking.setBookingStatus("Returned");
             bookingRepository.save(booking);
 
-            // Update vehicle status to available
-            Vehicle vehicle = booking.getVehicle();
-            if (vehicle != null) {
+            // Handle both vehicle and package bookings
+            if (booking.getVehicle() != null) {
+                // Regular vehicle booking - make vehicle available
+                Vehicle vehicle = booking.getVehicle();
                 vehicle.setStatus("Available");
                 vehicleRepository.save(vehicle);
+                response.put("message", "Vehicle returned successfully");
+            } else if (booking.getVehiclePackage() != null) {
+                // Package booking - make all package vehicles available
+                VehiclePackage vehiclePackage = booking.getVehiclePackage();
+                if (vehiclePackage.getVehicles() != null && !vehiclePackage.getVehicles().isEmpty()) {
+                    for (Vehicle packageVehicle : vehiclePackage.getVehicles()) {
+                        packageVehicle.setStatus("Available");
+                        vehicleRepository.save(packageVehicle);
+                    }
+                }
+                response.put("message", "Package returned successfully - all vehicles are now available");
             }
 
             response.put("success", true);
-            response.put("message", "Vehicle returned successfully");
+
             // Lightweight payload
             Map<String, Object> retPayload = new HashMap<>();
             retPayload.put("bookingId", booking.getBookingId());
             retPayload.put("bookingStatus", booking.getBookingStatus());
-            retPayload.put("vehicleId", vehicle != null ? vehicle.getVehicleId() : null);
+            retPayload.put("bookingType", booking.getVehicle() != null ? "VEHICLE" : "PACKAGE");
             response.put("booking", retPayload);
+
             return response;
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Error returning vehicle: " + e.getMessage());
+            response.put("message", "Error returning booking: " + e.getMessage());
             return response;
         }
     }

@@ -42,11 +42,28 @@ public class PaymentService {
                 return response;
             }
 
+            // Check if payment already exists to prevent duplicate payments
+            Payment existingPayment = paymentRepository.findByBooking(booking);
+            if (existingPayment != null) {
+                response.put("success", false);
+                response.put("message", "Payment already processed for this booking");
+                return response;
+            }
+
+            // Validate booking status - should be "Pending Payment" or "Confirmed" for new bookings
+            if (!"Pending Payment".equals(booking.getBookingStatus()) &&
+                !"Confirmed".equals(booking.getBookingStatus())) {
+                response.put("success", false);
+                response.put("message", "Booking is not in a valid state for payment processing");
+                return response;
+            }
+
             // Create the payment
             Payment payment = new Payment();
             payment.setPaymentDate(LocalDateTime.now());
-            payment.setAmount(paymentRequest.getAmount());
+            payment.setAmount(paymentRequest.getAmount() != null ? paymentRequest.getAmount() : booking.getTotalCost());
             payment.setPaymentMethod(paymentRequest.getPaymentMethod());
+            payment.setPaymentStatus("Completed");
             payment.setBooking(booking);
 
             // Update booking status based on payment method
@@ -56,18 +73,20 @@ public class PaymentService {
                 booking.setBookingStatus("Confirmed");
             }
 
-            // Save payment and updated booking
-            bookingRepository.save(booking);
-            paymentRepository.save(payment);
+            // Save payment first, then update booking
+            Payment savedPayment = paymentRepository.save(payment);
+            Booking updatedBooking = bookingRepository.save(booking);
 
             response.put("success", true);
             response.put("message", "Payment processed successfully");
-            response.put("bookingStatus", booking.getBookingStatus());
-            response.put("paymentId", payment.getPaymentId());
+            response.put("bookingStatus", updatedBooking.getBookingStatus());
+            response.put("paymentId", savedPayment.getPaymentId());
 
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Error processing payment: " + e.getMessage());
+            // Log the full exception for debugging
+            e.printStackTrace();
         }
 
         return response;

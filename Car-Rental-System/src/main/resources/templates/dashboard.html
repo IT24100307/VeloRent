@@ -1187,17 +1187,29 @@
 
             // Get package details for payment page
             const packageName = document.getElementById("package-booking-name").textContent;
-            const packagePrice = document.getElementById("package-booking-price").textContent;
+            const packagePriceText = document.getElementById("package-booking-price").textContent;
+            const totalCostText = document.getElementById("package-total-cost").textContent;
             const duration = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
+
+            // Debug logging to see what we're working with
+            console.log("DEBUG - packagePriceText:", packagePriceText);
+            console.log("DEBUG - totalCostText:", totalCostText);
+
+            // Extract clean numeric values - improved logic
+            const cleanPackagePrice = extractPriceFromText(packagePriceText);
+            const cleanTotalCost = extractPriceFromText(totalCostText);
+
+            console.log("DEBUG - cleanPackagePrice:", cleanPackagePrice);
+            console.log("DEBUG - cleanTotalCost:", cleanTotalCost);
 
             // Store package booking data in localStorage for payment page
             localStorage.setItem("pendingPackageBooking", JSON.stringify(bookingData));
             localStorage.setItem("selectedPackage", JSON.stringify({
               packageId: packageId,
               packageName: packageName,
-              price: packagePrice,
+              price: cleanPackagePrice,  // Store as clean number
               duration: duration,
-              totalCost: totalCost,
+              totalCost: cleanTotalCost,  // Store as clean number
               startDate: startDate,
               endDate: endDate
             }));
@@ -1446,6 +1458,20 @@
           el.textContent = text;
           el.className = 'message ' + (type || 'info');
           el.style.display = 'block';
+        }
+
+        // Add price extraction function
+        function extractPriceFromText(text) {
+          if (!text) return 0;
+
+          // Remove all non-digit and non-decimal characters, but keep dots for decimals
+          const cleanText = text.toString().replace(/[^\d.]/g, '');
+
+          // Parse as float to handle decimals properly
+          const parsed = parseFloat(cleanText);
+
+          // Return 0 if parsing failed
+          return isNaN(parsed) ? 0 : parsed;
         }
 
         // Removed: All payment-related functions (showPaymentModal, handlePaymentSubmission, card validation, etc.)
