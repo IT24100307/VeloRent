@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us | VeloRent - Luxury Car Rental</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- Luxury Theme CSS -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <!-- Custom CSS -->
+    <style>
+      /* Luxury About Us/Feedback Page Styling */
+      body {
+        background: var(--gradient-luxury) !important;
+        color: var(--text-luxury-light) !important;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: var(--font-luxury-secondary);
+      }
+
+      .hero-section {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%), 
+                    url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+        background-size: cover;
+        color: var(--text-luxury-light);
+        padding: 120px 0;
+        text-align: center;
+        position: relative;
+        border-bottom: 4px solid var(--luxury-gold);
+      }
+
+      .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(212, 175, 55, 0.1) 100%);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-title {
+        font-size: 4rem;
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--luxury-gold);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        color: var(--text-luxury-light);
+        font-weight: 500;
+      }
+
+      .luxury-card {
+        background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+        border-radius: var(--radius-luxury-large);
+        box-shadow: var(--shadow-luxury);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 30px;
+      }
+
+      .luxury-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+      }
+
+      .card-header-luxury {
+        padding: 30px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+        border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+      }
+
+      .card-body-luxury {
+        padding: 30px;
+      }
+
+      .section-title {
+        font-size: 2.5rem;
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        text-align: center;
+        position: relative;
+      }
+
+      .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: var(--gradient-gold);
+        border-radius: 2px;
+      }
+
+      .btn {
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+        border: none;
+        padding: 12px 24px;
+        border-radius: var(--radius-luxury-small);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition-smooth);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        color: var(--luxury-black);
+      }
+
+      .btn-primary {
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--luxury-gold);
+        border: 2px solid var(--luxury-gold);
+      }
+
+      .btn-secondary:hover {
+        background: var(--luxury-gold);
+        color: var(--luxury-black);
+      }
+
+      .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 120px 0;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 10px 25px;
+        font-weight: 600;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+      }
+
+      .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 60px 0 30px;
+        color: var(--dark-bg);
+      }
+
+      .vehicle-card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 25px;
+      }
+
+      .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .vehicle-img {
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .vehicle-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .vehicle-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #29cc97;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      .filter-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .filter-title {
+        font-weight: bold;
+        color: var(--dark-bg);
+        margin-bottom: 15px;
+      }
+
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+      }
+
+      .footer {
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+        padding: 50px 0 20px;
+        margin-top: 60px;
+      }
+
+      .footer-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .footer-links a {
+        color: #adb5bd;
+        display: block;
+        margin-bottom: 10px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .footer-links a:hover {
+        color: white;
+      }
+
+      .social-icons a {
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 15px;
+      }
+      .star-rating .fas.fa-star { color: #ffc107; }
+      .star-rating .far.fa-star { color: #ccc; }
+      .star-rating {
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .star-rating .fas.fa-star, .star-rating .far.fa-star {
+        color: var(--luxury-gold);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+      }
+
+      .star-rating .fas.fa-star:hover, .star-rating .far.fa-star:hover {
+        transform: scale(1.2);
+        filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+      }
+
+      .card-title {
+        color: var(--luxury-gold) !important;
+        font-family: var(--font-luxury-primary);
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+      }
+
+      .card-text {
+        color: var(--text-luxury-light);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 15px 0;
+      }
+
+      .feedback-date {
+        color: var(--text-luxury-muted);
+        font-size: 0.9rem;
+        text-align: right;
+        margin-top: 15px;
+      }
+
+      .admin-reply {
+        background: rgba(212, 175, 55, 0.1) !important;
+        border-left: 4px solid var(--luxury-gold) !important;
+        border-radius: var(--radius-luxury-small);
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .admin-reply h6 {
+        color: var(--luxury-gold) !important;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .admin-reply p {
+        color: var(--text-luxury-light);
+        margin: 0;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        color: var(--luxury-gold);
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+        font-family: var(--font-luxury-primary);
+      }
+
+      .form-control {
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: var(--radius-luxury-small);
+        padding: 12px 15px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-luxury-light);
+        font-size: 1rem;
+        font-weight: 500;
+        transition: var(--transition-smooth);
+      }
+
+      .form-control:focus {
+        border-color: var(--luxury-gold);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        background: rgba(0, 0, 0, 0.4);
+        color: var(--text-luxury-light);
+      }
+
+      textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .feedback-form-section {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid rgba(212, 175, 55, 0.2);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .hero-title {
+          font-size: 2.5rem;
+        }
+        
+        .section-title {
+          font-size: 2rem;
+        }
+        
+        .card-header-luxury,
+        .card-body-luxury {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent About Us</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+      <div class="container">
+        <a class="navbar-brand-luxury" href="/dashboard">
+          <i class="fas fa-crown mr-2"></i> VeloRent
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/rental-history"><i class="fas fa-history mr-1"></i>Rental History</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link-luxury" href="/feedback"><i class="fas fa-info-circle mr-1"></i>About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
+            </li>
+          </ul>
+          <div class="auth-buttons">
+            <div class="dropdown">
+              <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
+                <i class="fas fa-user-circle mr-1"></i>
+                <span id="user-initials">U</span>
+              </button>
+              <div class="dropdown-menu" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
+                <a class="dropdown-item hover-gold" href="#" id="logout-btn" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
+                  <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="container">
+          <h1 class="hero-title">About VeloRent</h1>
+          <p class="hero-subtitle">Your Premium Luxury Car Rental Experience</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="feedbackSection" style="padding: 60px 0;">
+      <div class="container">
+        <div class="luxury-card">
+          <div class="card-header-luxury">
+            <h2 class="section-title">Customer Testimonials</h2>
+            <p style="text-align: center; color: var(--text-luxury-muted); font-size: 1.1rem; margin: 0;">
+              What our valued customers say about their VeloRent experience
+            </p>
+          </div>
+          <div class="card-body-luxury">
+            <!-- List of Feedbacks -->
+            <div th:each="feedback : ${feedbacks}" style="margin-bottom: 30px;">
+              <div class="luxury-card">
+                <div class="card-body-luxury">
+              <h5 class="card-title" th:if="${feedback.customerName != null && !feedback.customerName.isEmpty()}">
+                <span th:text="${feedback.customerName}"></span>
+              </h5>
+              <div class="star-rating">
+                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                        <i th:class="${i <= feedback.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                    </span>
+              </div>
+              <p class="card-text" th:text="${feedback.comments}"></p>
+              <span th:text="${feedback.feedbackDate}" style="display: flex;justify-content: end;"></span>
+
+              <!-- Admin Reply Section - Display if available -->
+              <div th:if="${feedback.reply != null}" class="admin-reply">
+                <h6><i class="fas fa-reply mr-2"></i> Admin Response:</h6>
+                <p class="card-text" th:text="${feedback.reply}"></p>
+                <small class="text-muted d-block text-end" th:text="'Replied on: ' + ${feedback.replyDate}"></small>
+              </div>
+
+              <!-- Edit and Delete for own feedback - only if no admin reply -->
+              <div th:if="${feedback.customerId == currentUserId && feedback.reply == null}">
+                <form th:action="@{/api/feedback/update/{id}(id=${feedback.id})}" method="post">
+                  <div class="form-group mb-3">
+                    <label for="editCustomerName">Your Name:</label>
+                    <input type="text" class="form-control" id="editCustomerName" name="customerName" th:value="${feedback.customerName}" required>
+                  </div>
+                  <textarea class="form-control" name="feedback" th:text="${feedback.comments}"></textarea>
+                  <div class="star-rating mt-2">
+                    <i th:class="${1 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="1"></i>
+                    <i th:class="${2 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="2"></i>
+                    <i th:class="${3 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="3"></i>
+                    <i th:class="${4 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="4"></i>
+                    <i th:class="${5 <= feedback.rating} ? 'fas fa-star' : 'far fa-star'" data-rating="5"></i>
+                    <input type="hidden" name="rating" th:id="'edit-rating-' + ${feedback.id}" th:value="${feedback.rating}">
+                  </div>
+                  <button type="submit" class="btn btn-warning mt-2">Edit</button>
+                </form>
+                <form th:action="@{/api/feedback/delete/{id}(id=${feedback.id})}" method="post">
+                  <button type="submit" class="btn btn-danger mt-2">Delete</button>
+                </form>
+              </div>
+
+              <!-- Show locked message if feedback has admin reply -->
+              <div th:if="${feedback.customerId == currentUserId && feedback.reply != null}" class="mt-3">
+                <div class="alert alert-info">
+                  <i class="fas fa-lock"></i> This feedback can no longer be edited because an admin has responded.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 1}" style="padding-top: 20px;">
+          <ul class="pagination">
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+              <a class="page-link" th:href="@{/feedback(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Add New Feedback Form -->
+        <form th:action="@{/api/feedback/add}" method="post" style="padding-top: 20px;" class="alert alert-secondary">
+          <div class="form-group mb-3">
+            <label for="customerName">Your Name:</label>
+            <input type="text" class="form-control" id="customerName" name="customerName" required>
+          </div>
+          <div class="form-group">
+            <label>Add Your Rating:</label>
+            <div class="star-rating">
+              <i class="far fa-star" data-rating="1"></i>
+              <i class="far fa-star" data-rating="2"></i>
+              <i class="far fa-star" data-rating="3"></i>
+              <i class="far fa-star" data-rating="4"></i>
+              <i class="far fa-star" data-rating="5"></i>
+              <input type="hidden" name="rating" id="rating" value="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="comments">Add Your Feedback:</label>
+            <textarea class="form-control" id="comments" name="comments" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Add Feedback</button>
+        </form>
+
+        <!-- Back to Dashboard Button -->
+        <div class="text-center mt-4 mb-5">
+          <a href="/dashboard" class="btn btn-primary btn-lg">
+            <i class="fas fa-tachometer-alt mr-2"></i> Back to Dashboard
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <h5 class="footer-title">VeloRent</h5>
+            <p>Your trusted partner for all your vehicle rental needs. Quality vehicles at affordable prices.</p>
+            <div class="social-icons mt-3">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <h5 class="footer-title">Quick Links</h5>
+            <div class="footer-links">
+              <a href="#">About Us</a>
+              <a href="#">Services</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Privacy Policy</a>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <h5 class="footer-title">Support</h5>
+            <div class="footer-links">
+              <a href="#">FAQ</a>
+              <a href="#">Help Center</a>
+              <a href="#">Contact Us</a>
+              <a href="#">Careers</a>
+            </div>
+          </div>
+          <div class="col-md-2 mb-4">
+            <h5 class="footer-title">Contact</h5>
+            <address>
+              <p><i class="fas fa-map-marker-alt mr-2"></i> No32 Main St Melsiripura</p>
+              <p><i class="fas fa-phone mr-2"></i> (123) 456-7890</p>
+              <p><i class="fas fa-envelope mr-2"></i> 2025_Y2_S1_KUR_02@gmail.com</p>
+            </address>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Luxury Footer -->
+    <footer style="margin-top: 60px; background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 50%, var(--luxury-black) 100%); color: var(--text-luxury-light); padding: 60px 0 40px; border-top: 4px solid var(--luxury-gold);">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <h5 style="color: var(--luxury-gold); font-family: var(--font-luxury-primary); font-weight: 700; margin-bottom: 20px;">
+              <i class="fas fa-crown mr-2"></i>VeloRent
+            </h5>
+            <p style="color: var(--text-luxury-muted); line-height: 1.6;">
+              Experience the pinnacle of luxury car rentals. From exotic sports cars to premium sedans, 
+              we provide unmatched quality and service for the discerning driver.
+            </p>
+          </div>
+          <div class="col-md-4 mb-4">
+            <h6 style="color: var(--luxury-gold); font-weight: 600; margin-bottom: 15px;">Quick Links</h6>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <a href="/dashboard" style="color: var(--text-luxury-light); text-decoration: none; transition: var(--transition-smooth);" onmouseover="this.style.color='var(--luxury-gold)'" onmouseout="this.style.color='var(--text-luxury-light)'">Dashboard</a>
+              <a href="/rental-history" style="color: var(--text-luxury-light); text-decoration: none; transition: var(--transition-smooth);" onmouseover="this.style.color='var(--luxury-gold)'" onmouseout="this.style.color='var(--text-luxury-light)'">Rental History</a>
+              <a href="/security-settings" style="color: var(--text-luxury-light); text-decoration: none; transition: var(--transition-smooth);" onmouseover="this.style.color='var(--luxury-gold)'" onmouseout="this.style.color='var(--text-luxury-light)'">Security Settings</a>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <h6 style="color: var(--luxury-gold); font-weight: 600; margin-bottom: 15px;">Contact</h6>
+            <div style="color: var(--text-luxury-muted);">
+              <p><i class="fas fa-map-marker-alt mr-2" style="color: var(--luxury-gold);"></i> No32 Main St Melsiripura</p>
+              <p><i class="fas fa-phone mr-2" style="color: var(--luxury-gold);"></i> (123) 456-7890</p>
+              <p><i class="fas fa-envelope mr-2" style="color: var(--luxury-gold);"></i> 2025_Y2_S1_KUR_02@gmail.com</p>
+            </div>
+          </div>
+        </div>
+        <hr style="border-color: rgba(212, 175, 55, 0.3); margin: 40px 0 20px;">
+        <p style="text-align: center; margin: 0; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+          &copy; 2025 <span style="color: var(--luxury-gold); font-weight: 700; font-family: var(--font-luxury-primary);">VeloRent</span> - Luxury Car Rental System. All rights reserved.
+          <i class="fas fa-crown" style="color: var(--luxury-gold);"></i>
+        </p>
+      </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+    <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Luxury Theme Scripts -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
+    <script>
+      $(document).ready(function() {
+        // Hide page loader immediately when document is ready
+        const pageLoader = document.querySelector('.page-loader');
+        if (pageLoader) {
+          console.log('Hiding page loader...');
+          setTimeout(() => {
+            pageLoader.classList.add('fade-out');
+            setTimeout(() => {
+              pageLoader.style.display = 'none';
+              console.log('Page loader hidden');
+            }, 600);
+          }, 500);
+        }
+
+        // Star rating functionality
+        $('.star-rating i').click(function() {
+          var rating = $(this).data('rating');
+          var parent = $(this).closest('.star-rating');
+          parent.find('i').each(function() {
+            if ($(this).data('rating') <= rating) {
+              $(this).removeClass('far').addClass('fas');
+            } else {
+              $(this).removeClass('fas').addClass('far');
+            }
+          });
+          parent.find('input[name="rating"]').val(rating);
+        });
+      });
+
+      // Backup loader hide on window load
+      window.addEventListener('load', function() {
+        const pageLoader = document.querySelector('.page-loader');
+        if (pageLoader && pageLoader.style.display !== 'none') {
+          console.log('Backup: hiding page loader on window load');
+          pageLoader.classList.add('fade-out');
+          setTimeout(() => {
+            pageLoader.style.display = 'none';
+          }, 600);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -30,8 +30,16 @@ public class FeedbackService {
     private UserRepository userRepository;
 
     public Page<FeedbackDTO> getAllFeedbacks(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return feedbackRepository.findAll(pageable).map(this::convertToDTO);
+        try {
+            // Add sorting by creation date (newest first) for better user experience
+            Pageable pageable = PageRequest.of(page, size, 
+                org.springframework.data.domain.Sort.by("createdAt").descending());
+            return feedbackRepository.findAll(pageable).map(this::convertToDTO);
+        } catch (Exception e) {
+            // Fallback to simple pagination if sorting fails
+            Pageable pageable = PageRequest.of(page, size);
+            return feedbackRepository.findAll(pageable).map(this::convertToDTO);
+        }
     }
 
     public List<FeedbackDTO> getAllFeedbacksForAdmin() {
@@ -47,13 +55,22 @@ public class FeedbackService {
     }
 
     public FeedbackDTO createFeedback(String comments, int rating, String customerName) {
-        User currentUser = getCurrentUser();
         Feedback feedback = new Feedback();
         feedback.setComments(comments);
         feedback.setFeedbackDate(LocalDateTime.now());
         feedback.setRating(rating);
-        feedback.setCustomerName(customerName); // Set the customer name from form input
-        feedback.setCustomer(currentUser);
+        feedback.setCustomerName(customerName);
+        
+        try {
+            // Try to get current user, but don't fail if not authenticated
+            User currentUser = getCurrentUser();
+            feedback.setCustomer(currentUser);
+        } catch (Exception e) {
+            System.out.println("Warning: Creating feedback without user association - user not authenticated");
+            // Leave customer as null - this is now allowed
+            feedback.setCustomer(null);
+        }
+        
         feedbackRepository.save(feedback);
         return convertToDTO(feedback);
     }
@@ -111,16 +128,24 @@ public class FeedbackService {
         dto.setRating(feedback.getRating());
         dto.setComments(feedback.getComments());
         dto.setFeedbackDate(LocalDateToString(feedback.getFeedbackDate()));
-        dto.setCustomerId(feedback.getCustomer().getId());
-
-        // Use the customer-provided name if available, otherwise fall back to the user's name
-        if (feedback.getCustomerName() != null && !feedback.getCustomerName().isEmpty()) {
-            dto.setCustomerName(feedback.getCustomerName());
+        
+        // Handle null customer (for guest feedback)
+        if (feedback.getCustomer() != null) {
+            dto.setCustomerId(feedback.getCustomer().getId());
+            
+            // Use the customer-provided name if available, otherwise fall back to the user's name
+            if (feedback.getCustomerName() != null && !feedback.getCustomerName().isEmpty()) {
+                dto.setCustomerName(feedback.getCustomerName());
+            } else {
+                dto.setCustomerName(feedback.getCustomer().getFirstName() + " " + feedback.getCustomer().getLastName());
+            }
         } else {
-            dto.setCustomerName(feedback.getCustomer().getFirstName() + " " + feedback.getCustomer().getLastName());
+            // Guest feedback - use provided name
+            dto.setCustomerId(null);
+            dto.setCustomerName(feedback.getCustomerName() != null ? feedback.getCustomerName() : "Anonymous");
         }
 
-        dto.setResolved(feedback.setId());
+        dto.setResolved(feedback.isResolved());
 
         // Add reply-related data if available
         if (feedback.getReply() != null) {

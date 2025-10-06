@@ -31,7 +31,7 @@ public class Feedback {
     private LocalDateTime feedbackDate;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = true)
     private User customer;
 
     @Column(name = "is_deleted", nullable = false)
@@ -50,7 +50,18 @@ public class Feedback {
     @JoinColumn(name = "admin_id")
     private User admin;
 
-    public boolean setId() {
-        return false;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (feedbackDate == null) {
+            feedbackDate = LocalDateTime.now();
+        }
     }
+
+    // Lombok generates setters automatically, no need for custom setId method
 }

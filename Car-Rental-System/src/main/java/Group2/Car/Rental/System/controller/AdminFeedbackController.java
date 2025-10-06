@@ -1,15 +1,9 @@
 package Group2.Car.Rental.System.controller;
 
-
-import Group2.Car.Rental.System.dto.FeedbackDTO;
 import Group2.Car.Rental.System.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/api/admin/feedback")

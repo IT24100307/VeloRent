@@ -148,11 +148,11 @@ public class Vehicle {
 
         // Calculate discounted rate: original rate * (1 - discount/100)
         BigDecimal discountFactor = BigDecimal.ONE.subtract(
-            discountPercentage.divide(new BigDecimal("100"), 4, BigDecimal.ROUND_HALF_UP)
+            discountPercentage.divide(new BigDecimal("100"), 4, java.math.RoundingMode.HALF_UP)
         );
 
         this.discountedRatePerDay = this.rentalRatePerDay.multiply(discountFactor)
-            .setScale(2, BigDecimal.ROUND_HALF_UP);
+            .setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
     // Check if this vehicle has an active discount
