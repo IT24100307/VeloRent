@@ -87,12 +87,32 @@ public class ViewController {
     }
 
     @GetMapping("/feedback")
-    public String listFeedbacks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model) {
-        Page<FeedbackDTO> feedbackPage = feedbackService.getAllFeedbacks(page, size);
-        model.addAttribute("feedbacks", feedbackPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", feedbackPage.getTotalPages());
-        model.addAttribute("newFeedback", new FeedbackDTO());
+    public String listFeedbacks(@RequestParam(defaultValue = "0") int page, 
+                              @RequestParam(defaultValue = "10") int size, 
+                              Model model) {
+        try {
+            // Validate page parameters
+            if (page < 0) page = 0;
+            if (size < 1 || size > 50) size = 10; // Limit size to prevent performance issues
+            
+            Page<FeedbackDTO> feedbackPage = feedbackService.getAllFeedbacks(page, size);
+            
+            model.addAttribute("feedbacks", feedbackPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", feedbackPage.getTotalPages());
+            model.addAttribute("totalElements", feedbackPage.getTotalElements());
+            model.addAttribute("hasNext", feedbackPage.hasNext());
+            model.addAttribute("hasPrevious", feedbackPage.hasPrevious());
+            model.addAttribute("newFeedback", new FeedbackDTO());
+            
+        } catch (Exception e) {
+            // Log the error and provide a fallback
+            model.addAttribute("feedbacks", java.util.Collections.emptyList());
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
+            model.addAttribute("error", "Unable to load feedback at this time. Please try again later.");
+        }
+        
         return "feedback";
     }
 

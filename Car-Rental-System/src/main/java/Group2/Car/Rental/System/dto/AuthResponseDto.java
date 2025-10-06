@@ -1,6 +1,5 @@
 package Group2.Car.Rental.System.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

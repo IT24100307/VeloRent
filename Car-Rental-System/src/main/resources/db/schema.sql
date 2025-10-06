@@ -98,3 +98,21 @@ CREATE TABLE IF NOT EXISTS payments (
     booking_id INT NOT NULL UNIQUE,
     CONSTRAINT FK_payments_bookings FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
 );
+
+-- Create feedback table
+CREATE TABLE IF NOT EXISTS feedback (
+    feedback_id INT PRIMARY KEY IDENTITY(1,1),
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comments TEXT NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    feedback_date DATETIME NOT NULL DEFAULT GETDATE(),
+    customer_id INT NULL, -- Allow NULL for guest feedback
+    is_deleted BIT DEFAULT 0,
+    is_resolved BIT DEFAULT 0,
+    reply TEXT,
+    reply_date DATETIME,
+    admin_id INT,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_feedback_customers FOREIGN KEY (customer_id) REFERENCES users(user_id),
+    CONSTRAINT FK_feedback_admin FOREIGN KEY (admin_id) REFERENCES users(user_id)
+);
