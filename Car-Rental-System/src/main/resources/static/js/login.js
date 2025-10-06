@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
+ * Validates email format
+ * @param {string} email - Email to validate
+ * @returns {boolean} - True if email is valid
+ */
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
  * Handles the login form submission
  * @param {Event} event - The form submission event
  */
@@ -25,17 +35,44 @@ async function handleLogin(event) {
     const form = event.target;
     const submitButton = form.querySelector('button[type="submit"]');
     
-    // Validate form
-    if (!validateForm(form)) {
-        return;
-    }
-    
     // Clear previous messages
     clearMessage();
     
     // Get form data
     const email = form.email.value.trim();
     const password = form.password.value;
+    
+    // Enhanced client-side validation
+    const validationErrors = [];
+    
+    // Email validation
+    if (!email) {
+        validationErrors.push('Email address is required.');
+        form.email.focus();
+    } else if (!isValidEmail(email)) {
+        validationErrors.push('Please enter a valid email address.');
+        form.email.focus();
+    }
+    
+    // Password validation
+    if (!password) {
+        validationErrors.push('Password is required.');
+        if (!email || isValidEmail(email)) form.password.focus();
+    } else if (password.length < 6) {
+        validationErrors.push('Password must be at least 6 characters long.');
+        if (!email || isValidEmail(email)) form.password.focus();
+    }
+    
+    // Display validation errors
+    if (validationErrors.length > 0) {
+        showMessage(validationErrors[0], 'error');
+        return;
+    }
+    
+    // Additional form validation
+    if (!validateForm(form)) {
+        return;
+    }
     
     // Store email for later use (needed for 2FA)
     localStorage.setItem('userEmail', email);
@@ -128,10 +165,24 @@ async function handleLogin(event) {
                 }
             }
         } else {
-            showMessage(response.data.message || 'Invalid email or password', 'error');
+            // Display specific error message from server
+            const errorMessage = response.data.message || 'Login failed. Please check your credentials.';
+            showMessage(errorMessage, 'error');
+            
+            // Focus on appropriate field based on error type
+            if (errorMessage.includes('email') || errorMessage.includes('account')) {
+                form.email.focus();
+            } else if (errorMessage.includes('password')) {
+                form.password.focus();
+            }
         }
     } catch (error) {
-        showMessage('An error occurred. Please try again later.', 'error');
+        // Handle network errors or other exceptions
+        if (error.response && error.response.data && error.response.data.message) {
+            showMessage(error.response.data.message, 'error');
+        } else {
+            showMessage('Unable to connect to server. Please check your internet connection and try again.', 'error');
+        }
         console.error('Login error:', error);
     } finally {
         // Reset button state

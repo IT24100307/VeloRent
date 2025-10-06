@@ -52,8 +52,27 @@ public class AuthController {
             if (response.get("customerId") != null) dto.setCustomerId(response.get("customerId"));
 
             return ResponseEntity.ok(dto);
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            // Check if user exists to provide specific error message
+            if (userRepository.findByEmail(loginDto.getEmail()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponseDto("Incorrect password. Please try again.", null, false));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponseDto("No account found with this email address.", null, false));
+            }
+        } catch (RuntimeException e) {
+            // Handle specific runtime exceptions from AuthService
+            String message = e.getMessage();
+            if (message != null && message.contains("User not found")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponseDto("No account found with this email address.", null, false));
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new AuthResponseDto(message != null ? message : "Login failed. Please check your credentials.", null, false));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponseDto("Invalid credentials.", null, false));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new AuthResponseDto("Login failed. Please try again later.", null, false));
         }
     }
 

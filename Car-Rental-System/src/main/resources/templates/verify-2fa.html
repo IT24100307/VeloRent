@@ -4,56 +4,207 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Two-Factor Authentication | VeloRent - Luxury Car Rental</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
-    <!-- Luxury Theme CSS -->
+    <!-- Luxury Theme CSS (Main styling) -->
     <link rel="stylesheet" href="/css/luxury-theme.css" />
-    <link rel="stylesheet" href="/css/auth-styles.css" />
+    <!-- Bootstrap CSS (Secondary for grid system) -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
   </head>
   <body>
-    <div class="auth-container">
-      <div class="auth-header">
-        <h1>Security Verification</h1>
-        <p>Check your authenticator app</p>
-      </div>
-
-      <div id="message-container" class="message"></div>
-
-      <div class="auth-form">
-        <p style="text-align: center; margin-bottom: 20px">
-          Please enter the 6-digit verification code from your authenticator app
-          to complete login.
-        </p>
-
-        <form id="verify-2fa-form" class="auth-form">
-          <div class="form-group">
-            <label for="code">Verification Code</label>
-            <input
-              type="text"
-              id="code"
-              name="code"
-              required
-              pattern="[0-9]{6}"
-              maxlength="6"
-              placeholder="Enter 6-digit code"
-              autofocus
-            />
-          </div>
-
-          <input type="hidden" id="email" name="email" />
-
-          <button type="submit" class="btn">Verify</button>
-        </form>
-      </div>
-
-      <div class="auth-links">
-        <a href="/login">Cancel and return to login</a>
+    <!-- Page Loader -->
+    <div class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">VeloRent</div>
       </div>
     </div>
 
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+      <div class="container">
+        <a class="navbar-brand-luxury" href="/">
+          <i class="fas fa-crown mr-2"></i> VeloRent
+        </a>
+        <div class="ml-auto">
+          <a href="/login" class="btn-luxury btn-luxury-outline">
+            <i class="fas fa-arrow-left mr-1"></i> Back to Login
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 2FA Verification Container -->
+    <div class="luxury-auth-container">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-5 col-md-7">
+            <div class="form-luxury animate-fade-in-up">
+              <!-- Header -->
+              <div class="text-center mb-4">
+                <div class="luxury-icon-circle" style="background: linear-gradient(135deg, var(--luxury-gold-dark), var(--luxury-gold));">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1 class="luxury-title">
+                  Security Verification
+                </h1>
+                <p class="luxury-subtitle">
+                  Complete your secure login process
+                </p>
+              </div>
+
+              <!-- Instructions -->
+              <div class="text-center mb-4" style="padding: 1.5rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury); backdrop-filter: blur(10px);">
+                <i class="fas fa-mobile-alt" style="color: var(--luxury-gold); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                <p style="color: var(--text-luxury-light); margin: 0; font-size: 0.95rem;">
+                  Please enter the 6-digit verification code from your authenticator app to complete login.
+                </p>
+              </div>
+
+              <!-- Message Container -->
+              <div id="message-container" class="message-container"></div>
+
+              <!-- 2FA Verification Form -->
+              <form id="verify-2fa-form">
+                <div class="form-group-luxury">
+                  <label for="code" class="form-label-luxury">
+                    <i class="fas fa-key mr-2"></i>Verification Code
+                  </label>
+                  <input 
+                    type="text" 
+                    id="code" 
+                    name="code" 
+                    class="form-control-luxury text-center" 
+                    placeholder="000000"
+                    required 
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    autofocus
+                    style="font-size: 1.2rem; letter-spacing: 0.3rem; font-family: var(--font-luxury-mono);"
+                    data-label="Verification Code"
+                  />
+                  <div class="field-validation" id="code-validation"></div>
+                  <div class="form-help-text">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Enter the 6-digit code from your authenticator app
+                  </div>
+                </div>
+
+                <input type="hidden" id="email" name="email" />
+
+                <button type="submit" class="btn-luxury btn-luxury-gold w-100 mb-4">
+                  <i class="fas fa-shield-check mr-2"></i>
+                  Verify & Continue
+                </button>
+              </form>
+
+              <!-- Auth Links -->
+              <div class="text-center">
+                <div class="mb-3">
+                  <a href="#" id="resend-code" class="hover-gold" style="color: var(--text-luxury-gray); text-decoration: none; font-weight: 500;">
+                    <i class="fas fa-redo mr-1"></i>
+                    Having trouble? Get help
+                  </a>
+                </div>
+                <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 1.5rem;">
+                  <a href="/login" class="hover-gold" style="color: var(--luxury-gold); text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-arrow-left mr-1"></i>
+                    Cancel and return to login
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background Elements -->
+    <div style="position: fixed; top: 15%; right: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite;"></div>
+    <div style="position: fixed; bottom: 20%; left: 15%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(192,192,192,0.03) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite reverse;"></div>
+
+    <!-- Scripts -->
+    <script src="/js/luxury-theme.js"></script>
+    <script src="/js/luxury-theme-enhancer.js"></script>
     <script src="/js/auth-common.js"></script>
     <script src="/js/verify-2fa.js"></script>
+
+    <!-- Enhanced 2FA Interactions -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Auto-format code input
+        const codeInput = document.getElementById('code');
+        if (codeInput) {
+          codeInput.addEventListener('input', function(e) {
+            // Only allow numbers
+            this.value = this.value.replace(/\D/g, '');
+            
+            // Auto-submit when 6 digits are entered
+            if (this.value.length === 6) {
+              setTimeout(() => {
+                document.getElementById('verify-2fa-form').dispatchEvent(new Event('submit'));
+              }, 500);
+            }
+          });
+
+          // Focus animation
+          codeInput.addEventListener('focus', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.transition = 'transform 0.2s ease';
+          });
+
+          codeInput.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+          });
+        }
+
+        // Initialize luxury theme message handling
+        function showLuxuryMessage(message, type = 'info') {
+          const messageContainer = document.getElementById('message-container');
+          if (!messageContainer) return;
+          
+          let alertClass = 'alert-info-luxury';
+          let icon = 'fas fa-info-circle';
+          
+          switch(type) {
+            case 'error':
+              alertClass = 'alert-error-luxury';
+              icon = 'fas fa-exclamation-triangle';
+              break;
+            case 'success':
+              alertClass = 'alert-success-luxury';
+              icon = 'fas fa-check-circle';
+              break;
+            case 'warning':
+              alertClass = 'alert-warning-luxury';
+              icon = 'fas fa-exclamation-circle';
+              break;
+          }
+          
+          messageContainer.innerHTML = `
+            <div class="alert ${alertClass} animate-slide-down">
+              <i class="${icon} mr-2"></i>
+              ${message}
+            </div>
+          `;
+          
+          // Auto-hide success messages
+          if (type === 'success') {
+            setTimeout(() => {
+              const alert = messageContainer.querySelector('.alert');
+              if (alert) {
+                alert.classList.add('animate-fade-out');
+                setTimeout(() => {
+                  messageContainer.innerHTML = '';
+                }, 300);
+              }
+            }, 3000);
+          }
+        }
+
+        // Make showLuxuryMessage globally available
+        window.showLuxuryMessage = showLuxuryMessage;
+      });
+    </script>
   </body>
 </html>

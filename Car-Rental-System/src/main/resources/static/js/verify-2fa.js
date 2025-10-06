@@ -43,12 +43,21 @@ async function handleVerify2FA(event) {
     
     // Validate code format
     if (!/^\d{6}$/.test(code)) {
-        showMessage('Verification code must be 6 digits', 'error');
+        if (window.showLuxuryMessage) {
+            window.showLuxuryMessage('Verification code must be exactly 6 digits', 'error');
+        } else {
+            showMessage('Verification code must be 6 digits', 'error');
+        }
         return;
     }
     
     // Set button to loading state
     setButtonLoading(submitButton, true);
+    
+    // Show loading message
+    if (window.showLuxuryMessage) {
+        window.showLuxuryMessage('Verifying your code...', 'info');
+    }
     
     try {
         // Call the 2FA verification API
@@ -59,7 +68,11 @@ async function handleVerify2FA(event) {
         
         // Handle the response
         if (response.data.success) {
-            showMessage(response.data.message || 'Verification successful!', 'success');
+            if (window.showLuxuryMessage) {
+                window.showLuxuryMessage(response.data.message || 'Verification successful! Redirecting...', 'success');
+            } else {
+                showMessage(response.data.message || 'Verification successful!', 'success');
+            }
             
             // Clear any existing user data to prevent conflicts between different accounts
             localStorage.clear();
@@ -117,10 +130,18 @@ async function handleVerify2FA(event) {
                 window.location.href = redirectUrl;
             }, 1000);
         } else {
-            showMessage(response.data.message || 'Invalid verification code. Please try again.', 'error');
+            if (window.showLuxuryMessage) {
+                window.showLuxuryMessage(response.data.message || 'Invalid verification code. Please check your authenticator app and try again.', 'error');
+            } else {
+                showMessage(response.data.message || 'Invalid verification code. Please try again.', 'error');
+            }
         }
     } catch (error) {
-        showMessage('An error occurred. Please try again later.', 'error');
+        if (window.showLuxuryMessage) {
+            window.showLuxuryMessage('Network error occurred. Please check your connection and try again.', 'error');
+        } else {
+            showMessage('An error occurred. Please try again later.', 'error');
+        }
         console.error('2FA verification error:', error);
     } finally {
         // Reset button state
