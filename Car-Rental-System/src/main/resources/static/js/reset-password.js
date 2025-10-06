@@ -45,18 +45,31 @@ async function handleResetPassword(event) {
     
     // Validate authenticator code format
     if (!/^\d{6}$/.test(otp)) {
-        showMessage('Authentication code must be 6 digits', 'error');
+        if (window.showLuxuryMessage) {
+            window.showLuxuryMessage('Authentication code must be exactly 6 digits', 'error');
+        } else {
+            showMessage('Authentication code must be 6 digits', 'error');
+        }
         return;
     }
     
     // Confirm passwords match
     if (newPassword !== confirmPassword) {
-        showMessage('Passwords do not match', 'error');
+        if (window.showLuxuryMessage) {
+            window.showLuxuryMessage('Passwords do not match. Please check both fields.', 'error');
+        } else {
+            showMessage('Passwords do not match', 'error');
+        }
         return;
     }
     
     // Set button to loading state
     setButtonLoading(submitButton, true);
+    
+    // Show loading message
+    if (window.showLuxuryMessage) {
+        window.showLuxuryMessage('Resetting your password...', 'info');
+    }
     
     try {
         // Call the reset password API
@@ -68,7 +81,11 @@ async function handleResetPassword(event) {
         
         // Handle the response
         if (response.data.success) {
-            showMessage(response.data.message || 'Password has been reset successfully.', 'success');
+            if (window.showLuxuryMessage) {
+                window.showLuxuryMessage(response.data.message || 'Password has been reset successfully! Redirecting to login...', 'success');
+            } else {
+                showMessage(response.data.message || 'Password has been reset successfully.', 'success');
+            }
             
             // Clear the session storage
             sessionStorage.removeItem('reset_email');
@@ -78,10 +95,18 @@ async function handleResetPassword(event) {
                 window.location.href = '/login?message=' + encodeURIComponent('Your password has been reset successfully.') + '&type=success';
             }, 2000);
         } else {
-            showMessage(response.data.message || 'Failed to reset password. Please try again.', 'error');
+            if (window.showLuxuryMessage) {
+                window.showLuxuryMessage(response.data.message || 'Failed to reset password. Please verify your authentication code and try again.', 'error');
+            } else {
+                showMessage(response.data.message || 'Failed to reset password. Please try again.', 'error');
+            }
         }
     } catch (error) {
-        showMessage('An error occurred. Please try again later.', 'error');
+        if (window.showLuxuryMessage) {
+            window.showLuxuryMessage('Network error occurred. Please check your connection and try again.', 'error');
+        } else {
+            showMessage('An error occurred. Please try again later.', 'error');
+        }
         console.error('Reset password error:', error);
     } finally {
         // Reset button state

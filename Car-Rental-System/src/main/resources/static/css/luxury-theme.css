@@ -336,6 +336,73 @@ p {
   font-style: italic;
 }
 
+/* Password Input Container */
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-luxury-muted);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: var(--luxury-gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.password-toggle:focus {
+  outline: none;
+  color: var(--luxury-gold);
+}
+
+/* Field Validation Styles */
+.field-validation {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.field-validation.success {
+  color: #66bb6a;
+}
+
+.field-validation.error {
+  color: #ef5350;
+}
+
+.field-validation.warning {
+  color: var(--luxury-gold);
+}
+
+/* Form Help Text */
+.form-help-text {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-luxury-muted);
+  font-style: italic;
+}
+
+/* Auth Container */
+.luxury-auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 20px 40px;
+  position: relative;
+}
+
 /* Navigation Enhancements */
 .navbar-luxury {
   background: rgba(10, 10, 10, 0.95) !important;

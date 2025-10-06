@@ -100,6 +100,12 @@ function initializeFormValidation() {
             const comments = document.getElementById('comments');
             const rating = document.getElementById('rating');
             
+            // If this form is already in submitting state, block duplicate submits
+            if (this.dataset.submitting === 'true') {
+                e.preventDefault();
+                return false;
+            }
+
             // Validate customer name
             if (!customerName.value.trim()) {
                 e.preventDefault();
@@ -133,6 +139,9 @@ function initializeFormValidation() {
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
             submitBtn.disabled = true;
+
+            // Mark form as submitting to let the global guard allow this first submit
+            this.dataset.submitting = 'true';
             
             // Clear any existing validation errors
             clearValidationErrors();
@@ -282,15 +291,20 @@ window.addEventListener('scroll', function() {
     }, 10);
 });
 
-// Prevent form double submission
+// Prevent form double submission (without blocking the first valid submit)
 document.addEventListener('submit', function(e) {
     const form = e.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    
-    if (submitBtn && submitBtn.disabled) {
-        e.preventDefault();
-        return false;
+    // If already marked as submitting, block duplicates
+    if (form.dataset && form.dataset.submitting === 'true') {
+        // Allow the first handler that set the flag to proceed; others are blocked
+        // This event listener runs after the form-specific one in many cases, so we only block
+        // if some other rapid submit attempt occurs.
+        return; // do not call preventDefault here to avoid interfering with the initial submit
     }
+    // If no flag set (forms without our validator), set it now and disable the button to avoid duplicates
+    form.dataset.submitting = 'true';
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
 });
 
 // Add keyboard navigation for star ratings

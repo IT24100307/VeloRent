@@ -158,10 +158,13 @@ public class AuthService {
     }
 
     public Map<String, String> login(LoginDto loginDto) {
+        // First check if user exists
+        User user = userRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("No account found with this email address"));
+        
+        // Then authenticate - this will throw BadCredentialsException if password is wrong
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
-        User user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Map<String, String> response = new HashMap<>();
 

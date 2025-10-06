@@ -1,7 +1,7 @@
 package Group2.Car.Rental.System.config;
 
 import Group2.Car.Rental.System.repository.UserRepository;
-import Group2.Car.Rental.System.service.JwtService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,10 +36,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // Disable CSRF protection for API endpoints
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
-                                                "/api/vehicles/**", "/api/profile/**", "/profile/api/**",
-                                                "/api/payments/**", "/api/bookings/**", "/api/fleet/**")) // added fleet API
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
+                        "/api/vehicles/**", "/api/profile/**", "/profile/api/**",
+                        "/api/payments/**", "/api/bookings/**", "/api/fleet/**",
+                        "/api/feedback/**")) // allow feedback form posts without CSRF token
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
@@ -84,7 +85,8 @@ public class SecurityConfig {
     // PasswordEncoder.
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(passwordEncoder());
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setUserDetailsService(userDetailsService());
         return authProvider;
     }

@@ -174,7 +174,7 @@ public class UserService {
             // 2) Fallback: legacy plain-text password migration
             // If stored password looks not encoded (no bcrypt prefix) and equals the provided current password
             boolean looksPlain = stored != null && !stored.startsWith("$2a$") && !stored.startsWith("$2b$") && !stored.startsWith("$2y$");
-            if (looksPlain && stored.equals(passwordDto.getCurrentPassword())) {
+            if (looksPlain && stored != null && stored.equals(passwordDto.getCurrentPassword())) {
                 currentMatches = true;
                 // Immediately migrate to BCrypt using the new password below
             }

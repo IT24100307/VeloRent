@@ -8,7 +8,6 @@
     <!-- CSRF Token -->
     <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
     <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
-
     <!-- Bootstrap & Icons -->
     <link rel="stylesheet" th:href="@{/css/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/fontawesome/css/all.min.css}">
@@ -91,7 +90,6 @@
             color: rgba(248, 249, 250, 0.8);
             font-size: 1.1rem;
         }
-
         .profile-body {
             padding: 2rem;
         }
@@ -112,13 +110,6 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-        }
-
-        .section-title .title-text {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -161,89 +152,155 @@
             border: 1px solid rgba(212, 175, 55, 0.2);
             border-radius: 8px;
             padding: 0.75rem 1rem;
-            font-size: 1rem;
         }
 
-        .btn-luxury {
-            background: linear-gradient(135deg, var(--luxury-gold), #f4d03f);
-            color: #1a1a1a;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: bold;
+        .view-mode-fields .form-control-plaintext {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            border: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-radius: var(--radius-luxury-medium);
+            color: #ffffff !important;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            font-weight: 600;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Additional styling for all form-control-plaintext elements */
+        .form-control-plaintext {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid rgba(212, 175, 55, 0.4) !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            padding: 15px 20px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            margin-bottom: 20px;
+        }
+
+        /* Enhanced view mode styling */
+        .view-mode {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid rgba(212, 175, 55, 0.4) !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            padding: 15px 20px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            margin-bottom: 20px;
+        }
+
+        .password-section {
+            margin-top: 40px;
+            padding: 30px;
+            border-top: 3px solid rgba(212, 175, 55, 0.4);
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.05) 0%, rgba(231, 76, 60, 0.02) 100%);
+            border-radius: var(--radius-luxury-medium);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .password-section h4 {
+            color: #e74c3c;
+            font-family: var(--font-luxury-primary);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .btn-luxury:hover {
+        .password-section h4::before {
+            content: '\f023';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+        }
+
+        /* Enhanced text visibility for all profile elements */
+        .profile-section p,
+        .profile-section span,
+        .profile-section div:not(.btn):not(.form-control):not(.form-group) {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* Form group spacing and layout */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Enhanced button styling */
+        .btn-primary {
+            background: var(--gradient-gold) !important;
+            border: 2px solid rgba(212, 175, 55, 0.8) !important;
+            color: #1a1a1a !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            padding: 12px 30px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            font-family: var(--font-luxury-primary) !important;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f1c40f 0%, #e6ac00 100%) !important;
+            border-color: #f1c40f !important;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
-            color: #1a1a1a;
         }
 
-        .btn-outline-luxury {
-            background: transparent;
-            color: var(--luxury-gold);
-            border: 2px solid var(--luxury-gold);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.8) 0%, rgba(108, 117, 125, 0.6) 100%) !important;
+            border: 2px solid rgba(108, 117, 125, 0.8) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            padding: 12px 30px !important;
+            border-radius: var(--radius-luxury-medium) !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-family: var(--font-luxury-primary) !important;
         }
 
-        .btn-outline-luxury:hover {
-            background: var(--luxury-gold);
-            color: #1a1a1a;
-            transform: translateY(-1px);
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 1) 0%, rgba(108, 117, 125, 0.8) 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .alert {
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1rem;
+        .btn-edit {
+            background-color: #4e73df;
+            color: white;
         }
 
-        .alert-success {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
-            color: #4caf50;
-            border-left: 4px solid #4caf50;
-        }
-
-        .alert-danger {
-            background: linear-gradient(135deg, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 0.1));
-            color: #ef5350;
-            border-left: 4px solid #ef5350;
-        }
-
-        @media (max-width: 768px) {
-            .profile-container {
-                margin: 1rem auto;
-                padding: 0 0.5rem;
-            }
-            
-            .profile-header {
-                padding: 1.5rem;
-            }
-            
-            .profile-avatar {
-                width: 80px;
-                height: 80px;
-                font-size: 2rem;
-            }
-            
-            .profile-name {
-                font-size: 1.5rem;
-            }
-
-            .section-title {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
+        .btn-cancel {
+            background-color: #f8f9fc;
+            color: #5a5c69;
         }
     </style>
 </head>
@@ -284,10 +341,8 @@
                 <!-- Personal Information -->
                 <div class="section">
                     <div class="section-title">
-                        <div class="title-text">
-                            <i class="fas fa-user"></i> Personal Information
-                        </div>
-                        <div>
+                        <i class="fas fa-user"></i> Personal Information
+                        <div class="ms-auto">
                             <button id="editBtn" class="btn btn-outline-luxury btn-sm">
                                 <i class="fas fa-edit mr-1"></i> Edit
                             </button>
@@ -329,15 +384,13 @@
                 <!-- Contact Information (Customer Only) -->
                 <div th:if="${isCustomer}" class="section">
                     <div class="section-title">
-                        <div class="title-text">
-                            <i class="fas fa-address-card"></i> Contact & Address
-                        </div>
+                        <i class="fas fa-address-card"></i> Contact & Address
                     </div>
                     
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label">Phone</label>
+                                <label class="form-label">Phone Number</label>
                                 <input type="text" class="form-control edit-fields d-none" id="contactNumber" name="contactNumber" th:value="${profile.contactNumber}">
                                 <div class="form-control-plaintext view-fields" th:text="${profile.contactNumber != null ? profile.contactNumber : 'Not set'}"></div>
                             </div>
@@ -351,7 +404,7 @@
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
-                                <label class="form-label">Address</label>
+                                <label class="form-label">Street Address</label>
                                 <input type="text" class="form-control edit-fields d-none" id="addressStreet" name="addressStreet" th:value="${profile.addressStreet}">
                                 <div class="form-control-plaintext view-fields" th:text="${profile.addressStreet != null ? profile.addressStreet : 'Not set'}"></div>
                             </div>
@@ -369,9 +422,7 @@
                 <!-- Security Settings -->
                 <div class="section">
                     <div class="section-title">
-                        <div class="title-text">
-                            <i class="fas fa-lock"></i> Security
-                        </div>
+                        <i class="fas fa-lock"></i> Security
                     </div>
                     
                     <form id="passwordForm">
@@ -461,125 +512,6 @@
                 saveBtn.classList.add('d-none');
                 cancelBtn.classList.add('d-none');
             });
-            
-            // Save functionality
-            saveBtn?.addEventListener('click', function() {
-                saveProfile();
-            });
-            
-            // Save profile function
-            function saveProfile() {
-                const successAlert = document.getElementById('successAlert');
-                const errorAlert = document.getElementById('errorAlert');
-                
-                // Show saving message
-                successAlert.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving your profile...';
-                successAlert.classList.remove('d-none');
-                errorAlert.classList.add('d-none');
-                
-                // Get form data
-                const firstName = document.getElementById('firstName')?.value?.trim() || '';
-                const lastName = document.getElementById('lastName')?.value?.trim() || '';
-                const contactNumber = document.getElementById('contactNumber')?.value?.trim() || '';
-                const addressStreet = document.getElementById('addressStreet')?.value?.trim() || '';
-                const addressCity = document.getElementById('addressCity')?.value?.trim() || '';
-                const addressPostalCode = document.getElementById('addressPostalCode')?.value?.trim() || '';
-                
-                // Basic validation
-                if (!firstName || !lastName) {
-                    errorAlert.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>First name and last name are required.';
-                    errorAlert.classList.remove('d-none');
-                    successAlert.classList.add('d-none');
-                    return;
-                }
-                
-                // Prepare data
-                const profileData = {
-                    firstName: firstName,
-                    lastName: lastName,
-                    contactNumber: contactNumber || null,
-                    addressStreet: addressStreet || null,
-                    addressCity: addressCity || null,
-                    addressPostalCode: addressPostalCode || null
-                };
-                
-                // Get CSRF token
-                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
-                
-                // Create headers
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                
-                if (csrfHeader && csrfToken) {
-                    headers[csrfHeader] = csrfToken;
-                }
-                
-                // Get email from URL params
-                const urlParams = new URLSearchParams(window.location.search);
-                const email = urlParams.get('email');
-                const apiUrl = email ? `/api/profile/update?email=${encodeURIComponent(email)}` : '/api/profile/update';
-                
-                // Send update request
-                fetch(apiUrl, {
-                    method: 'POST',
-                    headers: headers,
-                    credentials: 'same-origin',
-                    body: JSON.stringify(profileData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success message
-                        successAlert.innerHTML = '<i class="fas fa-check-circle mr-2"></i>' + (data.message || 'Profile updated successfully!');
-                        
-                        // Update view fields with new values
-                        document.getElementById('firstNameDisplay').textContent = firstName;
-                        document.getElementById('lastNameDisplay').textContent = lastName;
-                        
-                        // Update avatar and name in header
-                        const avatar = document.getElementById('profile-avatar');
-                        const nameDisplay = document.getElementById('profile-name');
-                        avatar.textContent = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-                        nameDisplay.textContent = firstName + ' ' + lastName;
-                        
-                        // Update other fields if they exist
-                        const contactDisplay = document.querySelector('#contactNumber')?.closest('.form-group')?.querySelector('.view-fields');
-                        if (contactDisplay) contactDisplay.textContent = contactNumber || 'Not set';
-                        
-                        const streetDisplay = document.querySelector('#addressStreet')?.closest('.form-group')?.querySelector('.view-fields');
-                        if (streetDisplay) streetDisplay.textContent = addressStreet || 'Not set';
-                        
-                        const cityDisplay = document.querySelector('#addressCity')?.closest('.form-group')?.querySelector('.view-fields');
-                        if (cityDisplay) cityDisplay.textContent = addressCity || 'Not set';
-                        
-                        const postalDisplay = document.querySelector('#addressPostalCode')?.closest('.form-group')?.querySelector('.view-fields');
-                        if (postalDisplay) postalDisplay.textContent = addressPostalCode || 'Not set';
-                        
-                        // Exit edit mode after 2 seconds
-                        setTimeout(() => {
-                            editFields.forEach(field => field.classList.add('d-none'));
-                            viewFields.forEach(field => field.classList.remove('d-none'));
-                            editBtn.classList.remove('d-none');
-                            saveBtn.classList.add('d-none');
-                            cancelBtn.classList.add('d-none');
-                            successAlert.classList.add('d-none');
-                        }, 2000);
-                    } else {
-                        // Show error message
-                        errorAlert.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>' + (data.message || 'Failed to update profile.');
-                        errorAlert.classList.remove('d-none');
-                        successAlert.classList.add('d-none');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating profile:', error);
-                    errorAlert.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Network error. Please try again.';
-                    errorAlert.classList.remove('d-none');
-                    successAlert.classList.add('d-none');
-                });
-            }
         });
     </script>
 </body>
