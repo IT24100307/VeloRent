@@ -18,14 +18,18 @@
       background: var(--gradient-luxury) !important;
       color: var(--text-luxury-light) !important;
       min-height: 100vh;
-      padding-top: 80px;
+      padding-top: 100px;
       font-family: var(--font-luxury-secondary);
+      margin: 0;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
+      max-width: 100%;
+      width: 100vw;
+      margin: 0;
+      padding: 60px 40px 40px 40px;
+      box-sizing: border-box;
     }
 
     /* Enhanced Navigation Styling */
@@ -76,22 +80,27 @@
 
     .rental-history-header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 60px;
+      margin-top: 40px;
       position: relative;
+      width: 100%;
+      z-index: 10;
     }
 
     .rental-history-title {
-      font-size: 3rem;
-      color: var(--luxury-gold);
+      font-size: 3.5rem;
+      color: var(--luxury-gold) !important;
       font-family: var(--font-luxury-primary);
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      margin-top: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .rental-history-title::before {
@@ -114,15 +123,17 @@
     }
 
     .card {
-      background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%);
+      background: linear-gradient(135deg, rgba(45, 45, 45, 0.95) 0%, rgba(26, 26, 26, 0.95) 100%);
       border-radius: var(--radius-luxury-large);
-      box-shadow: var(--shadow-luxury);
-      padding: 30px;
-      margin-bottom: 30px;
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      margin-bottom: 40px;
+      border: 2px solid rgba(212, 175, 55, 0.6);
+      backdrop-filter: blur(15px);
       position: relative;
       overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .card::before {
@@ -136,9 +147,9 @@
     }
 
     .section-title {
-      font-size: 1.8rem;
-      margin-bottom: 25px;
-      color: var(--luxury-gold);
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: var(--luxury-gold) !important;
       font-family: var(--font-luxury-primary);
       font-weight: 700;
       display: flex;
@@ -146,6 +157,7 @@
       gap: 15px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     .section-title i {
@@ -205,37 +217,78 @@
     }
 
     footer {
-      margin-top: 50px;
+      margin-top: 60px;
       text-align: center;
-      color: var(--light-text);
+      color: var(--text-luxury-muted) !important;
       font-size: 14px;
-      padding: 30px;
-      border-top: 1px solid var(--border-color);
-      background: rgba(255,255,255,0.5);
-      border-radius: 15px;
+      padding: 40px;
+      border-top: 2px solid rgba(212, 175, 55, 0.3);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+      border-radius: var(--radius-luxury-large);
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 90px;
+      }
+      
+      .container {
+        padding: 30px 20px;
+      }
+      
+      .rental-history-title {
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+      }
+      
+      .card {
+        padding: 25px 20px;
+        margin-bottom: 25px;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
     }
 
     /* Enhanced rental history cards */
     .rentals-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 25px;
-      margin-top: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+      width: 100%;
+    }
+    
+    @media (min-width: 1600px) {
+      .rentals-grid {
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+        gap: 35px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .rentals-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
     }
 
     .rental-card {
-      background: var(--card-background);
+      background: linear-gradient(135deg, rgba(60, 60, 60, 0.9) 0%, rgba(40, 40, 40, 0.9) 100%);
       border-radius: 20px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       overflow: hidden;
       transition: all 0.3s ease;
       position: relative;
-      border: 2px solid transparent;
+      border: 2px solid rgba(212, 175, 55, 0.4);
     }
 
     .rental-card:hover {
       transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 50px rgba(212, 175, 55, 0.3);
+      border-color: var(--luxury-gold);
     }
 
     .rental-card.current {
@@ -294,10 +347,11 @@
     }
 
     .booking-id {
-      color: #fff;
-      font-size: 12px;
-      font-weight: 500;
-      opacity: 0.9;
+      color: var(--luxury-gold) !important;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 1;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
     }
 
     .status-badge {
@@ -319,18 +373,21 @@
     .status-badge.cancelled { background: var(--danger-color); }
 
     .card-content {
-      padding: 20px;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: var(--radius-luxury-medium);
     }
 
     .card-title {
-      font-weight: 600;
-      font-size: 20px;
+      font-weight: 700;
+      font-size: 1.4rem;
       margin-bottom: 15px;
-      color: var(--luxury-gold);
+      color: var(--luxury-gold) !important;
       display: flex;
       align-items: center;
       gap: 10px;
       font-family: var(--font-luxury-primary);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     .package-badge {
@@ -343,14 +400,15 @@
     }
 
     .date-range {
-      background: var(--gradient-primary);
-      color: white;
-      padding: 12px 15px;
-      border-radius: 10px;
-      margin: 15px 0;
+      background: linear-gradient(135deg, var(--luxury-gold) 0%, #f4d03f 100%);
+      color: var(--luxury-black) !important;
+      padding: 15px 20px;
+      border-radius: var(--radius-luxury-medium);
+      margin: 20px 0;
       text-align: center;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
     }
 
     .detail-row {
@@ -361,40 +419,46 @@
 
     .detail-label {
       width: 100px;
-      color: var(--light-text);
+      color: var(--text-luxury-muted) !important;
       font-weight: 500;
     }
 
     .detail-value {
       flex: 1;
       font-weight: 600;
-      color: var(--text-color);
+      color: var(--text-luxury-light) !important;
     }
 
     .price {
-      font-size: 24px;
+      font-size: 1.8rem;
       font-weight: 700;
-      margin: 15px 0;
-      color: var(--luxury-gold);
+      margin: 20px 0;
+      color: var(--luxury-gold) !important;
       text-align: center;
+      font-family: var(--font-luxury-primary);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     /* Package vehicles section */
     .package-vehicles {
-      margin-top: 20px;
-      border-top: 2px solid var(--border-color);
-      padding-top: 20px;
+      margin-top: 25px;
+      border-top: 2px solid rgba(212, 175, 55, 0.3);
+      padding-top: 25px;
+      background: rgba(212, 175, 55, 0.05);
+      border-radius: var(--radius-luxury-medium);
+      padding: 25px 20px 20px 20px;
     }
 
     .vehicles-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 1.1rem;
+      font-weight: 700;
       margin-bottom: 15px;
-      color: var(--luxury-gold);
+      color: var(--luxury-gold) !important;
       display: flex;
       align-items: center;
       gap: 8px;
       font-family: var(--font-luxury-primary);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
 
     .vehicle-list {
@@ -403,17 +467,19 @@
     }
 
     .vehicle-item {
-      background: rgba(212, 175, 55, 0.1);
-      padding: 15px;
+      background: rgba(212, 175, 55, 0.15);
+      padding: 18px;
       border-radius: var(--radius-luxury-small);
       border-left: 4px solid var(--luxury-gold);
       transition: var(--transition-smooth);
-      border: 1px solid rgba(212, 175, 55, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .vehicle-item:hover {
-      background: rgba(212, 175, 55, 0.2);
-      transform: translateX(5px);
+      background: rgba(212, 175, 55, 0.25);
+      transform: translateX(8px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
     }
 
     .vehicle-info {
@@ -423,15 +489,16 @@
     }
 
     .vehicle-name {
-      font-weight: 600;
-      color: var(--text-luxury-light);
+      font-weight: 700;
+      color: var(--text-luxury-light) !important;
       font-family: var(--font-luxury-secondary);
+      font-size: 1rem;
     }
 
     .vehicle-reg {
-      font-size: 12px;
-      color: var(--light-text);
-      background: white;
+      font-size: 13px;
+      color: var(--luxury-black) !important;
+      background: var(--luxury-gold);
       padding: 4px 8px;
       border-radius: 15px;
     }
@@ -446,18 +513,32 @@
     .empty-message {
       text-align: center;
       padding: 60px 30px;
-      color: var(--light-text);
-      font-size: 18px;
-      background: var(--card-background);
-      border-radius: 15px;
-      margin-top: 20px;
-      box-shadow: var(--shadow);
+      color: var(--text-luxury-muted) !important;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.02) 100%);
+      border-radius: var(--radius-luxury-large);
+      margin-top: 30px;
+      box-shadow: var(--shadow-luxury);
+      border: 1px solid rgba(212, 175, 55, 0.1);
     }
 
     .empty-message i {
-      font-size: 64px;
+      font-size: 3rem;
+      color: var(--luxury-gold) !important;
       margin-bottom: 20px;
-      opacity: 0.5;
+      opacity: 0.7;
+    }
+    
+    .empty-message div {
+      color: var(--text-luxury-light) !important;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .empty-message small {
+      color: var(--text-luxury-muted) !important;
+      font-size: 0.9rem;
     }
 
     /* Responsive design */
@@ -558,7 +639,8 @@
   <div id="message-container"></div>
 
   <div class="rental-history-header">
-    <h1 class="rental-history-title">My Rental History</h1>
+    <h1 class="rental-history-title">MY RENTAL HISTORY</h1>
+    <p style="color: var(--text-luxury-muted); font-size: 1.2rem; margin-top: 15px; text-align: center;">Track your current and past vehicle rentals</p>
   </div>
 
   <div class="card">

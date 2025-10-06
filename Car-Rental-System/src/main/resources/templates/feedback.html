@@ -688,6 +688,20 @@
     <script src="/js/luxury-theme-enhancer.js"></script>
     <script>
       $(document).ready(function() {
+        // Hide page loader immediately when document is ready
+        const pageLoader = document.querySelector('.page-loader');
+        if (pageLoader) {
+          console.log('Hiding page loader...');
+          setTimeout(() => {
+            pageLoader.classList.add('fade-out');
+            setTimeout(() => {
+              pageLoader.style.display = 'none';
+              console.log('Page loader hidden');
+            }, 600);
+          }, 500);
+        }
+
+        // Star rating functionality
         $('.star-rating i').click(function() {
           var rating = $(this).data('rating');
           var parent = $(this).closest('.star-rating');
@@ -700,6 +714,18 @@
           });
           parent.find('input[name="rating"]').val(rating);
         });
+      });
+
+      // Backup loader hide on window load
+      window.addEventListener('load', function() {
+        const pageLoader = document.querySelector('.page-loader');
+        if (pageLoader && pageLoader.style.display !== 'none') {
+          console.log('Backup: hiding page loader on window load');
+          pageLoader.classList.add('fade-out');
+          setTimeout(() => {
+            pageLoader.style.display = 'none';
+          }, 600);
+        }
       });
     </script>
   </body>

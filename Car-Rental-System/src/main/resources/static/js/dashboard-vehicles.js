@@ -32,13 +32,19 @@ function loadAvailableVehicles() {
     return response.json();
   })
   .then(vehicles => {
+    console.log('Vehicles loaded successfully:', vehicles.length);
     allVehicles = vehicles;
     displayVehicles(vehicles);
 
-    // Populate filter dropdowns if available
-    if (window.populateFilterDropdowns) {
-      window.populateFilterDropdowns();
-    }
+    // Populate filter dropdowns with a slight delay to ensure DOM is ready
+    setTimeout(() => {
+      if (window.populateFilterDropdowns) {
+        console.log('Populating filter dropdowns');
+        window.populateFilterDropdowns();
+      } else {
+        console.warn('populateFilterDropdowns function not found');
+      }
+    }, 100);
 
     // Hide loading and show vehicles container
     loadingElement.style.display = "none";
@@ -53,14 +59,21 @@ function loadAvailableVehicles() {
 
 // Display vehicles in the grid
 function displayVehicles(vehicles) {
+  console.log('displayVehicles called with', vehicles?.length || 0, 'vehicles');
   const vehiclesGrid = document.getElementById("vehicles-grid");
 
+  if (!vehiclesGrid) {
+    console.error('vehicles-grid element not found');
+    return;
+  }
+
   if (!vehicles || vehicles.length === 0) {
-    vehiclesGrid.innerHTML = '<p style="text-align: center; color: var(--light-text); grid-column: 1 / -1;">No vehicles available at the moment.</p>';
+    vehiclesGrid.innerHTML = '<div style="text-align: center; color: var(--text-luxury-muted); grid-column: 1 / -1; padding: 40px; font-size: 1.2rem;"><i class="fas fa-car" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i><br>No vehicles match your criteria.<br><small style="opacity: 0.7;">Try adjusting your filters or search terms.</small></div>';
     return;
   }
 
   vehiclesGrid.innerHTML = '';
+  console.log('Rendering', vehicles.length, 'vehicles');
 
   vehicles.forEach(vehicle => {
     const vehicleCard = document.createElement('div');
@@ -79,16 +92,35 @@ function displayVehicles(vehicles) {
     }
 
     vehicleCard.innerHTML = `
-      <img src="${imageUrl}" alt="${vehicle.make} ${vehicle.model}" class="vehicle-image" onerror="this.src='https://via.placeholder.com/200x120?text=No+Image'">
-      <div class="vehicle-info">
-        <div class="vehicle-make-model">${vehicle.make} ${vehicle.model}</div>
-        <div class="vehicle-year">${vehicle.year}</div>
-        <div class="vehicle-price">${priceDisplay}</div>
-        <div class="vehicle-status" style="color: ${vehicle.status === 'AVAILABLE' ? '#27ae60' : 'var(--text-luxury-muted)'}">
+      <div class="vehicle-image-container" style="position: relative; overflow: hidden; border-radius: var(--radius-luxury-medium); margin-bottom: 20px;">
+        <img src="${imageUrl}" alt="${vehicle.make} ${vehicle.model}" class="vehicle-image" onerror="this.src='https://via.placeholder.com/300x220/1a1a1a/d4af37?text=No+Image+Available'">
+        <div class="vehicle-status-badge" style="position: absolute; top: 15px; right: 15px; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; ${
+          vehicle.status === 'AVAILABLE' 
+            ? 'background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);' 
+            : 'background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);'
+        }">
           ${vehicle.status}
         </div>
-        <button class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})" type="button">
-          <i class="fas fa-eye"></i> View Details
+      </div>
+      <div class="vehicle-info" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="vehicle-details">
+          <div class="vehicle-make-model" style="font-size: 1.4rem; font-weight: 700; color: var(--luxury-gold); margin-bottom: 8px; font-family: var(--font-luxury-primary);">
+            ${vehicle.make} ${vehicle.model}
+          </div>
+          <div class="vehicle-year" style="color: var(--text-luxury-muted); font-size: 1rem; margin-bottom: 15px; font-weight: 500;">
+            <i class="fas fa-calendar-alt" style="margin-right: 8px; color: var(--luxury-gold);"></i>Year: ${vehicle.year}
+          </div>
+          <div class="vehicle-price" style="font-size: 1.5rem; font-weight: 700; margin: 15px 0; color: var(--luxury-gold); font-family: var(--font-luxury-primary);">
+            ${priceDisplay}
+          </div>
+        </div>
+        <button class="view-details-btn" onclick="viewVehicleDetails(${vehicle.vehicleId})" type="button" 
+          style="width: 100%; padding: 12px 20px; background: linear-gradient(135deg, var(--luxury-gold), #f1c40f); 
+          color: var(--luxury-black); border: none; border-radius: var(--radius-luxury-small); 
+          font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; 
+          transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); cursor: pointer; 
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); margin-top: auto;">
+          <i class="fas fa-eye" style="margin-right: 8px;"></i> View Details
         </button>
       </div>
     `;
