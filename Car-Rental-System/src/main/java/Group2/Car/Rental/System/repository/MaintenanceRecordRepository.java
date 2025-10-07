@@ -1,0 +1,36 @@
+package Group2.Car.Rental.System.repository;
+
+import Group2.Car.Rental.System.entity.MaintenanceRecord;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import java.time.LocalDate;
+import java.util.List;
+
+@Repository
+public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRecord, Integer> {
+    
+    // Find all maintenance records for a specific vehicle
+    List<MaintenanceRecord> findByVehicleIdOrderByMaintenanceDateDesc(Integer vehicleId);
+    
+    // Find maintenance records within a date range
+    List<MaintenanceRecord> findByMaintenanceDateBetween(LocalDate startDate, LocalDate endDate);
+    
+    // Find recent maintenance (last 30 days)
+    @Query("SELECT m FROM MaintenanceRecord m WHERE m.maintenanceDate >= :thirtyDaysAgo ORDER BY m.maintenanceDate DESC")
+    List<MaintenanceRecord> findRecentMaintenance(@Param("thirtyDaysAgo") LocalDate thirtyDaysAgo);
+    
+    // Calculate total maintenance cost for a vehicle
+    @Query("SELECT COALESCE(SUM(m.cost), 0) FROM MaintenanceRecord m WHERE m.vehicleId = :vehicleId")
+    Double getTotalMaintenanceCostByVehicle(@Param("vehicleId") Integer vehicleId);
+    
+    // Find maintenance records by description containing keyword
+    List<MaintenanceRecord> findByDescriptionContainingIgnoreCaseOrderByMaintenanceDateDesc(String keyword);
+    
+    // Count maintenance records for a vehicle
+    long countByVehicleId(Integer vehicleId);
+    
+    // Find all maintenance records ordered by date
+    List<MaintenanceRecord> findAllByOrderByMaintenanceDateDesc();
+}

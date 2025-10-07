@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -40,8 +41,8 @@ public class SecurityConfig {
             .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
                         "/api/vehicles/**", "/api/profile/**", "/profile/api/**",
                         "/api/payments/**", "/api/bookings/**", "/api/fleet/**",
-                        "/api/feedback/**")) // allow feedback form posts without CSRF token
-                .authorizeHttpRequests(auth -> auth
+                        "/api/upload/**", "/api/feedback/**")) // allow feedback form posts without CSRF token
+        .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
                         .requestMatchers("/api/admin/**").permitAll()
@@ -50,6 +51,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/api/fleet/**").permitAll() // Allow access to fleet manager package APIs
+            // Allow public GET access to images so <img> tags can load without Authorization header
+            .requestMatchers(HttpMethod.GET, "/api/upload/images/**").permitAll()
+            // All other upload operations (POST/PUT/DELETE) require authentication
+            .requestMatchers(HttpMethod.POST, "/api/upload/**").authenticated()
+            .requestMatchers(HttpMethod.PUT, "/api/upload/**").authenticated()
+            .requestMatchers(HttpMethod.DELETE, "/api/upload/**").authenticated()
                         .requestMatchers("/fleet-manager/**").permitAll() // Allow access to all fleet manager pages
                         .requestMatchers("/api/public/**").permitAll() // Allow access to public endpoints
 
@@ -58,7 +65,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/profile/**").permitAll()
 
-                        .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/login",
+                        .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/uploads/**", "/login",
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",

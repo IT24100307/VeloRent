@@ -652,6 +652,65 @@ public class BookingService {
         );
     }
 
+    /**
+     * Get dashboard statistics including currently rented vehicles count
+     * @return map containing dashboard statistics
+     */
+    public Map<String, Object> getDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        try {
+            // Get all vehicles
+            List<Vehicle> allVehicles = vehicleRepository.findAll();
+            int totalVehicles = allVehicles.size();
+            
+            // Count vehicles by status from vehicle table
+            long availableFromVehicleStatus = allVehicles.stream()
+                    .filter(v -> "Available".equals(v.getStatus()))
+                    .count();
+            long maintenanceFromVehicleStatus = allVehicles.stream()
+                    .filter(v -> "Maintenance".equals(v.getStatus()) || "Out of Service".equals(v.getStatus()))
+                    .count();
+            
+            // Get currently rented vehicles from active bookings
+            long currentlyRentedFromBookings = 0;
+            try {
+                // Count unique vehicles with active (Confirmed) bookings
+                currentlyRentedFromBookings = bookingRepository.findByBookingStatus("Confirmed").stream()
+                        .filter(booking -> booking.getVehicle() != null)
+                        .filter(booking -> {
+                            LocalDateTime now = LocalDateTime.now();
+                            return booking.getStartDate().isBefore(now) && booking.getEndDate().isAfter(now);
+                        })
+                        .map(booking -> booking.getVehicle().getVehicleId())
+                        .distinct()
+                        .count();
+            } catch (Exception e) {
+                System.err.println("Error counting rented vehicles from bookings: " + e.getMessage());
+            }
+            
+            stats.put("totalVehicles", totalVehicles);
+            stats.put("availableVehicles", (int) availableFromVehicleStatus);
+            stats.put("currentlyRentedVehicles", (int) currentlyRentedFromBookings);
+            stats.put("maintenanceVehicles", (int) maintenanceFromVehicleStatus);
+            
+            System.out.println("Dashboard Stats - Total: " + totalVehicles + 
+                             ", Available: " + availableFromVehicleStatus + 
+                             ", Currently Rented: " + currentlyRentedFromBookings + 
+                             ", Maintenance: " + maintenanceFromVehicleStatus);
+                             
+        } catch (Exception e) {
+            System.err.println("Error calculating dashboard stats: " + e.getMessage());
+            // Return default values
+            stats.put("totalVehicles", 0);
+            stats.put("availableVehicles", 0);
+            stats.put("currentlyRentedVehicles", 0);
+            stats.put("maintenanceVehicles", 0);
+        }
+        
+        return stats;
+    }
+
     // Build lightweight booking summaries for safe JSON serialization
     public List<Group2.Car.Rental.System.dto.BookingSummaryDTO> getCustomerBookingSummaries(Long customerId) {
         Optional<Customer> customerOptional = customerRepository.findByUserId(customerId);

@@ -32,4 +32,9 @@ public class FleetManagerController {
     public String vehicleUsageHistoryWorking() {
         return "fleet-manager-vehicle-usage-history-working";
     }
+
+    @GetMapping("/maintenance")
+    public String maintenance() {
+        return "fleet-manager-maintenance";
+    }
 }

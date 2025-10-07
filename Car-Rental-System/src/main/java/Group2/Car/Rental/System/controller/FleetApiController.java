@@ -44,4 +44,27 @@ public class FleetApiController {
             return ResponseEntity.ok(new java.util.ArrayList<>());
         }
     }
+
+    /**
+     * Get dashboard statistics including currently rented vehicles
+     * @return dashboard statistics
+     */
+    @GetMapping("/dashboard-stats")
+    public ResponseEntity<java.util.Map<String, Object>> getDashboardStats() {
+        try {
+            System.out.println("API endpoint called: /api/fleet/dashboard-stats");
+            java.util.Map<String, Object> stats = bookingService.getDashboardStats();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            System.err.println("Error in dashboard stats endpoint: " + e.getMessage());
+            e.printStackTrace();
+            // Return default stats
+            java.util.Map<String, Object> defaultStats = new java.util.HashMap<>();
+            defaultStats.put("totalVehicles", 0);
+            defaultStats.put("availableVehicles", 0);
+            defaultStats.put("currentlyRentedVehicles", 0);
+            defaultStats.put("maintenanceVehicles", 0);
+            return ResponseEntity.ok(defaultStats);
+        }
+    }
 }
