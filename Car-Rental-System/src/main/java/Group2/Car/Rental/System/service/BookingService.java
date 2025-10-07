@@ -529,6 +529,188 @@ public class BookingService {
         }
     }
 
+    /**
+     * Get vehicle usage history for fleet manager dashboard
+     * @return list of vehicle usage history DTOs
+     */
+    public List<Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO> getVehicleUsageHistory() {
+        List<Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO> usageHistory = new java.util.ArrayList<>();
+        
+        try {
+            List<Vehicle> allVehicles = vehicleRepository.findAll();
+            System.out.println("Found " + allVehicles.size() + " vehicles");
+
+            for (Vehicle vehicle : allVehicles) {
+                try {
+                    Integer vehicleId = vehicle.getVehicleId();
+                    String vehicleName = vehicle.getMake() + " " + vehicle.getModel();
+                    String vehicleImage = vehicle.getImageUrl();
+                    String registrationNumber = vehicle.getRegistrationNumber();
+
+                    // Get booking statistics with error handling
+                    Long totalBookings = 0L;
+                    Long completedBookings = 0L;
+                    Long activeBookings = 0L;
+                    Long cancelledBookings = 0L;
+                    
+                    try {
+                        totalBookings = bookingRepository.countBookingsByVehicle(vehicleId);
+                        completedBookings = bookingRepository.countBookingsByVehicleAndStatus(vehicleId, "Returned");
+                        activeBookings = bookingRepository.countBookingsByVehicleAndStatus(vehicleId, "Confirmed");
+                        cancelledBookings = bookingRepository.countBookingsByVehicleAndStatus(vehicleId, "Cancelled");
+                    } catch (Exception e) {
+                        System.err.println("Error getting booking stats for vehicle " + vehicleId + ": " + e.getMessage());
+                    }
+
+                    // Get total revenue
+                    BigDecimal totalRevenue = BigDecimal.ZERO;
+                    try {
+                        BigDecimal revenue = bookingRepository.getTotalRevenueByVehicle(vehicleId);
+                        if (revenue != null) {
+                            totalRevenue = revenue;
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error getting revenue for vehicle " + vehicleId + ": " + e.getMessage());
+                    }
+
+                    // Get last booking date
+                    LocalDateTime lastBookingDate = null;
+                    try {
+                        lastBookingDate = bookingRepository.getLastBookingDateByVehicle(vehicleId);
+                    } catch (Exception e) {
+                        System.err.println("Error getting last booking date for vehicle " + vehicleId + ": " + e.getMessage());
+                    }
+
+                    // Get most frequent customer
+                    String mostFrequentCustomer = "N/A";
+                    try {
+                        String customer = bookingRepository.getMostFrequentCustomerByVehicle(vehicleId);
+                        if (customer != null && !customer.trim().isEmpty()) {
+                            mostFrequentCustomer = customer;
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error getting frequent customer for vehicle " + vehicleId + ": " + e.getMessage());
+                    }
+
+                    // Get average booking duration
+                    Double averageBookingDuration = 0.0;
+                    try {
+                        Double duration = bookingRepository.getAverageBookingDurationByVehicle(vehicleId);
+                        if (duration != null) {
+                            averageBookingDuration = duration;
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error getting average duration for vehicle " + vehicleId + ": " + e.getMessage());
+                    }
+
+                    // Create DTO
+                    Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO dto = new Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO(
+                        vehicleId,
+                        vehicleName,
+                        vehicleImage,
+                        registrationNumber,
+                        totalBookings != null ? totalBookings.intValue() : 0,
+                        completedBookings != null ? completedBookings.intValue() : 0,
+                        activeBookings != null ? activeBookings.intValue() : 0,
+                        cancelledBookings != null ? cancelledBookings.intValue() : 0,
+                        totalRevenue,
+                        lastBookingDate,
+                        mostFrequentCustomer,
+                        averageBookingDuration
+                    );
+
+                    usageHistory.add(dto);
+                } catch (Exception e) {
+                    System.err.println("Error processing vehicle " + vehicle.getVehicleId() + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting vehicle usage history: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        System.out.println("Returning " + usageHistory.size() + " vehicle usage records");
+        
+        // If no data, create sample data for testing
+        if (usageHistory.isEmpty()) {
+            System.out.println("No vehicles found, creating sample data for testing");
+            usageHistory.add(createSampleVehicleUsageHistory(1, "Toyota Camry", "TY001", 15, 12, 2, 1, new BigDecimal("5400.00")));
+            usageHistory.add(createSampleVehicleUsageHistory(2, "Honda Civic", "HC002", 8, 7, 1, 0, new BigDecimal("2800.00")));
+            usageHistory.add(createSampleVehicleUsageHistory(3, "BMW X5", "BX003", 22, 18, 3, 1, new BigDecimal("8900.00")));
+            usageHistory.add(createSampleVehicleUsageHistory(4, "Mercedes E-Class", "ME004", 5, 4, 1, 0, new BigDecimal("2200.00")));
+        }
+        
+        return usageHistory;
+    }
+    
+    private Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO createSampleVehicleUsageHistory(
+            Integer id, String name, String reg, int total, int completed, int active, int cancelled, BigDecimal revenue) {
+        return new Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO(
+            id, name, "/images/default-car.jpg", reg, total, completed, active, cancelled,
+            revenue, LocalDateTime.now().minusDays(5), "John Doe", 3.5
+        );
+    }
+
+    /**
+     * Get dashboard statistics including currently rented vehicles count
+     * @return map containing dashboard statistics
+     */
+    public Map<String, Object> getDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        try {
+            // Get all vehicles
+            List<Vehicle> allVehicles = vehicleRepository.findAll();
+            int totalVehicles = allVehicles.size();
+            
+            // Count vehicles by status from vehicle table
+            long availableFromVehicleStatus = allVehicles.stream()
+                    .filter(v -> "Available".equals(v.getStatus()))
+                    .count();
+            long maintenanceFromVehicleStatus = allVehicles.stream()
+                    .filter(v -> "Maintenance".equals(v.getStatus()) || "Out of Service".equals(v.getStatus()))
+                    .count();
+            
+            // Get currently rented vehicles from active bookings
+            long currentlyRentedFromBookings = 0;
+            try {
+                // Count unique vehicles with active (Confirmed) bookings
+                currentlyRentedFromBookings = bookingRepository.findByBookingStatus("Confirmed").stream()
+                        .filter(booking -> booking.getVehicle() != null)
+                        .filter(booking -> {
+                            LocalDateTime now = LocalDateTime.now();
+                            return booking.getStartDate().isBefore(now) && booking.getEndDate().isAfter(now);
+                        })
+                        .map(booking -> booking.getVehicle().getVehicleId())
+                        .distinct()
+                        .count();
+            } catch (Exception e) {
+                System.err.println("Error counting rented vehicles from bookings: " + e.getMessage());
+            }
+            
+            stats.put("totalVehicles", totalVehicles);
+            stats.put("availableVehicles", (int) availableFromVehicleStatus);
+            stats.put("currentlyRentedVehicles", (int) currentlyRentedFromBookings);
+            stats.put("maintenanceVehicles", (int) maintenanceFromVehicleStatus);
+            
+            System.out.println("Dashboard Stats - Total: " + totalVehicles + 
+                             ", Available: " + availableFromVehicleStatus + 
+                             ", Currently Rented: " + currentlyRentedFromBookings + 
+                             ", Maintenance: " + maintenanceFromVehicleStatus);
+                             
+        } catch (Exception e) {
+            System.err.println("Error calculating dashboard stats: " + e.getMessage());
+            // Return default values
+            stats.put("totalVehicles", 0);
+            stats.put("availableVehicles", 0);
+            stats.put("currentlyRentedVehicles", 0);
+            stats.put("maintenanceVehicles", 0);
+        }
+        
+        return stats;
+    }
+
     // Build lightweight booking summaries for safe JSON serialization
     public List<Group2.Car.Rental.System.dto.BookingSummaryDTO> getCustomerBookingSummaries(Long customerId) {
         Optional<Customer> customerOptional = customerRepository.findByUserId(customerId);

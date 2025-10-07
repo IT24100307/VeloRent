@@ -36,6 +36,14 @@
             line-height: 1.6;
         }
 
+        /* Prevent background scroll when a modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* Also prevent clicking the header while modal is open */
+        body.modal-open header { pointer-events: none; }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -47,6 +55,8 @@
             color: white;
             padding: 1rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10000;
         }
 
         nav {
@@ -359,7 +369,8 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 100;
+            /* Ensure modals overlay the header (header has z-index: 10000) */
+            z-index: 20000;
             left: 0;
             top: 0;
             width: 100%;
@@ -465,6 +476,113 @@
         .image-preview i {
             font-size: 3rem;
             color: var(--light-text);
+        }
+
+        .file-upload-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .file-upload-label:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .file-upload-label i {
+            font-size: 1.2rem;
+        }
+
+        .upload-progress {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--card-background);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--background-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar::after {
+            content: '';
+            display: block;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            animation: progressAnimation 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progressAnimation {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--light-text);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .progress-text::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--primary-color);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal z-index fixes */
+        .modal {
+            /* Keep this higher than header */
+            z-index: 20000 !important;
+            position: fixed !important;
+        }
+
+        #edit-vehicle-modal,
+        #add-vehicle-modal,
+        #delete-modal {
+            z-index: 20000 !important;
+            position: fixed !important;
         }
 
         .form-actions {
@@ -593,6 +711,7 @@
                 </div>
                 <div class="nav-links">
                     <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="/fleet-manager/maintenance"><i class="fas fa-wrench"></i> Maintenance</a>
                     <a href="/security-settings"><i class="fas fa-shield-alt"></i> Security</a>
                     <a onclick="handleLogout(event)" style="cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     <!-- Profile dropdown -->
@@ -621,6 +740,7 @@
                 <h1 class="dashboard-title"><i class="fas fa-car-side"></i> Fleet Management Dashboard</h1>
                 <div class="dashboard-actions">
                     <a href="/fleet-manager/packages" class="btn" style="margin-right: 10px;"><i class="fas fa-box"></i> Manage Packages</a>
+                    <a href="/fleet-manager/vehicle-usage-history" class="btn" style="margin-right: 10px;"><i class="fas fa-chart-line"></i> Usage History</a>
                     <button onclick="showAddVehicleModal()" id="add-vehicle-btn" class="btn btn-accent"><i class="fas fa-plus"></i> Add New Vehicle</button>
                 </div>
             </div>
@@ -699,7 +819,7 @@
         </main>
 
         <!-- Add Vehicle Modal -->
-        <div id="add-vehicle-modal" class="modal">
+        <div id="add-vehicle-modal" class="modal" style="z-index: 1000;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title"><i class="fas fa-plus-circle"></i> Add New Vehicle</h2>
@@ -745,10 +865,21 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="imageUrl"><i class="fas fa-image"></i> Vehicle Image URL</label>
-                        <input type="url" id="imageUrl" name="imageUrl" class="form-control" placeholder="https://example.com/image.jpg" oninput="updateImagePreview(this.value, 'add-image-preview')">
+                        <label for="vehicleImageFile"><i class="fas fa-image"></i> Vehicle Image</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="vehicleImageFile" name="vehicleImageFile" class="form-control file-input" accept="image/*" onchange="handleImageUpload(this, 'add-image-preview', 'add')">
+                            <label for="vehicleImageFile" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose Image File</span>
+                            </label>
+                        </div>
                         <div class="image-preview" id="add-image-preview">
                             <i class="fas fa-image"></i>
+                        </div>
+                        <input type="hidden" id="imageUrl" name="imageUrl">
+                        <div class="upload-progress" id="add-upload-progress" style="display: none;">
+                            <div class="progress-bar"></div>
+                            <span class="progress-text">Uploading...</span>
                         </div>
                     </div>
 
@@ -761,7 +892,7 @@
         </div>
 
         <!-- Edit Vehicle Modal -->
-        <div id="edit-vehicle-modal" class="modal">
+        <div id="edit-vehicle-modal" class="modal" style="z-index: 1000;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title"><i class="fas fa-edit"></i> Edit Vehicle</h2>
@@ -808,10 +939,21 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="edit-imageUrl"><i class="fas fa-image"></i> Vehicle Image URL</label>
-                        <input type="url" id="edit-imageUrl" name="imageUrl" class="form-control" placeholder="https://example.com/image.jpg" oninput="updateImagePreview(this.value, 'edit-image-preview')">
+                        <label for="editVehicleImageFile"><i class="fas fa-image"></i> Vehicle Image</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="editVehicleImageFile" name="editVehicleImageFile" class="form-control file-input" accept="image/*" onchange="handleImageUpload(this, 'edit-image-preview', 'edit')">
+                            <label for="editVehicleImageFile" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose Image File</span>
+                            </label>
+                        </div>
                         <div class="image-preview" id="edit-image-preview">
                             <i class="fas fa-image"></i>
+                        </div>
+                        <input type="hidden" id="edit-imageUrl" name="imageUrl">
+                        <div class="upload-progress" id="edit-upload-progress" style="display: none;">
+                            <div class="progress-bar"></div>
+                            <span class="progress-text">Uploading...</span>
                         </div>
                     </div>
 
@@ -824,7 +966,7 @@
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div id="delete-modal" class="modal">
+        <div id="delete-modal" class="modal" style="z-index: 1000;">
             <div class="modal-content" style="max-width: 400px;">
                 <div class="modal-header">
                     <h2 class="modal-title"><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Confirm Deletion</h2>
@@ -1107,10 +1249,12 @@
             document.getElementById("add-vehicle-form").reset();
             document.getElementById("add-image-preview").innerHTML = '<i class="fas fa-image"></i>';
             document.getElementById("add-vehicle-modal").style.display = "block";
+            document.body.classList.add('modal-open');
         }
 
         function closeAddVehicleModal() {
             document.getElementById("add-vehicle-modal").style.display = "none";
+            document.body.classList.remove('modal-open');
         }
 
         function showEditVehicleModal(vehicleId) {
@@ -1129,30 +1273,42 @@
             document.getElementById("edit-status").value = vehicle.status || 'Available';
             document.getElementById("edit-imageUrl").value = vehicle.imageUrl || '';
 
-            // Update image preview
+            // Reset file input and update image preview
+            const fileInput = document.getElementById("editVehicleImageFile");
+            fileInput.value = '';
+            const label = fileInput.nextElementSibling;
+            const span = label.querySelector('span');
+            span.textContent = 'Choose Image File';
+            label.style.background = 'linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%)';
+            
             updateImagePreview(vehicle.imageUrl || '', 'edit-image-preview');
 
             document.getElementById("edit-vehicle-modal").style.display = "block";
+            document.body.classList.add('modal-open');
         }
 
         function closeEditVehicleModal() {
             document.getElementById("edit-vehicle-modal").style.display = "none";
+            document.body.classList.remove('modal-open');
         }
 
         function showDeleteConfirmation(id) {
             vehicleIdToDelete = id;
             document.getElementById("delete-modal").style.display = "block";
+            document.body.classList.add('modal-open');
         }
 
         function closeDeleteModal() {
             document.getElementById("delete-modal").style.display = "none";
+            document.body.classList.remove('modal-open');
         }
 
         // Image preview function
         function updateImagePreview(url, previewId) {
             const previewElement = document.getElementById(previewId);
-            if (url && isValidUrl(url)) {
-                previewElement.innerHTML = `<img src="${url}" alt="Vehicle preview">`;
+            console.log('updateImagePreview called with:', url, previewId);
+            if (url && url.trim() !== '') {
+                previewElement.innerHTML = `<img src="${url}" alt="Vehicle preview" onload="console.log('Image loaded successfully')" onerror="console.error('Image failed to load:', this.src); this.parentElement.innerHTML='<i class=\'fas fa-image\'></i>';">`;
             } else {
                 previewElement.innerHTML = `<i class="fas fa-image"></i>`;
             }
@@ -1165,6 +1321,116 @@
             } catch (_) {
                 return false;
             }
+        }
+
+        // File upload handling
+        function handleImageUpload(fileInput, previewId, formType) {
+            console.log('handleImageUpload called with:', fileInput, previewId, formType);
+            const file = fileInput.files[0];
+            if (!file) {
+                console.log('No file selected');
+                return;
+            }
+
+            console.log('File selected:', file.name, file.type, file.size);
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                console.log('Invalid file type:', file.type);
+                showMessage('Please select an image file', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                console.log('File too large:', file.size);
+                showMessage('Image file must be less than 5MB', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            // Get token
+            const token = localStorage.getItem('token');
+            console.log('Token available:', !!token);
+
+            // Show progress
+            const progressElement = document.getElementById(formType + '-upload-progress');
+            if (progressElement) {
+                progressElement.style.display = 'block';
+            } else {
+                console.error('Progress element not found:', formType + '-upload-progress');
+            }
+
+            // Upload file
+            const formData = new FormData();
+            formData.append('file', file);
+
+            console.log('Starting upload to /api/upload/vehicle-image');
+
+            fetch('/api/upload/vehicle-image', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Upload response status:', response.status);
+                if (progressElement) {
+                    progressElement.style.display = 'none';
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Upload response data:', data);
+                
+                if (data.success) {
+                    // Update preview with full URL
+                    const fullImageUrl = window.location.origin + data.fileUrl;
+                    console.log('Full image URL:', fullImageUrl);
+                    updateImagePreview(fullImageUrl, previewId);
+                    
+                    // Set hidden URL field
+                    const hiddenInput = formType === 'add' ? 
+                        document.getElementById('imageUrl') : 
+                        document.getElementById('edit-imageUrl');
+                    if (hiddenInput) {
+                        hiddenInput.value = data.fileUrl;
+                        console.log('Hidden input updated:', hiddenInput.value);
+                    } else {
+                        console.error('Hidden input not found');
+                    }
+                    
+                    // Update file label
+                    const label = fileInput.nextElementSibling;
+                    if (label) {
+                        const span = label.querySelector('span');
+                        if (span) {
+                            span.textContent = file.name;
+                            label.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+                        }
+                    }
+                    
+                    showMessage('Image uploaded successfully!', 'success');
+                } else {
+                    console.error('Upload failed:', data);
+                    showMessage(data.message || 'Failed to upload image', 'error');
+                    fileInput.value = '';
+                }
+            })
+            .catch(error => {
+                if (progressElement) {
+                    progressElement.style.display = 'none';
+                }
+                console.error('Upload error:', error);
+                showMessage('Failed to upload image: ' + error.message, 'error');
+                fileInput.value = '';
+            });
         }
 
         // CRUD operations for vehicles

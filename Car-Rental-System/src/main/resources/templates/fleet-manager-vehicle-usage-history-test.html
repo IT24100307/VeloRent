@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Usage History - Test</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e8e8e8;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .page-header {
+            text-align: center;
+            margin: 40px 0 60px 0;
+            padding: 40px 20px;
+            background: rgba(42, 42, 42, 0.95);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        .page-title {
+            font-size: 3rem;
+            color: #d4af37;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: #0a0a0a;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .test-message {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Vehicle Usage History - TEST PAGE
+            </h1>
+            <div class="test-message">
+                <h3>✅ SUCCESS!</h3>
+                <p>The page is accessible! The security configuration has been fixed.</p>
+                <p>Once the Spring Boot application is running properly, this page will show real vehicle usage data.</p>
+            </div>
+            <a href="/fleet-manager/dashboard" class="back-btn">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>
