@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,4 +62,28 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     // Count bookings by type
     long countByBookingType(String bookingType);
+
+    // Vehicle usage history queries
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.vehicle.vehicleId = :vehicleId")
+    Long countBookingsByVehicle(@Param("vehicleId") Integer vehicleId);
+
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.vehicle.vehicleId = :vehicleId AND b.bookingStatus = :status")
+    Long countBookingsByVehicleAndStatus(@Param("vehicleId") Integer vehicleId, @Param("status") String status);
+
+    @Query("SELECT SUM(b.totalCost) FROM Booking b WHERE b.vehicle.vehicleId = :vehicleId AND b.bookingStatus IN ('Confirmed', 'Returned')")
+    BigDecimal getTotalRevenueByVehicle(@Param("vehicleId") Integer vehicleId);
+
+    @Query("SELECT MAX(b.startDate) FROM Booking b WHERE b.vehicle.vehicleId = :vehicleId")
+    LocalDateTime getLastBookingDateByVehicle(@Param("vehicleId") Integer vehicleId);
+
+    @Query(value = "SELECT AVG(CAST(DATEDIFF(day, b.start_date, b.end_date) AS FLOAT)) FROM bookings b WHERE b.vehicle_id = :vehicleId AND b.booking_status IN ('Confirmed', 'Returned')", nativeQuery = true)
+    Double getAverageBookingDurationByVehicle(@Param("vehicleId") Integer vehicleId);
+
+    @Query(value = "SELECT TOP 1 CONCAT(u.first_name, ' ', u.last_name) FROM bookings b " +
+           "JOIN customers c ON b.customer_id = c.customer_id " +
+           "JOIN users u ON c.user_id = u.id " +
+           "WHERE b.vehicle_id = :vehicleId " +
+           "GROUP BY u.id, u.first_name, u.last_name " +
+           "ORDER BY COUNT(b.booking_id) DESC", nativeQuery = true)
+    String getMostFrequentCustomerByVehicle(@Param("vehicleId") Integer vehicleId);
 }

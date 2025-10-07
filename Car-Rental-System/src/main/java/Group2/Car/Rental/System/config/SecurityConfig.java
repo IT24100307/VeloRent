@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         .requestMatchers("/api/fleet/**").permitAll() // Allow access to fleet manager package APIs
+                        .requestMatchers("/fleet-manager/**").permitAll() // Allow access to all fleet manager pages
                         .requestMatchers("/api/public/**").permitAll() // Allow access to public endpoints
 
                         .requestMatchers("/api/payments/**").permitAll() // Allow access to payment endpoints
@@ -61,8 +62,8 @@ public class SecurityConfig {
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
-                                "/fleet-manager/dashboard", "/fleet-manager/packages", "/feedback", "/admin/feedback",
-                                "/profile", "/profile/**", "/payment", "/rental-history")
+                                "/fleet-manager/dashboard", "/fleet-manager/packages", "/fleet-manager/vehicle-usage-history", 
+                                "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )

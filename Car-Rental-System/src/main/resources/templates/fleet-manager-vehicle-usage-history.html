@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Usage History | VeloRent - Fleet Manager</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+    <!-- Luxury Theme CSS -->
+    <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <style>
+        /* Luxury Theme CSS Variables */
+        :root {
+            --luxury-black: #0a0a0a;
+            --luxury-charcoal: #1a1a1a;
+            --luxury-dark: #2a2a2a;
+            --luxury-gold: #d4af37;
+            --luxury-gold-light: #f4d03f;
+            --luxury-gold-dark: #b8860b;
+            --text-luxury-light: #e8e8e8;
+            --text-luxury-muted: #b0b0b0;
+            --text-luxury-dark: #666;
+            --bg-luxury-card: rgba(42, 42, 42, 0.95);
+            --bg-luxury-hover: rgba(212, 175, 55, 0.1);
+            --border-luxury: rgba(212, 175, 55, 0.2);
+            --radius-luxury: 12px;
+            --shadow-luxury: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --font-luxury-primary: 'Playfair Display', serif;
+            --font-luxury-body: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+            color: var(--text-luxury-light);
+            font-family: var(--font-luxury-body);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin: 40px 0 60px 0;
+            padding: 40px 20px;
+            background: var(--bg-luxury-card);
+            border-radius: var(--radius-luxury);
+            box-shadow: var(--shadow-luxury);
+            border: 1px solid var(--border-luxury);
+        }
+
+        .page-title {
+            font-size: 3rem;
+            color: var(--luxury-gold);
+            font-family: var(--font-luxury-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .page-subtitle {
+            color: var(--text-luxury-muted);
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-gold-dark) 100%);
+            color: var(--luxury-black);
+            text-decoration: none;
+            border-radius: var(--radius-luxury);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+            text-decoration: none;
+            color: var(--luxury-black);
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: var(--bg-luxury-card);
+            border-radius: var(--radius-luxury);
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border-luxury);
+            box-shadow: var(--shadow-luxury);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            color: var(--luxury-gold);
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-luxury-light);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-luxury-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .vehicle-card {
+            background: var(--bg-luxury-card);
+            border-radius: var(--radius-luxury);
+            overflow: hidden;
+            border: 1px solid var(--border-luxury);
+            box-shadow: var(--shadow-luxury);
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .vehicle-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--luxury-charcoal);
+        }
+
+        .vehicle-info {
+            padding: 25px;
+        }
+
+        .vehicle-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--luxury-gold);
+            margin-bottom: 8px;
+        }
+
+        .vehicle-reg {
+            color: var(--text-luxury-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .usage-stat {
+            text-align: center;
+            padding: 12px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .usage-stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-luxury-light);
+        }
+
+        .usage-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-luxury-muted);
+            margin-top: 4px;
+        }
+
+        .utilization-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .utilization-high {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .utilization-medium {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+            border: 1px solid rgba(241, 196, 15, 0.3);
+        }
+
+        .utilization-low {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .revenue-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .revenue-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--luxury-gold);
+        }
+
+        .revenue-label {
+            color: var(--text-luxury-muted);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 100px;
+            color: var(--luxury-gold);
+        }
+
+        .loading i {
+            font-size: 3rem;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 60px 40px;
+            background: var(--bg-luxury-card);
+            border-radius: var(--radius-luxury);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            background: var(--bg-luxury-card);
+            border-radius: var(--radius-luxury);
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid var(--luxury-gold);
+            box-shadow: var(--shadow-luxury);
+        }
+
+        .filter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            align-items: end;
+        }
+
+        .form-group label {
+            color: var(--luxury-gold-light);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--border-luxury);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: var(--text-luxury-light);
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--luxury-gold);
+            color: var(--text-luxury-light);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Enhanced styling for select dropdowns */
+        select.form-control {
+            background: rgba(42, 42, 42, 0.95);
+            color: var(--text-luxury-light);
+            border: 2px solid var(--luxury-gold);
+            font-weight: 500;
+        }
+
+        select.form-control:focus {
+            background: rgba(42, 42, 42, 0.98);
+            border-color: var(--luxury-gold-light);
+        }
+
+        /* Style for dropdown options */
+        select.form-control option {
+            background: var(--luxury-charcoal);
+            color: var(--text-luxury-light);
+            padding: 10px 15px;
+            font-weight: 500;
+        }
+
+        select.form-control option:hover,
+        select.form-control option:focus {
+            background: var(--luxury-gold);
+            color: var(--luxury-black);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-luxury-muted);
+            border-top: 1px solid var(--border-luxury);
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Vehicle Usage History
+            </h1>
+            <p class="page-subtitle">
+                Track vehicle performance and identify usage patterns
+            </p>
+            <a href="/fleet-manager/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="stats-overview" id="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-car"></i></div>
+                <div class="stat-value" id="total-vehicles-stat">0</div>
+                <div class="stat-label">Total Vehicles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="stat-value" id="avg-utilization-stat">0%</div>
+                <div class="stat-label">Average Utilization</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-value" id="total-revenue-stat">RS 0</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-value" id="total-bookings-stat">0</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-controls">
+                <div class="form-group">
+                    <label for="utilization-filter">Filter by Utilization</label>
+                    <select id="utilization-filter" class="form-control">
+                        <option value="">All Vehicles</option>
+                        <option value="High">High Utilization</option>
+                        <option value="Medium">Medium Utilization</option>
+                        <option value="Low">Low Utilization</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sort-by">Sort Vehicles By</label>
+                    <select id="sort-by" class="form-control">
+                        <option value="totalBookings">Number of Total Bookings</option>
+                        <option value="totalRevenue">Highest Revenue Generated</option>
+                        <option value="vehicleName">Vehicle Name (A-Z)</option>
+                        <option value="lastBookingDate">Most Recently Booked</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="search-vehicle">Search Vehicle</label>
+                    <input type="text" id="search-vehicle" class="form-control" placeholder="Search by name or registration...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner"></i>
+            <div style="margin-left: 20px;">Loading vehicle usage data...</div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-message" class="error-message" style="display: none;">
+            <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>Failed to Load Data</h3>
+            <p>Unable to fetch vehicle usage history. Please check your connection and try again.</p>
+            <button onclick="loadVehicleUsageHistory()" class="back-btn" style="margin-top: 20px;">
+                <i class="fas fa-refresh"></i>
+                Retry
+            </button>
+        </div>
+
+        <!-- Vehicles Grid -->
+        <div id="vehicles-grid" class="vehicles-grid" style="display: none;">
+            <!-- Vehicle cards will be populated here -->
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 <span style="color: var(--luxury-gold); font-weight: 700; font-family: var(--font-luxury-primary);">VeloRent</span> - Luxury Car Rental System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login?message=' + encodeURIComponent('Please log in to access this page') + '&type=error';
+                return;
+            }
+
+            // Check fleet manager role
+            const userRole = localStorage.getItem('userRole');
+            if (!userRole || !(userRole.includes('FLEET_MANAGER') || userRole.includes('FLEETMANAGER'))) {
+                window.location.href = '/dashboard?message=' + encodeURIComponent('You do not have permission to access this page') + '&type=error';
+                return;
+            }
+
+            // Load data
+            loadVehicleUsageHistory();
+
+            // Set up event listeners
+            document.getElementById('utilization-filter').addEventListener('change', filterAndSortVehicles);
+            document.getElementById('sort-by').addEventListener('change', filterAndSortVehicles);
+            document.getElementById('search-vehicle').addEventListener('input', filterAndSortVehicles);
+        });
+
+        let vehicleUsageData = [];
+        let filteredData = [];
+
+        async function loadVehicleUsageHistory() {
+            const token = localStorage.getItem('token');
+            const loadingElement = document.getElementById('loading');
+            const errorElement = document.getElementById('error-message');
+            const gridElement = document.getElementById('vehicles-grid');
+
+            // Show loading
+            loadingElement.style.display = 'flex';
+            errorElement.style.display = 'none';
+            gridElement.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/fleet/vehicle-usage-history', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch vehicle usage history');
+                }
+
+                vehicleUsageData = await response.json();
+                filteredData = [...vehicleUsageData];
+                
+                updateStatistics();
+                filterAndSortVehicles();
+                
+                // Hide loading and show content
+                loadingElement.style.display = 'none';
+                gridElement.style.display = 'grid';
+
+            } catch (error) {
+                console.error('Error loading vehicle usage history:', error);
+                loadingElement.style.display = 'none';
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function updateStatistics() {
+            const totalVehicles = vehicleUsageData.length;
+            const totalRevenue = vehicleUsageData.reduce((sum, vehicle) => sum + (vehicle.totalRevenue || 0), 0);
+            const totalBookings = vehicleUsageData.reduce((sum, vehicle) => sum + (vehicle.totalBookings || 0), 0);
+            
+            // Calculate average utilization
+            const utilizationCounts = vehicleUsageData.reduce((counts, vehicle) => {
+                counts[vehicle.utilizationStatus] = (counts[vehicle.utilizationStatus] || 0) + 1;
+                return counts;
+            }, {});
+            
+            const highUtilization = utilizationCounts['High'] || 0;
+            const avgUtilizationPercent = totalVehicles > 0 ? Math.round((highUtilization / totalVehicles) * 100) : 0;
+
+            document.getElementById('total-vehicles-stat').textContent = totalVehicles;
+            document.getElementById('avg-utilization-stat').textContent = avgUtilizationPercent + '%';
+            document.getElementById('total-revenue-stat').textContent = 'RS ' + totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('total-bookings-stat').textContent = totalBookings;
+        }
+
+        function filterAndSortVehicles() {
+            const utilizationFilter = document.getElementById('utilization-filter').value;
+            const sortBy = document.getElementById('sort-by').value;
+            const searchTerm = document.getElementById('search-vehicle').value.toLowerCase();
+
+            // Filter data
+            filteredData = vehicleUsageData.filter(vehicle => {
+                const matchesUtilization = !utilizationFilter || vehicle.utilizationStatus === utilizationFilter;
+                const matchesSearch = !searchTerm || 
+                    vehicle.vehicleName.toLowerCase().includes(searchTerm) ||
+                    vehicle.registrationNumber.toLowerCase().includes(searchTerm);
+                
+                return matchesUtilization && matchesSearch;
+            });
+
+            // Sort data
+            filteredData.sort((a, b) => {
+                switch (sortBy) {
+                    case 'totalBookings':
+                        return (b.totalBookings || 0) - (a.totalBookings || 0);
+                    case 'totalRevenue':
+                        return (b.totalRevenue || 0) - (a.totalRevenue || 0);
+                    case 'vehicleName':
+                        return a.vehicleName.localeCompare(b.vehicleName);
+                    case 'lastBookingDate':
+                        const dateA = a.lastBookingDate ? new Date(a.lastBookingDate) : new Date(0);
+                        const dateB = b.lastBookingDate ? new Date(b.lastBookingDate) : new Date(0);
+                        return dateB - dateA;
+                    default:
+                        return 0;
+                }
+            });
+
+            renderVehicles();
+        }
+
+        function renderVehicles() {
+            const gridElement = document.getElementById('vehicles-grid');
+            
+            if (filteredData.length === 0) {
+                gridElement.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-luxury-muted);">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>No vehicles found</h3>
+                        <p>Try adjusting your filters or search criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            gridElement.innerHTML = filteredData.map(vehicle => {
+                const lastBookingDate = vehicle.lastBookingDate 
+                    ? new Date(vehicle.lastBookingDate).toLocaleDateString()
+                    : 'Never';
+                
+                const vehicleImage = vehicle.vehicleImage || '/images/default-vehicle.png';
+                
+                return `
+                    <div class="vehicle-card">
+                        <img src="${vehicleImage}" alt="${vehicle.vehicleName}" class="vehicle-image" 
+                             onerror="this.src='/images/default-vehicle.png'">
+                        <div class="vehicle-info">
+                            <div class="vehicle-name">${vehicle.vehicleName}</div>
+                            <div class="vehicle-reg">${vehicle.registrationNumber}</div>
+                            
+                            <div class="usage-stats">
+                                <div class="usage-stat">
+                                    <div class="usage-stat-value">${vehicle.totalBookings || 0}</div>
+                                    <div class="usage-stat-label">Total Bookings</div>
+                                </div>
+                                <div class="usage-stat">
+                                    <div class="usage-stat-value">${vehicle.completedBookings || 0}</div>
+                                    <div class="usage-stat-label">Completed</div>
+                                </div>
+                                <div class="usage-stat">
+                                    <div class="usage-stat-value">${vehicle.activeBookings || 0}</div>
+                                    <div class="usage-stat-label">Active</div>
+                                </div>
+                                <div class="usage-stat">
+                                    <div class="usage-stat-value">${vehicle.cancelledBookings || 0}</div>
+                                    <div class="usage-stat-label">Cancelled</div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <span class="utilization-badge utilization-${vehicle.utilizationStatus.toLowerCase()}">
+                                    ${vehicle.utilizationStatus} Utilization
+                                </span>
+                                <small style="color: var(--text-luxury-muted);">
+                                    Last booking: ${lastBookingDate}
+                                </small>
+                            </div>
+                            
+                            <div class="revenue-info">
+                                <div>
+                                    <div class="revenue-amount">RS ${(vehicle.totalRevenue || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                                    <div class="revenue-label">Total Revenue</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--text-luxury-light); font-weight: 600;">
+                                        ${(vehicle.averageBookingDuration || 0).toFixed(1)} days
+                                    </div>
+                                    <div class="revenue-label">Avg Duration</div>
+                                </div>
+                            </div>
+                            
+                            ${vehicle.mostFrequentCustomer && vehicle.mostFrequentCustomer !== 'N/A' ? `
+                                <div style="margin-top: 15px; padding: 10px; background: rgba(212, 175, 55, 0.05); border-radius: 8px;">
+                                    <small style="color: var(--text-luxury-muted);">Most frequent customer:</small>
+                                    <div style="color: var(--luxury-gold); font-weight: 600;">${vehicle.mostFrequentCustomer}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

@@ -17,4 +17,19 @@ public class FleetManagerController {
     public String fleetManagerPackages() {
         return "fleet-manager-packages";
     }
+
+    @GetMapping("/vehicle-usage-history")
+    public String vehicleUsageHistory() {
+        return "fleet-manager-vehicle-usage-history";
+    }
+
+    @GetMapping("/vehicle-usage-history-test")
+    public String vehicleUsageHistoryTest() {
+        return "fleet-manager-vehicle-usage-history-test";
+    }
+
+    @GetMapping("/vehicle-usage-history-working")
+    public String vehicleUsageHistoryWorking() {
+        return "fleet-manager-vehicle-usage-history-working";
+    }
 }
