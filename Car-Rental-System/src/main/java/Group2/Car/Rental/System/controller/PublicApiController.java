@@ -8,7 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/public")
@@ -23,13 +25,29 @@ public class PublicApiController {
     }
 
     /**
-     * Get all activated packages for homepage display
+     * Get all visible packages for homepage display (including partially reserved ones)
      * This endpoint is publicly accessible and doesn't require authentication
      */
     @GetMapping("/packages")
     public ResponseEntity<List<VehiclePackage>> getActivatedPackages() {
-        List<VehiclePackage> activatedPackages = vehiclePackageService.getActivatedPackages();
-        return ResponseEntity.ok(activatedPackages);
+        List<VehiclePackage> visiblePackages = vehiclePackageService.getVisiblePackages();
+        return ResponseEntity.ok(visiblePackages);
+    }
+
+    /**
+     * Get package availability status and message
+     */
+    @GetMapping("/packages/{packageId}/availability")
+    public ResponseEntity<Map<String, Object>> getPackageAvailability(@PathVariable Integer packageId) {
+        Map<String, Object> response = new HashMap<>();
+        boolean isAvailable = vehiclePackageService.isPackageAvailableForBooking(packageId);
+        String message = vehiclePackageService.getPackageAvailabilityMessage(packageId);
+        
+        response.put("available", isAvailable);
+        response.put("message", message);
+        response.put("packageId", packageId);
+        
+        return ResponseEntity.ok(response);
     }
 
     /**

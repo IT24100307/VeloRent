@@ -86,6 +86,7 @@
             background-color: var(--background-color);
             color: var(--text-luxury-light) !important;
             min-height: 100vh;
+            /* Offset height to clear fixed navbar (approx navbar height + border) */
             padding-top: 120px;
             font-family: var(--font-luxury-secondary);
             line-height: 1.6;
@@ -95,13 +96,18 @@
             overflow: hidden;
         }
 
-        body.modal-open header { pointer-events: none; }
+    body.modal-open header { pointer-events: none; }
+    /* Disable navbar clicks when modal is open */
+    body.modal-open .navbar-luxury { pointer-events: none; }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
         }
+        /* Tighten spacing under fixed navbar */
+    /* Spacing handled dynamically via JS to match navbar height */
+    .navbar + .container { padding-top: 0; }
 
     /* Enhanced Navigation Styling */
     .navbar-luxury {
@@ -112,8 +118,10 @@
         padding: 1.2rem 0;
         min-height: 80px;
         z-index: 10000 !important;
-        position: relative;
-    }        .navbar-brand-luxury {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+    }
+        .navbar-brand-luxury {
             font-size: 1.8rem !important;
             font-weight: 700 !important;
             color: var(--luxury-gold) !important;
@@ -1060,7 +1068,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
         <div class="container">
-            <a class="navbar-brand-luxury" href="/fleet-manager-dashboard">
+            <a class="navbar-brand-luxury" href="/fleet-manager/dashboard">
                 <i class="fas fa-crown mr-2"></i> VeloRent Fleet Manager
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -1117,7 +1125,7 @@
             <div id="message-container"></div>
 
             <!-- Luxury Dashboard Header -->
-            <div class="dashboard-header" style="text-align: center; margin-bottom: 50px; margin-top: 20px;">
+            <div class="dashboard-header" style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
                 <h1 class="dashboard-title" style="font-size: 2.5rem; color: var(--luxury-gold); font-family: var(--font-luxury-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
                     <i class="fas fa-car-side" style="font-size: 2rem;"></i>
                     Fleet Management Dashboard
@@ -1208,7 +1216,7 @@
         </main>
 
         <!-- Add Vehicle Modal -->
-        <div id="add-vehicle-modal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);">
+    <div id="add-vehicle-modal" class="modal" style="display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);">
             <div class="modal-content" style="background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%); margin: 5% auto; padding: 40px; border-radius: var(--radius-luxury-large); width: 90%; max-width: 600px; border: 2px solid rgba(212, 175, 55, 0.3); box-shadow: var(--shadow-luxury); position: relative; overflow: hidden;">
                 <div style="content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-gold);"></div>
                 <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -1282,7 +1290,7 @@
         </div>
 
         <!-- Edit Vehicle Modal -->
-        <div id="edit-vehicle-modal" class="modal" style="z-index: 1000 !important; position: fixed !important;">
+    <div id="edit-vehicle-modal" class="modal" style="display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);">
             <div class="modal-content" style="background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%); margin: 3% auto; padding: 40px; border-radius: var(--radius-luxury-large); width: 90%; max-width: 800px; border: 2px solid rgba(212, 175, 55, 0.3); box-shadow: var(--shadow-luxury); position: relative; overflow: hidden; max-height: 90vh; overflow-y: auto;">
                 <div style="content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-gold);"></div>
                 <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(212, 175, 55, 0.3);">
@@ -1357,7 +1365,7 @@
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div id="delete-modal" class="modal" style="z-index: 1000;">
+    <div id="delete-modal" class="modal" style="display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(3px);">
             <div class="modal-content" style="background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%); margin: 15% auto; padding: 40px; border-radius: var(--radius-luxury-large); width: 90%; max-width: 500px; border: 2px solid rgba(231, 76, 60, 0.3); box-shadow: var(--shadow-luxury); position: relative; overflow: hidden;">
                 <div style="content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);"></div>
                 <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(231, 76, 60, 0.3);">
@@ -1678,6 +1686,7 @@
             document.getElementById("add-image-preview").innerHTML = '<i class="fas fa-image"></i>';
             document.getElementById("add-vehicle-modal").style.display = "block";
             document.body.classList.add('modal-open');
+            setModalOffset('add-vehicle-modal');
         }
 
         function closeAddVehicleModal() {
@@ -1713,6 +1722,7 @@
 
             document.getElementById("edit-vehicle-modal").style.display = "block";
             document.body.classList.add('modal-open');
+            setModalOffset('edit-vehicle-modal');
         }
 
         function closeEditVehicleModal() {
@@ -1724,6 +1734,7 @@
             vehicleIdToDelete = id;
             document.getElementById("delete-modal").style.display = "block";
             document.body.classList.add('modal-open');
+            setModalOffset('delete-modal');
         }
 
         function closeDeleteModal() {
@@ -2043,5 +2054,43 @@
             </p>
         </div>
     </footer>
+<script>
+    (function(){
+        function setBodyOffset(){
+            var navbar = document.querySelector('.navbar-luxury');
+            if(!navbar) return;
+            var h = navbar.offsetHeight || 0;
+            // Add 2px buffer for border/shadow
+            document.body.style.paddingTop = (h + 2) + 'px';
+        }
+        window.addEventListener('load', setBodyOffset);
+        window.addEventListener('resize', setBodyOffset);
+        // In case fonts/icons change the height after load
+        setTimeout(setBodyOffset, 300);
+    })();
+    </script>
+<script>
+    // Keep modal content below fixed navbar with dynamic offset and centering
+    function setModalOffset(modalId){
+        try{
+            var modal = document.getElementById(modalId);
+            if(!modal) return;
+            var content = modal.querySelector('.modal-content');
+            if(!content) return;
+            var nav = document.querySelector('.navbar-luxury');
+            var navH = (nav && nav.offsetHeight) ? nav.offsetHeight : 0;
+            // Default top margin to keep content visible and centered-ish
+            var vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            var desiredTop = Math.max(20, Math.min(60, Math.floor((vh - content.offsetHeight)/4)));
+            content.style.marginTop = (navH + desiredTop) + 'px';
+        }catch(e){ /* no-op */ }
+    }
+    window.addEventListener('resize', function(){
+        ['add-vehicle-modal','edit-vehicle-modal','delete-modal'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el && el.style.display === 'block') setModalOffset(id);
+        });
+    });
+</script>
 </body>
 </html>
