@@ -480,17 +480,159 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+        animation: modalFadeIn 0.3s ease-out;
+      }
+
+      /* Modal Z-Index Hierarchy */
+      #package-details-modal {
+        z-index: 150;
+      }
+
+      #vehicle-details-modal {
+        z-index: 200;
+        background-color: rgba(0, 0, 0, 0.85);
+      }
+
+      #booking-modal {
+        z-index: 250;
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+
+      #package-booking-modal {
+        z-index: 250;
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+
+      #payment-modal {
+        z-index: 300;
+        background-color: rgba(0, 0, 0, 0.95);
+      }
+
+      /* Enhanced backdrop blur for higher z-index modals */
+      #vehicle-details-modal {
+        backdrop-filter: blur(8px);
+      }
+
+      #booking-modal, #package-booking-modal {
+        backdrop-filter: blur(10px);
+      }
+
+      #payment-modal {
+        backdrop-filter: blur(12px);
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          backdrop-filter: blur(0px);
+        }
+        to {
+          opacity: 1;
+          backdrop-filter: blur(5px);
+        }
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          transform: translateY(-50px) scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
       }
 
       .modal-content {
         background-color: var(--card-background);
-        margin: 10% auto;
+        margin: 5% auto;
         padding: 20px;
-        border-radius: 8px;
-        width: 80%;
+        border-radius: 15px;
+        width: 90%;
         max-width: 500px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        animation: modalSlideIn 0.4s ease-out;
+        transform-origin: center top;
+      }
+
+      /* Vehicle Modal Specific Styles */
+      #vehicle-details-modal .modal-content {
+        animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      #vehicle-details-modal .modal-content:hover .vehicle-details-image img {
+        transform: scale(1.02);
+      }
+
+      #vehicle-details-modal .close:hover {
+        transform: rotate(90deg);
+        color: #ff6b6b;
+      }
+
+      /* Button Hover Effects for Vehicle Modal */
+      #vehicle-details-modal .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      #vehicle-details-modal .btn-accent:hover {
+        background: linear-gradient(135deg, var(--luxury-gold) 0%, #f1c40f 100%);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+      }
+
+      /* Responsive Design for Vehicle Modal */
+      @media (max-width: 768px) {
+        #vehicle-details-modal .modal-content {
+          margin: 2% auto;
+          width: 95%;
+          max-width: none;
+          padding: 15px;
+        }
+        
+        #vehicle-details-modal .vehicle-details-container {
+          grid-template-columns: 1fr !important;
+          gap: 25px !important;
+        }
+        
+        #vehicle-details-modal .modal-header {
+          padding: 20px 15px !important;
+          margin: -15px -15px 0 -15px !important;
+        }
+        
+        #vehicle-details-modal .modal-title {
+          font-size: 20px !important;
+        }
+        
+        #vehicle-details-modal .vehicle-details-info > div {
+          padding: 20px !important;
+        }
+        
+        #vehicle-details-modal .form-actions {
+          flex-direction: column;
+          gap: 10px !important;
+        }
+        
+        #vehicle-details-modal .btn {
+          width: 100%;
+          min-width: auto !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #vehicle-details-modal .vehicle-details-info > div > div {
+          grid-template-columns: 1fr !important;
+        }
+        
+        #vehicle-details-modal .modal-header div:first-child {
+          gap: 10px !important;
+        }
+        
+        #vehicle-details-modal .modal-header div:first-child > div:first-child {
+          width: 40px !important;
+          height: 40px !important;
+        }
       }
 
       .modal-header {
@@ -1169,14 +1311,18 @@
         background: linear-gradient(135deg, var(--luxury-gold) 0%, #d4af37 100%);
         color: var(--luxury-black);
         border: none;
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         cursor: pointer;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 700;
         transition: var(--transition-smooth);
         box-shadow: 0 6px 25px rgba(212, 175, 55, 0.4);
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .packages-nav button:hover {
@@ -1219,6 +1365,78 @@
         text-align: center;
         font-size: 1.5rem;
         background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+      }
+
+      /* Partially Reserved Package Styling */
+      .package-slide.partially-reserved {
+        position: relative;
+      }
+
+      .package-slide.partially-reserved::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .package-slide.partially-reserved .package-content {
+        position: relative;
+        z-index: 3;
+      }
+
+      /* Ensure buttons in partially reserved packages are clickable */
+      .package-slide.partially-reserved .package-actions {
+        position: relative;
+        z-index: 4;
+      }
+
+      .package-slide.partially-reserved .package-actions .btn {
+        position: relative;
+        z-index: 5;
+      }
+
+      .availability-notice {
+        background: rgba(255, 193, 7, 0.95);
+        color: #000;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 10px rgba(255, 193, 7, 0.4);
+        border: 1px solid rgba(255, 193, 7, 0.8);
+        text-align: left;
+        line-height: 1.3;
+      }
+
+      .availability-notice i {
+        font-size: 14px;
+      }
+
+      .btn-disabled {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+        border-color: #6c757d !important;
+        color: #ffffff !important;
+        cursor: not-allowed !important;
+        opacity: 0.8 !important;
+        font-size: 11px !important;
+        padding: 8px 12px !important;
+        font-weight: 600 !important;
+      }
+
+      .btn-disabled:hover {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+        border-color: #6c757d !important;
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
       }
     </style>
   </head>
@@ -1424,50 +1642,103 @@
       <div class="container">
       <!-- Vehicle Details Modal -->
       <div id="vehicle-details-modal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-          <div class="modal-header">
-            <h2 class="modal-title"><i class="fa fa-car"></i> <span id="modal-vehicle-title">Vehicle Details</span></h2>
-            <span class="close" role="button" tabindex="0" onclick="closeVehicleDetailsModal()" onkeydown="if(event.key==='Enter'||event.key==='Escape'){closeVehicleDetailsModal()}">&times;</span>
-          </div>
-          <div id="vehicle-details-content">
-            <!-- Vehicle details will be populated dynamically -->
-            <div class="vehicle-details-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
-              <div class="vehicle-details-image" style="flex: 1; min-width: 300px;">
-                <img id="modal-vehicle-image" src="" alt="Vehicle" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <div class="modal-content" style="max-width: 950px; background: linear-gradient(135deg, var(--luxury-charcoal) 0%, #1a1a1a 100%); color: var(--text-luxury-light); border: 2px solid rgba(212, 175, 55, 0.3); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(212, 175, 55, 0.1);">
+          <div class="modal-header" style="background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border-bottom: 2px solid rgba(212, 175, 55, 0.3); padding: 25px; margin: -20px -20px 0 -20px; border-radius: 8px 8px 0 0;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <div style="background: var(--gradient-gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: var(--luxury-black);">
+                <i class="fa fa-car" style="font-size: 20px;"></i>
               </div>
-              <div class="vehicle-details-info" style="flex: 1; min-width: 300px;">
-                <table style="width: 100%; border-collapse: collapse;">
-                  <tr>
-                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Brand</th>
-                    <td id="modal-vehicle-make" style="padding: 8px;"></td>
-                  </tr>
-                  <tr>
-                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Model</th>
-                    <td id="modal-vehicle-model" style="padding: 8px;"></td>
-                  </tr>
-                  <tr>
-                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Year</th>
-                    <td id="modal-vehicle-year" style="padding: 8px;"></td>
-                  </tr>
-                  <tr>
-                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Registration</th>
-                    <td id="modal-vehicle-registration" style="padding: 8px;"></td>
-                  </tr>
-                  <tr>
-                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Rental Rate</th>
-                    <td id="modal-vehicle-rate" style="padding: 8px;"></td>
-                  </tr>
-                  <tr>
-                    <th style="text-align: left; padding: 8px; background-color: var(--background-color);">Status</th>
-                    <td id="modal-vehicle-status" style="padding: 8px;"></td>
-                  </tr>
-                </table>
+              <div>
+                <h2 class="modal-title" style="color: var(--luxury-gold); font-size: 24px; margin: 0; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                  <span id="modal-vehicle-title">Premium Vehicle Details</span>
+                </h2>
+                <p style="margin: 5px 0 0 0; color: rgba(255, 255, 255, 0.7); font-size: 14px;">Discover luxury on wheels</p>
+              </div>
+            </div>
+            <span class="close" role="button" tabindex="0" onclick="closeVehicleDetailsModal()" onkeydown="if(event.key==='Enter'||event.key==='Escape'){closeVehicleDetailsModal()}" style="color: var(--luxury-gold); font-size: 32px; font-weight: 300; transition: all 0.3s ease; cursor: pointer; padding: 10px;">&times;</span>
+          </div>
+          
+          <div id="vehicle-details-content" style="padding: 30px 25px;">
+            <div class="vehicle-details-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
+              
+              <!-- Left Column - Image & Gallery -->
+              <div class="vehicle-details-image" style="position: relative;">
+                <div style="position: relative; border-radius: 15px; overflow: hidden; background: linear-gradient(45deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%); padding: 3px;">
+                  <img id="modal-vehicle-image" src="" alt="Vehicle" style="width: 100%; height: 280px; object-fit: cover; border-radius: 12px; transition: transform 0.3s ease;">
+                  <div style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 8px 15px; border-radius: 20px; color: var(--luxury-gold); font-size: 12px; font-weight: 600;">
+                    <i class="fa fa-star" style="margin-right: 5px;"></i>PREMIUM
+                  </div>
+                </div>
+                
+                <!-- Features Badges -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;">
+                  <span style="background: rgba(212, 175, 55, 0.15); color: var(--luxury-gold); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid rgba(212, 175, 55, 0.3);">
+                    <i class="fa fa-shield-alt" style="margin-right: 5px;"></i>INSURED
+                  </span>
+                  <span style="background: rgba(46, 204, 113, 0.15); color: #2ecc71; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid rgba(46, 204, 113, 0.3);">
+                    <i class="fa fa-check-circle" style="margin-right: 5px;"></i>VERIFIED
+                  </span>
+                  <span style="background: rgba(52, 152, 219, 0.15); color: #3498db; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid rgba(52, 152, 219, 0.3);">
+                    <i class="fa fa-cog" style="margin-right: 5px;"></i>AUTO
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Right Column - Details -->
+              <div class="vehicle-details-info">
+                <div style="background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 25px; border: 1px solid rgba(212, 175, 55, 0.2);">
+                  
+                  <!-- Vehicle Specs Grid -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    
+                    <div style="background: rgba(212, 175, 55, 0.05); padding: 15px; border-radius: 10px; border-left: 3px solid var(--luxury-gold);">
+                      <div style="color: rgba(255, 255, 255, 0.6); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Brand</div>
+                      <div id="modal-vehicle-make" style="color: var(--luxury-gold); font-size: 16px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div style="background: rgba(212, 175, 55, 0.05); padding: 15px; border-radius: 10px; border-left: 3px solid var(--luxury-gold);">
+                      <div style="color: rgba(255, 255, 255, 0.6); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Model</div>
+                      <div id="modal-vehicle-model" style="color: var(--luxury-gold); font-size: 16px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div style="background: rgba(212, 175, 55, 0.05); padding: 15px; border-radius: 10px; border-left: 3px solid var(--luxury-gold);">
+                      <div style="color: rgba(255, 255, 255, 0.6); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Year</div>
+                      <div id="modal-vehicle-year" style="color: var(--luxury-gold); font-size: 16px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div style="background: rgba(212, 175, 55, 0.05); padding: 15px; border-radius: 10px; border-left: 3px solid var(--luxury-gold);">
+                      <div style="color: rgba(255, 255, 255, 0.6); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Registration</div>
+                      <div id="modal-vehicle-registration" style="color: var(--luxury-gold); font-size: 16px; font-weight: 600;"></div>
+                    </div>
+                    
+                  </div>
+                  
+                  <!-- Price Section -->
+                  <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; border: 1px solid rgba(212, 175, 55, 0.3);">
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Rental Rate</div>
+                    <div id="modal-vehicle-rate" style="color: var(--luxury-gold); font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>
+                    <div style="color: rgba(255, 255, 255, 0.5); font-size: 12px; margin-top: 5px;">Best price guaranteed</div>
+                  </div>
+                  
+                  <!-- Status -->
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; background: rgba(46, 204, 113, 0.1); border-radius: 10px; border: 1px solid rgba(46, 204, 113, 0.3);">
+                    <i class="fa fa-check-circle" style="color: #27ae60; font-size: 16px;"></i>
+                    <span style="color: rgba(255, 255, 255, 0.6); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Status:</span>
+                    <span id="modal-vehicle-status" style="color: #27ae60; font-weight: 600;"></span>
+                  </div>
+                  
+                </div>
               </div>
             </div>
 
-            <div class="form-actions" style="margin-top: 20px;">
-              <button type="button" class="btn" onclick="closeVehicleDetailsModal()">Close</button>
-              <button type="button" class="btn btn-accent" id="rent-vehicle-btn" onclick="openBookingModal()">Rent This Vehicle</button>
+            <!-- Action Buttons -->
+            <div class="form-actions" style="margin-top: 40px; display: flex; gap: 15px; justify-content: center; padding-top: 25px; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+              <button type="button" class="btn" onclick="closeVehicleDetailsModal()" style="background: transparent; border: 2px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.8); padding: 12px 30px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; min-width: 120px;">
+                <i class="fa fa-times" style="margin-right: 8px;"></i>Close
+              </button>
+              <button type="button" class="btn btn-accent" id="rent-vehicle-btn" onclick="openBookingModal()" style="background: var(--gradient-gold); border: none; color: var(--luxury-black); padding: 12px 30px; border-radius: 8px; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); min-width: 160px;">
+                <i class="fa fa-calendar-check" style="margin-right: 8px;"></i>Rent This Vehicle
+              </button>
             </div>
           </div>
         </div>
@@ -2071,15 +2342,19 @@
           const track = document.getElementById('packages-track');
           const section = document.getElementById('packages-section');
           const welcome = document.getElementById('welcome-msg');
-          fetch('/api/fleet/packages', {
+          fetch('/api/public/packages', {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+            headers: { 'Accept': 'application/json' }
           })
           .then(r => r.json())
           .then((list) => {
             if (!Array.isArray(list)) return;
-            const active = list.filter(p => (p.status || '').toLowerCase() === 'activated');
-            if (active.length === 0) return;
+            // Show both activated and partially reserved packages
+            const visible = list.filter(p => {
+              const status = (p.status || '').toLowerCase();
+              return status === 'activated' || status === 'partially reserved';
+            });
+            if (visible.length === 0) return;
             // Hide welcome, show section with luxury title
             if (welcome) welcome.style.display = 'none';
             section.style.display = 'block';
@@ -2087,20 +2362,28 @@
             // Update section title dynamically
             const sectionTitle = section.querySelector('h3');
             if (sectionTitle && !sectionTitle.innerHTML.includes('🎉')) {
-              sectionTitle.innerHTML = `🎉 Active Luxury Packages (${active.length})`;
+              sectionTitle.innerHTML = `🎉 Luxury Packages (${visible.length})`;
             }
             // Build slides
             track.innerHTML = '';
             const indicators = document.createElement('div');
             indicators.className = 'packages-indicators';
             
-            active.forEach((p, idx) => {
+            visible.forEach((p, idx) => {
               const slide = document.createElement('div');
-              slide.className = 'package-slide';
+              const isPartiallyReserved = (p.status || '').toLowerCase() === 'partially reserved';
+              slide.className = `package-slide ${isPartiallyReserved ? 'partially-reserved' : ''}`;
               const imgSrc = p.imageUrl || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
               
               // Set background image
               slide.style.backgroundImage = `url(${imgSrc})`;
+              
+              // Add availability message for partially reserved packages
+              const availabilityMessage = isPartiallyReserved ? 
+                `<div class="availability-notice">
+                  <i class="fas fa-clock"></i>
+                  <small>Temporarily unavailable - Some vehicles are currently rented individually</small>
+                </div>` : '';
               
               slide.innerHTML = `
                 <div class="package-content">
@@ -2108,10 +2391,15 @@
                     <h4>${p.packageName || 'Luxury Package'}</h4>
                     <div class="package-meta">Duration: <strong>${p.duration || 0} days</strong></div>
                     <div class="package-meta">Starting from: <strong>Rs. ${p.price || 0}</strong></div>
+                    ${availabilityMessage}
                   </div>
                   <div class="package-actions">
                     <button class="btn view-details-btn" data-pkg-idx="${idx}">View Details</button>
-                    <button class="btn btn-accent" data-pkg-buy-idx="${idx}">Book Now</button>
+                    <button class="btn ${isPartiallyReserved ? 'btn-disabled' : 'btn-accent'}" 
+                            data-pkg-buy-idx="${idx}" 
+                            ${isPartiallyReserved ? 'disabled title="Package temporarily unavailable"' : ''}>
+                      ${isPartiallyReserved ? 'Unavailable' : 'Book Now'}
+                    </button>
                   </div>
                 </div>`;
               track.appendChild(slide);
@@ -2128,7 +2416,7 @@
             packageSlider.appendChild(indicators);
 
             // Enhanced Controls with Indicators
-            let current = 0; const total = active.length;
+            let current = 0; const total = visible.length;
             
             function updateIndicators() {
               document.querySelectorAll('.package-indicator').forEach((ind, i) => {
@@ -2148,20 +2436,34 @@
               updateIndicators();
               // Reset timer
               clearInterval(timer);
-              timer = setInterval(() => go(current+1), 6000);
+              if (total > 1) timer = setInterval(() => go(current+1), 5000);
             }
             
             const prev = document.getElementById('pkg-prev');
             const next = document.getElementById('pkg-next');
-            prev.onclick = () => { clearInterval(timer); go(current-1); timer = setInterval(() => go(current+1), 6000); };
-            next.onclick = () => { clearInterval(timer); go(current+1); timer = setInterval(() => go(current+1), 6000); };
+            prev.onclick = () => { 
+              clearInterval(timer); 
+              go(current-1); 
+              if (total > 1) timer = setInterval(() => go(current+1), 5000); 
+            };
+            next.onclick = () => { 
+              clearInterval(timer); 
+              go(current+1); 
+              if (total > 1) timer = setInterval(() => go(current+1), 5000); 
+            };
             
-            let timer = setInterval(() => go(current+1), 6000);
-            
-            // Pause on hover
-            const packageSliderElement = document.querySelector('.packages-slider');
-            packageSliderElement.addEventListener('mouseenter', () => clearInterval(timer));
-            packageSliderElement.addEventListener('mouseleave', () => { timer = setInterval(() => go(current+1), 6000); });
+            // Start auto-slide timer only if there are multiple packages
+            let timer;
+            if (total > 1) {
+              timer = setInterval(() => go(current+1), 5000);
+              
+              // Pause on hover
+              const packageSliderElement = document.querySelector('.packages-slider');
+              packageSliderElement.addEventListener('mouseenter', () => clearInterval(timer));
+              packageSliderElement.addEventListener('mouseleave', () => { 
+                if (total > 1) timer = setInterval(() => go(current+1), 5000); 
+              });
+            }
             
             // Make goToSlide available globally for indicators
             window.goToSlide = goToSlide;
@@ -2173,13 +2475,19 @@
             track.querySelectorAll('[data-pkg-idx]').forEach(btn => {
               btn.addEventListener('click', (e) => {
                 const idx = parseInt(e.currentTarget.getAttribute('data-pkg-idx'));
-                showPackageDetails(active[idx]);
+                showPackageDetails(visible[idx]);
               });
             });
             track.querySelectorAll('[data-pkg-buy-idx]').forEach(btn => {
               btn.addEventListener('click', (e) => {
                 const idx = parseInt(e.currentTarget.getAttribute('data-pkg-buy-idx'));
-                buyPackage(active[idx]);
+                const pkg = visible[idx];
+                // Check if package is partially reserved before allowing booking
+                if ((pkg.status || '').toLowerCase() === 'partially reserved') {
+                  showMessage('This package is temporarily unavailable because one or more vehicles are currently rented individually. Please try again later when the vehicles are returned.', 'warning');
+                  return;
+                }
+                buyPackage(pkg);
               });
             });
           })

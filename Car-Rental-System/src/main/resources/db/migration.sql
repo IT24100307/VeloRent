@@ -10,3 +10,6 @@ CHECK (
     (vehicle_id IS NOT NULL AND package_id IS NULL) OR
     (vehicle_id IS NULL AND package_id IS NOT NULL)
 );
+
+-- Expand status column in vehicle_packages to accommodate "Temporarily Unavailable"
+ALTER TABLE vehicle_packages ALTER COLUMN status VARCHAR(30);

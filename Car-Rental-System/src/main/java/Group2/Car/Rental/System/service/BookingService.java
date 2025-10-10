@@ -43,6 +43,9 @@ public class BookingService {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    @Autowired
+    private VehiclePackageService vehiclePackageService;
+
     /**
      * Create a new booking
      * @param bookingRequest the booking request DTO
@@ -110,6 +113,9 @@ public class BookingService {
             vehicle.setStatus("Booked");
             vehicleRepository.save(vehicle);
 
+            // Mark packages containing this vehicle as partially reserved (still visible but not bookable)
+            vehiclePackageService.markPackagesAsPartiallyReserved(vehicle.getVehicleId());
+
             response.put("success", true);
             // Return a lightweight booking payload to avoid serialization issues
             Map<String, Object> bookingPayload = new HashMap<>();
@@ -152,10 +158,10 @@ public class BookingService {
 
             VehiclePackage vehiclePackage = packageOptional.get();
 
-            // Check if package is active
-            if (!"Activated".equalsIgnoreCase(vehiclePackage.getStatus())) {
+            // Check if package is available for booking (not partially reserved)
+            if (!vehiclePackageService.isPackageAvailableForBooking(packageBookingRequest.getPackageId())) {
                 response.put("success", false);
-                response.put("message", "Package is not available for booking");
+                response.put("message", vehiclePackageService.getPackageAvailabilityMessage(packageBookingRequest.getPackageId()));
                 return response;
             }
 
@@ -181,6 +187,17 @@ public class BookingService {
                 response.put("success", false);
                 response.put("message", "Start date cannot be in the past");
                 return response;
+            }
+
+            // Validate all vehicles in package are available
+            if (vehiclePackage.getVehicles() != null) {
+                for (Vehicle vehicle : vehiclePackage.getVehicles()) {
+                    if (!"Available".equals(vehicle.getStatus())) {
+                        response.put("success", false);
+                        response.put("message", "One or more vehicles in the package are currently unavailable");
+                        return response;
+                    }
+                }
             }
 
             // Calculate total cost based on package duration and price
@@ -271,10 +288,10 @@ public class BookingService {
 
             VehiclePackage vehiclePackage = packageOptional.get();
 
-            // Check if package is active
-            if (!"Activated".equalsIgnoreCase(vehiclePackage.getStatus())) {
+            // Check if package is available for booking (not partially reserved)
+            if (!vehiclePackageService.isPackageAvailableForBooking(packageBookingRequest.getPackageId())) {
                 response.put("success", false);
-                response.put("message", "Package is not available for booking");
+                response.put("message", vehiclePackageService.getPackageAvailabilityMessage(packageBookingRequest.getPackageId()));
                 return response;
             }
 
@@ -455,6 +472,9 @@ public class BookingService {
             Vehicle vehicle = booking.getVehicle();
             vehicle.setStatus("Available");
             vehicleRepository.save(vehicle);
+            
+            // Restore packages containing this vehicle from partial reservation
+            vehiclePackageService.restorePackagesFromPartialReservation(vehicle.getVehicleId());
 
             response.put("success", true);
             response.put("message", "Booking cancelled successfully");
@@ -499,6 +519,10 @@ public class BookingService {
                 Vehicle vehicle = booking.getVehicle();
                 vehicle.setStatus("Available");
                 vehicleRepository.save(vehicle);
+                
+                // Restore packages containing this vehicle from partial reservation
+                vehiclePackageService.restorePackagesFromPartialReservation(vehicle.getVehicleId());
+                
                 response.put("message", "Vehicle returned successfully");
             } else if (booking.getVehiclePackage() != null) {
                 // Package booking - make all package vehicles available

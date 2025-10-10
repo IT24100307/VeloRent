@@ -23,8 +23,8 @@ public class VehiclePackage {
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "status", length = 20)
-    private String status = "Activated"; // Activated or Deactivated
+    @Column(name = "status", length = 30)
+    private String status = "Activated"; // Activated, Deactivated, or Temporarily Unavailable
 
     @Column(name = "duration", nullable = false)
     private Integer duration; // in days
