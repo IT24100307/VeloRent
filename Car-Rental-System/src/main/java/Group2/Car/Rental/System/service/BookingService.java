@@ -6,6 +6,7 @@ import Group2.Car.Rental.System.dto.BookingResponse;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Payment;
+import Group2.Car.Rental.System.entity.User;
 import Group2.Car.Rental.System.entity.Vehicle;
 import Group2.Car.Rental.System.entity.VehiclePackage;
 import Group2.Car.Rental.System.repository.BookingRepository;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -627,6 +629,59 @@ public class BookingService {
                         System.err.println("Error getting average duration for vehicle " + vehicleId + ": " + e.getMessage());
                     }
 
+                    // Get current vehicle status and customer info if rented
+                    String vehicleStatus = vehicle.getStatus(); // Available, Rented, Maintenance, Out of Service
+                    String currentCustomerName = null;
+                    String currentCustomerEmail = null;
+                    String currentCustomerPhone = null;
+                    Integer currentBookingId = null;
+
+                    // If vehicle is currently rented or booked, get current customer details
+                    if ("Rented".equals(vehicleStatus) || "Booked".equals(vehicleStatus)) {
+                        try {
+                            // Find active or future booking for this vehicle
+                            LocalDateTime now = LocalDateTime.now();
+                            List<Booking> currentBookings;
+                            
+                            if ("Booked".equals(vehicleStatus)) {
+                                // For booked vehicles, find future bookings (confirmed but not started yet)
+                                currentBookings = bookingRepository.findByVehicle(vehicle).stream()
+                                    .filter(booking -> !"Cancelled".equals(booking.getBookingStatus()) && 
+                                                     !"Returned".equals(booking.getBookingStatus()) &&
+                                                     booking.getEndDate().isAfter(now))
+                                    .collect(java.util.stream.Collectors.toList());
+                            } else {
+                                // For rented vehicles, find currently active bookings
+                                currentBookings = bookingRepository.findByVehicleAndStartDateBeforeAndEndDateAfterAndBookingStatusNot(
+                                    vehicle, now, now, "Cancelled"
+                                );
+                            }
+                            
+                            // If no bookings found with specific logic, try to find any non-cancelled booking
+                            if (currentBookings.isEmpty()) {
+                                currentBookings = bookingRepository.findByVehicle(vehicle).stream()
+                                    .filter(booking -> !"Cancelled".equals(booking.getBookingStatus()) && 
+                                                     !"Returned".equals(booking.getBookingStatus()))
+                                    .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // Most recent first
+                                    .collect(Collectors.toList());
+                            }
+                            
+                            if (!currentBookings.isEmpty()) {
+                                Booking activeBooking = currentBookings.get(0); // Get first active booking
+                                currentBookingId = activeBooking.getBookingId();
+                                
+                                if (activeBooking.getCustomer() != null && activeBooking.getCustomer().getUser() != null) {
+                                    User user = activeBooking.getCustomer().getUser();
+                                    currentCustomerName = user.getFirstName() + " " + user.getLastName();
+                                    currentCustomerEmail = user.getEmail();
+                                    currentCustomerPhone = activeBooking.getCustomer().getContactNumber();
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error getting current customer for vehicle " + vehicleId + ": " + e.getMessage());
+                        }
+                    }
+
                     // Create DTO
                     Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO dto = new Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO(
                         vehicleId,
@@ -640,7 +695,12 @@ public class BookingService {
                         totalRevenue,
                         lastBookingDate,
                         mostFrequentCustomer,
-                        averageBookingDuration
+                        averageBookingDuration,
+                        vehicleStatus,
+                        currentCustomerName,
+                        currentCustomerEmail,
+                        currentCustomerPhone,
+                        currentBookingId
                     );
 
                     usageHistory.add(dto);
@@ -659,21 +719,125 @@ public class BookingService {
         // If no data, create sample data for testing
         if (usageHistory.isEmpty()) {
             System.out.println("No vehicles found, creating sample data for testing");
-            usageHistory.add(createSampleVehicleUsageHistory(1, "Toyota Camry", "TY001", 15, 12, 2, 1, new BigDecimal("5400.00")));
-            usageHistory.add(createSampleVehicleUsageHistory(2, "Honda Civic", "HC002", 8, 7, 1, 0, new BigDecimal("2800.00")));
-            usageHistory.add(createSampleVehicleUsageHistory(3, "BMW X5", "BX003", 22, 18, 3, 1, new BigDecimal("8900.00")));
-            usageHistory.add(createSampleVehicleUsageHistory(4, "Mercedes E-Class", "ME004", 5, 4, 1, 0, new BigDecimal("2200.00")));
+            // Create sample data with different vehicle statuses
+            usageHistory.add(createSampleVehicleUsageHistoryWithStatus(1, "Toyota Camry", "TY001", 15, 12, 2, 1, new BigDecimal("5400.00"), "Rented", "Alice Johnson", "alice.johnson@example.com", "+1-555-0101", 1001));
+            usageHistory.add(createSampleVehicleUsageHistoryWithStatus(2, "Honda Civic", "HC002", 8, 7, 1, 0, new BigDecimal("2800.00"), "Available", null, null, null, null));
+            usageHistory.add(createSampleVehicleUsageHistoryWithStatus(3, "BMW X5", "BX003", 22, 18, 3, 1, new BigDecimal("8900.00"), "Booked", "Michael Brown", "michael.brown@example.com", "+1-555-0103", 1003));
+            usageHistory.add(createSampleVehicleUsageHistoryWithStatus(4, "Mercedes E-Class", "ME004", 5, 4, 1, 0, new BigDecimal("2200.00"), "Maintenance", null, null, null, null));
         }
         
         return usageHistory;
     }
     
-    private Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO createSampleVehicleUsageHistory(
-            Integer id, String name, String reg, int total, int completed, int active, int cancelled, BigDecimal revenue) {
+    private Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO createSampleVehicleUsageHistoryWithStatus(
+            Integer id, String name, String reg, int total, int completed, int active, int cancelled, 
+            BigDecimal revenue, String vehicleStatus, String currentCustomerName, 
+            String currentCustomerEmail, String currentCustomerPhone, Integer currentBookingId) {
+        
         return new Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO(
             id, name, "/images/default-car.jpg", reg, total, completed, active, cancelled,
-            revenue, LocalDateTime.now().minusDays(5), "John Doe", 3.5
+            revenue, LocalDateTime.now().minusDays(5), "Sarah Wilson", 3.5,
+            vehicleStatus, currentCustomerName, currentCustomerEmail, currentCustomerPhone, currentBookingId
         );
+    }
+
+    /**
+     * Get current customer details for a rented vehicle
+     * @param vehicleId the vehicle ID
+     * @return map containing customer details if vehicle is rented
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getCurrentCustomerForVehicle(Integer vehicleId) {
+        Map<String, Object> customerDetails = new HashMap<>();
+        
+        try {
+            System.out.println("DEBUG: Getting customer details for vehicle ID: " + vehicleId);
+            
+            Optional<Vehicle> vehicleOpt = vehicleRepository.findById(vehicleId);
+            if (vehicleOpt.isEmpty()) {
+                System.out.println("DEBUG: Vehicle not found with ID: " + vehicleId);
+                customerDetails.put("error", "Vehicle not found");
+                return customerDetails;
+            }
+            
+            Vehicle vehicle = vehicleOpt.get();
+            System.out.println("DEBUG: Vehicle found - ID: " + vehicle.getVehicleId() + ", Status: " + vehicle.getStatus());
+            
+            if (!"Rented".equals(vehicle.getStatus()) && !"Booked".equals(vehicle.getStatus())) {
+                System.out.println("DEBUG: Vehicle is not rented or booked. Status: " + vehicle.getStatus());
+                customerDetails.put("error", "Vehicle is not currently rented or booked");
+                customerDetails.put("vehicleStatus", vehicle.getStatus());
+                return customerDetails;
+            }
+            
+            // Find active booking for this vehicle
+            LocalDateTime now = LocalDateTime.now();
+            System.out.println("DEBUG: Looking for active bookings at time: " + now);
+            
+            List<Booking> activeBookings = bookingRepository.findByVehicleAndStartDateBeforeAndEndDateAfterAndBookingStatusNot(
+                vehicle, now, now, "Cancelled"
+            );
+            System.out.println("DEBUG: Found " + activeBookings.size() + " active bookings with date range check");
+            
+            // If no active bookings found with date range, try to find any non-cancelled booking
+            if (activeBookings.isEmpty()) {
+                System.out.println("DEBUG: No active bookings found, trying fallback approach");
+                List<Booking> allBookings = bookingRepository.findByVehicle(vehicle);
+                System.out.println("DEBUG: Total bookings for vehicle: " + allBookings.size());
+                
+                activeBookings = allBookings.stream()
+                    .filter(booking -> !"Cancelled".equals(booking.getBookingStatus()) && 
+                                     !"Returned".equals(booking.getBookingStatus()))
+                    .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // Most recent first
+                    .collect(Collectors.toList());
+                System.out.println("DEBUG: Found " + activeBookings.size() + " non-cancelled bookings");
+                
+                // Print booking details for debugging
+                for (Booking booking : activeBookings) {
+                    System.out.println("DEBUG: Booking ID: " + booking.getBookingId() + 
+                                     ", Status: " + booking.getBookingStatus() + 
+                                     ", Customer: " + (booking.getCustomer() != null ? booking.getCustomer().getUserId() : "null"));
+                }
+            }
+            
+            if (activeBookings.isEmpty()) {
+                System.out.println("DEBUG: No active bookings found for vehicle");
+                customerDetails.put("error", "No active booking found for this vehicle");
+                return customerDetails;
+            }
+            
+            Booking activeBooking = activeBookings.get(0);
+            System.out.println("DEBUG: Using booking ID: " + activeBooking.getBookingId());
+            
+            customerDetails.put("bookingId", activeBooking.getBookingId());
+            customerDetails.put("startDate", activeBooking.getStartDate());
+            customerDetails.put("endDate", activeBooking.getEndDate());
+            customerDetails.put("totalCost", activeBooking.getTotalCost());
+            customerDetails.put("bookingStatus", activeBooking.getBookingStatus());
+            
+            if (activeBooking.getCustomer() != null && activeBooking.getCustomer().getUser() != null) {
+                User user = activeBooking.getCustomer().getUser();
+                Customer customer = activeBooking.getCustomer();
+                
+                System.out.println("DEBUG: Customer found - Name: " + user.getFirstName() + " " + user.getLastName() + 
+                                 ", Email: " + user.getEmail());
+                
+                customerDetails.put("customerName", user.getFirstName() + " " + user.getLastName());
+                customerDetails.put("customerEmail", user.getEmail());
+                customerDetails.put("customerPhone", customer.getContactNumber());
+                customerDetails.put("customerAddress", customer.getAddressStreet());
+                customerDetails.put("customerCity", customer.getAddressCity());
+                customerDetails.put("customerPostalCode", customer.getAddressPostalCode());
+            } else {
+                System.out.println("DEBUG: No customer or user found for booking");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error getting current customer for vehicle " + vehicleId + ": " + e.getMessage());
+            customerDetails.put("error", "Unable to retrieve customer details");
+        }
+        
+        return customerDetails;
     }
 
     /**

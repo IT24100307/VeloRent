@@ -56,5 +56,27 @@ public class VehiclePackageController {
         Optional<VehiclePackage> result = service.setStatus(id, status);
         return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<Map<String, Object>> getPackageAnalytics() {
+        try {
+            Map<String, Object> analytics = service.getPackageAnalytics();
+            return ResponseEntity.ok(analytics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to fetch package analytics: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/analytics")
+    public ResponseEntity<Map<String, Object>> getPackageAnalyticsById(@PathVariable Integer id) {
+        try {
+            Map<String, Object> analytics = service.getPackageAnalyticsById(id);
+            return ResponseEntity.ok(analytics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to fetch package analytics: " + e.getMessage()));
+        }
+    }
 }
 

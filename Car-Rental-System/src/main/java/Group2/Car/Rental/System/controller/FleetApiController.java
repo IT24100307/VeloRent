@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,6 +66,26 @@ public class FleetApiController {
             defaultStats.put("currentlyRentedVehicles", 0);
             defaultStats.put("maintenanceVehicles", 0);
             return ResponseEntity.ok(defaultStats);
+        }
+    }
+
+    /**
+     * Get current customer details for a rented vehicle
+     * @param vehicleId the vehicle ID
+     * @return current customer details if vehicle is rented
+     */
+    @GetMapping("/vehicle/{vehicleId}/current-customer")
+    public ResponseEntity<java.util.Map<String, Object>> getCurrentCustomer(@PathVariable Integer vehicleId) {
+        try {
+            System.out.println("API endpoint called: /api/fleet/vehicle/" + vehicleId + "/current-customer");
+            java.util.Map<String, Object> customerDetails = bookingService.getCurrentCustomerForVehicle(vehicleId);
+            return ResponseEntity.ok(customerDetails);
+        } catch (Exception e) {
+            System.err.println("Error getting current customer for vehicle " + vehicleId + ": " + e.getMessage());
+            e.printStackTrace();
+            java.util.Map<String, Object> error = new java.util.HashMap<>();
+            error.put("error", "Unable to retrieve customer details");
+            return ResponseEntity.ok(error);
         }
     }
 }

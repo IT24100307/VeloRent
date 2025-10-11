@@ -19,6 +19,13 @@ public class VehicleUsageHistoryDTO {
     private String mostFrequentCustomer;
     private Double averageBookingDuration; // in days
     private String utilizationStatus; // High, Medium, Low
+    
+    // New fields for vehicle status
+    private String vehicleStatus; // Available, Rented, Maintenance, Out of Service
+    private String currentCustomerName; // Name of current customer if rented
+    private String currentCustomerEmail; // Email of current customer if rented
+    private String currentCustomerPhone; // Phone of current customer if rented
+    private Integer currentBookingId; // Current booking ID if rented
 
     // Constructors
     public VehicleUsageHistoryDTO() {}
@@ -28,7 +35,9 @@ public class VehicleUsageHistoryDTO {
                                  Integer completedBookings, Integer activeBookings, 
                                  Integer cancelledBookings, BigDecimal totalRevenue, 
                                  LocalDateTime lastBookingDate, String mostFrequentCustomer, 
-                                 Double averageBookingDuration) {
+                                 Double averageBookingDuration, String vehicleStatus,
+                                 String currentCustomerName, String currentCustomerEmail,
+                                 String currentCustomerPhone, Integer currentBookingId) {
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.vehicleImage = vehicleImage;
@@ -41,6 +50,11 @@ public class VehicleUsageHistoryDTO {
         this.lastBookingDate = lastBookingDate;
         this.mostFrequentCustomer = mostFrequentCustomer;
         this.averageBookingDuration = averageBookingDuration;
+        this.vehicleStatus = vehicleStatus;
+        this.currentCustomerName = currentCustomerName;
+        this.currentCustomerEmail = currentCustomerEmail;
+        this.currentCustomerPhone = currentCustomerPhone;
+        this.currentBookingId = currentBookingId;
         
         // Calculate utilization status based on total bookings
         if (totalBookings >= 10) {
@@ -91,4 +105,19 @@ public class VehicleUsageHistoryDTO {
 
     public String getUtilizationStatus() { return utilizationStatus; }
     public void setUtilizationStatus(String utilizationStatus) { this.utilizationStatus = utilizationStatus; }
+
+    public String getVehicleStatus() { return vehicleStatus; }
+    public void setVehicleStatus(String vehicleStatus) { this.vehicleStatus = vehicleStatus; }
+
+    public String getCurrentCustomerName() { return currentCustomerName; }
+    public void setCurrentCustomerName(String currentCustomerName) { this.currentCustomerName = currentCustomerName; }
+
+    public String getCurrentCustomerEmail() { return currentCustomerEmail; }
+    public void setCurrentCustomerEmail(String currentCustomerEmail) { this.currentCustomerEmail = currentCustomerEmail; }
+
+    public String getCurrentCustomerPhone() { return currentCustomerPhone; }
+    public void setCurrentCustomerPhone(String currentCustomerPhone) { this.currentCustomerPhone = currentCustomerPhone; }
+
+    public Integer getCurrentBookingId() { return currentBookingId; }
+    public void setCurrentBookingId(Integer currentBookingId) { this.currentBookingId = currentBookingId; }
 }

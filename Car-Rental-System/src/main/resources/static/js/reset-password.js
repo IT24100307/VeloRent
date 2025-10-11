@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         resetPasswordForm.addEventListener('submit', handleResetPassword);
     }
-});
+}); 
 
 /**
  * Handles the reset password form submission
