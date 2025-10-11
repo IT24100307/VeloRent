@@ -361,6 +361,183 @@
             color: var(--luxury-black);
         }
 
+        /* Vehicle Status Styles */
+        .vehicle-status-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-available {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-rented {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .status-booked {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-maintenance {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-out-of-service {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-view-customer {
+            background: linear-gradient(135deg, var(--luxury-gold), var(--luxury-gold-dark));
+            color: var(--luxury-black);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-view-customer:hover {
+            background: linear-gradient(135deg, var(--luxury-gold-light), var(--luxury-gold));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Customer Details Modal */
+        .customer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .customer-modal-content {
+            background: var(--bg-luxury-card);
+            border-radius: var(--radius-luxury);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            border: 1px solid var(--border-luxury);
+        }
+
+        .customer-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-luxury);
+        }
+
+        .customer-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--luxury-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .customer-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-luxury-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .customer-modal-close:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .customer-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .customer-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .customer-detail-label {
+            font-size: 0.85rem;
+            color: var(--text-luxury-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .customer-detail-value {
+            color: var(--text-luxury-light);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .booking-info {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .booking-info-title {
+            color: var(--luxury-gold);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         footer {
             text-align: center;
             padding: 40px 20px;
@@ -459,6 +636,65 @@
         <!-- Vehicles Grid -->
         <div id="vehicles-grid" class="vehicles-grid" style="display: none;">
             <!-- Vehicle cards will be populated here -->
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div id="customerModal" class="customer-modal">
+        <div class="customer-modal-content">
+            <div class="customer-modal-header">
+                <h3 class="customer-modal-title">
+                    <i class="fas fa-user"></i>
+                    Customer Details
+                </h3>
+                <button class="customer-modal-close" onclick="closeCustomerModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="customer-details-grid">
+                <div class="customer-detail-item">
+                    <div class="customer-detail-label">Full Name</div>
+                    <div class="customer-detail-value" id="modalCustomerName">-</div>
+                </div>
+                <div class="customer-detail-item">
+                    <div class="customer-detail-label">Email Address</div>
+                    <div class="customer-detail-value" id="modalCustomerEmail">-</div>
+                </div>
+                <div class="customer-detail-item">
+                    <div class="customer-detail-label">Phone Number</div>
+                    <div class="customer-detail-value" id="modalCustomerPhone">-</div>
+                </div>
+                <div class="customer-detail-item">
+                    <div class="customer-detail-label">Vehicle ID</div>
+                    <div class="customer-detail-value" id="modalVehicleId">-</div>
+                </div>
+            </div>
+
+            <div class="booking-info">
+                <div class="booking-info-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Current Booking Information
+                </div>
+                <div class="customer-details-grid">
+                    <div class="customer-detail-item">
+                        <div class="customer-detail-label">Booking ID</div>
+                        <div class="customer-detail-value" id="modalBookingId">-</div>
+                    </div>
+                    <div class="customer-detail-item">
+                        <div class="customer-detail-label">Start Date</div>
+                        <div class="customer-detail-value" id="modalStartDate">-</div>
+                    </div>
+                    <div class="customer-detail-item">
+                        <div class="customer-detail-label">End Date</div>
+                        <div class="customer-detail-value" id="modalEndDate">-</div>
+                    </div>
+                    <div class="customer-detail-item">
+                        <div class="customer-detail-label">Total Cost</div>
+                        <div class="customer-detail-value" id="modalTotalCost">-</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -629,14 +865,19 @@
                                     <div class="usage-stat-value">${vehicle.completedBookings || 0}</div>
                                     <div class="usage-stat-label">Completed</div>
                                 </div>
-                                <div class="usage-stat">
-                                    <div class="usage-stat-value">${vehicle.activeBookings || 0}</div>
-                                    <div class="usage-stat-label">Active</div>
+                            </div>
+                            
+                            <!-- Vehicle Status -->
+                            <div class="vehicle-status-section" style="margin: 15px 0;">
+                                <div class="status-badge status-${(vehicle.vehicleStatus || 'Available').toLowerCase().replace(' ', '-')}">
+                                    <i class="fas ${getStatusIcon(vehicle.vehicleStatus)}"></i>
+                                    ${vehicle.vehicleStatus || 'Available'}
                                 </div>
-                                <div class="usage-stat">
-                                    <div class="usage-stat-value">${vehicle.cancelledBookings || 0}</div>
-                                    <div class="usage-stat-label">Cancelled</div>
-                                </div>
+                                ${(vehicle.vehicleStatus === 'Rented' || vehicle.vehicleStatus === 'Booked') ? `
+                                    <button class="btn-view-customer" onclick="showCustomerDetails('${vehicle.vehicleId}', '${vehicle.currentCustomerName || ''}', '${vehicle.currentCustomerEmail || ''}', '${vehicle.currentCustomerPhone || ''}', '${vehicle.currentBookingId || ''}')">
+                                        <i class="fas fa-user"></i> View Customer Details
+                                    </button>
+                                ` : ''}
                             </div>
                             
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -672,6 +913,100 @@
                 `;
             }).join('');
         }
+
+        // Helper function to get status icon
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'Available': return 'fa-check-circle';
+                case 'Rented': return 'fa-key';
+                case 'Booked': return 'fa-calendar-check';
+                case 'Maintenance': return 'fa-wrench';
+                case 'Out of Service': return 'fa-exclamation-triangle';
+                default: return 'fa-question-circle';
+            }
+        }
+
+        // Show customer details modal
+        async function showCustomerDetails(vehicleId, customerName, customerEmail, customerPhone, bookingId) {
+            document.getElementById('modalVehicleId').textContent = vehicleId;
+            
+            // Set loading state
+            document.getElementById('modalCustomerName').textContent = 'Loading...';
+            document.getElementById('modalCustomerEmail').textContent = 'Loading...';
+            document.getElementById('modalCustomerPhone').textContent = 'Loading...';
+            document.getElementById('modalBookingId').textContent = 'Loading...';
+            document.getElementById('modalStartDate').textContent = 'Loading...';
+            document.getElementById('modalEndDate').textContent = 'Loading...';
+            document.getElementById('modalTotalCost').textContent = 'Loading...';
+
+            // Fetch customer details from the API
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/fleet/vehicle/${vehicleId}/current-customer`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const customerDetails = await response.json();
+                    console.log('Customer details response:', customerDetails); // Debug log
+                    
+                    if (!customerDetails.error) {
+                        // Update all fields with API data
+                        document.getElementById('modalCustomerName').textContent = customerDetails.customerName || '-';
+                        document.getElementById('modalCustomerEmail').textContent = customerDetails.customerEmail || '-';
+                        document.getElementById('modalCustomerPhone').textContent = customerDetails.customerPhone || '-';
+                        document.getElementById('modalBookingId').textContent = customerDetails.bookingId || '-';
+                        document.getElementById('modalStartDate').textContent = 
+                            customerDetails.startDate ? new Date(customerDetails.startDate).toLocaleDateString() : '-';
+                        document.getElementById('modalEndDate').textContent = 
+                            customerDetails.endDate ? new Date(customerDetails.endDate).toLocaleDateString() : '-';
+                        document.getElementById('modalTotalCost').textContent = 
+                            customerDetails.totalCost ? `RS ${parseFloat(customerDetails.totalCost).toLocaleString('en-US', {minimumFractionDigits: 2})}` : '-';
+                    } else {
+                        console.warn('Error fetching customer details:', customerDetails.error);
+                        // Show error or default values
+                        document.getElementById('modalCustomerName').textContent = '-';
+                        document.getElementById('modalCustomerEmail').textContent = '-';
+                        document.getElementById('modalCustomerPhone').textContent = '-';
+                        document.getElementById('modalBookingId').textContent = '-';
+                        document.getElementById('modalStartDate').textContent = '-';
+                        document.getElementById('modalEndDate').textContent = '-';
+                        document.getElementById('modalTotalCost').textContent = '-';
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching customer details:', error);
+                // Show default values
+                document.getElementById('modalStartDate').textContent = '-';
+                document.getElementById('modalEndDate').textContent = '-';
+                document.getElementById('modalTotalCost').textContent = '-';
+            }
+
+            document.getElementById('customerModal').style.display = 'flex';
+        }
+
+        // Close customer details modal
+        function closeCustomerModal() {
+            document.getElementById('customerModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('customerModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCustomerModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCustomerModal();
+            }
+        });
     </script>
 </body>
 </html>

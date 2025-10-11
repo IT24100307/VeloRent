@@ -13,6 +13,8 @@
   <!-- Luxury Theme CSS -->
   <link rel="stylesheet" href="/css/luxury-theme.css" />
   <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Luxury Theme CSS Variables */
     :root {
@@ -35,6 +37,39 @@
       --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --font-luxury-primary: 'Playfair Display', serif;
       --font-luxury-secondary: 'Inter', sans-serif;
+    }
+
+    /* Grid System for Analytics */
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -15px;
+    }
+
+    .col-md-3 {
+      flex: 0 0 25%;
+      max-width: 25%;
+      padding: 0 15px;
+      margin-bottom: 20px;
+    }
+
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding: 0 15px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .col-md-3,
+      .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
+
+    .text-center {
+      text-align: center;
     }
 
     /* Page Loader */
@@ -790,6 +825,99 @@
 
   <div id="flash" style="margin:20px 0;"></div>
   
+  <!-- Analytics Dashboard -->
+  <div class="analytics-section" style="margin-bottom: 40px;">
+    <div class="page-header">
+      <h2><i class="fas fa-chart-line mr-2"></i> Package Analytics</h2>
+      <div>
+        <button class="btn btn-secondary" onclick="toggleAnalytics()" id="toggle-analytics-btn">
+          <i class="fas fa-eye mr-2"></i> Show Analytics
+        </button>
+      </div>
+    </div>
+    
+    <div id="analytics-dashboard" style="display: none;">
+      <!-- Stats Cards Row -->
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-3">
+          <div class="luxury-card text-center" style="padding: 20px;">
+            <i class="fas fa-box fa-2x" style="color: var(--luxury-gold); margin-bottom: 10px;"></i>
+            <h3 id="total-packages" style="color: var(--luxury-gold); margin: 10px 0;">0</h3>
+            <p style="color: var(--text-luxury-muted); margin: 0;">Total Packages</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="luxury-card text-center" style="padding: 20px;">
+            <i class="fas fa-check-circle fa-2x" style="color: #28a745; margin-bottom: 10px;"></i>
+            <h3 id="active-packages" style="color: #28a745; margin: 10px 0;">0</h3>
+            <p style="color: var(--text-luxury-muted); margin: 0;">Active Packages</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="luxury-card text-center" style="padding: 20px;">
+            <i class="fas fa-calendar-check fa-2x" style="color: #007bff; margin-bottom: 10px;"></i>
+            <h3 id="total-bookings" style="color: #007bff; margin: 10px 0;">0</h3>
+            <p style="color: var(--text-luxury-muted); margin: 0;">Total Bookings</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="luxury-card text-center" style="padding: 20px;">
+            <i class="fas fa-dollar-sign fa-2x" style="color: #ffc107; margin-bottom: 10px;"></i>
+            <h3 id="total-revenue" style="color: #ffc107; margin: 10px 0;">Rs. 0</h3>
+            <p style="color: var(--text-luxury-muted); margin: 0;">Potential Revenue</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Charts Row -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="luxury-card" style="padding: 25px;">
+            <h4 style="color: var(--luxury-gold); margin-bottom: 20px; text-align: center;">
+              <i class="fas fa-chart-pie mr-2"></i>Package Status Distribution
+            </h4>
+            <div style="position: relative; height: 300px;">
+              <canvas id="packageStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="luxury-card" style="padding: 25px;">
+            <h4 style="color: var(--luxury-gold); margin-bottom: 20px; text-align: center;">
+              <i class="fas fa-star mr-2"></i>Package Popularity
+            </h4>
+            <div style="position: relative; height: 300px;">
+              <canvas id="packagePopularityChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row" style="margin-top: 30px;">
+        <div class="col-md-6">
+          <div class="luxury-card" style="padding: 25px;">
+            <h4 style="color: var(--luxury-gold); margin-bottom: 20px; text-align: center;">
+              <i class="fas fa-chart-line mr-2"></i>Booking Trends (Last 12 Months)
+            </h4>
+            <div style="position: relative; height: 300px;">
+              <canvas id="monthlyTrendsChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="luxury-card" style="padding: 25px;">
+            <h4 style="color: var(--luxury-gold); margin-bottom: 20px; text-align: center;">
+              <i class="fas fa-money-bill-wave mr-2"></i>Revenue by Package
+            </h4>
+            <div style="position: relative; height: 300px;">
+              <canvas id="packageRevenueChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <div class="page-header">
     <h2><i class="fas fa-box mr-2"></i> Rental Packages</h2>
     <div>
@@ -1289,7 +1417,273 @@
         }, 500);
       }
     }, 1000);
+    
+    // Load initial data
+    reloadPackages();
   });
+
+  // Analytics functionality
+  let analyticsVisible = false;
+  let charts = {};
+
+  async function toggleAnalytics() {
+    const dashboard = document.getElementById('analytics-dashboard');
+    const button = document.getElementById('toggle-analytics-btn');
+    
+    if (analyticsVisible) {
+      dashboard.style.display = 'none';
+      button.innerHTML = '<i class="fas fa-eye mr-2"></i> Show Analytics';
+      analyticsVisible = false;
+    } else {
+      dashboard.style.display = 'block';
+      button.innerHTML = '<i class="fas fa-eye-slash mr-2"></i> Hide Analytics';
+      analyticsVisible = true;
+      await loadAnalytics();
+    }
+  }
+
+  async function loadAnalytics() {
+    try {
+      const response = await fetch('/api/fleet/packages/analytics', { headers });
+      if (!response.ok) {
+        throw new Error('Failed to fetch analytics');
+      }
+      
+      const analytics = await response.json();
+      
+      // Update stats cards
+      if (analytics.packageStats) {
+        document.getElementById('total-packages').textContent = analytics.packageStats.totalPackages || 0;
+        document.getElementById('active-packages').textContent = analytics.packageStats.activatedPackages || 0;
+      }
+      
+      if (analytics.bookingStats) {
+        document.getElementById('total-bookings').textContent = analytics.bookingStats.totalPackageBookings || 0;
+      }
+      
+      if (analytics.packageStats) {
+        const potentialRevenue = analytics.packageStats.totalPotentialRevenue || 0;
+        document.getElementById('total-revenue').textContent = `Rs. ${potentialRevenue.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      }
+      
+      // Create charts
+      createPackageStatusChart(analytics.packageStats);
+      createPackagePopularityChart(analytics.packagePopularity);
+      createMonthlyTrendsChart(analytics.monthlyTrends);
+      createPackageRevenueChart(analytics.packageRevenue);
+      
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+      flash('Failed to load analytics: ' + error.message, 'error');
+    }
+  }
+
+  function createPackageStatusChart(packageStats) {
+    const ctx = document.getElementById('packageStatusChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.statusChart) {
+      charts.statusChart.destroy();
+    }
+    
+    charts.statusChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Activated', 'Deactivated', 'Partially Reserved'],
+        datasets: [{
+          data: [
+            packageStats?.activatedPackages || 0,
+            packageStats?.deactivatedPackages || 0,
+            packageStats?.partiallyReservedPackages || 0
+          ],
+          backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+          borderColor: '#2a2a2a',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#f8f9fa',
+              font: { size: 12 }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function createPackagePopularityChart(popularityData) {
+    const ctx = document.getElementById('packagePopularityChart').getContext('2d');
+    
+    if (charts.popularityChart) {
+      charts.popularityChart.destroy();
+    }
+    
+    const sortedData = (popularityData || []).sort((a, b) => b.bookingCount - a.bookingCount).slice(0, 5);
+    
+    charts.popularityChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: sortedData.map(item => item.packageName),
+        datasets: [{
+          label: 'Bookings',
+          data: sortedData.map(item => item.bookingCount),
+          backgroundColor: 'rgba(212, 175, 55, 0.8)',
+          borderColor: '#d4af37',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#f8f9fa'
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#f8f9fa',
+              maxTicksLimit: 5
+            },
+            grid: {
+              color: 'rgba(248, 249, 250, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: '#f8f9fa'
+            },
+            grid: {
+              color: 'rgba(248, 249, 250, 0.1)'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function createMonthlyTrendsChart(monthlyData) {
+    const ctx = document.getElementById('monthlyTrendsChart').getContext('2d');
+    
+    if (charts.trendsChart) {
+      charts.trendsChart.destroy();
+    }
+    
+    const labels = Object.keys(monthlyData || {});
+    const data = Object.values(monthlyData || {});
+    
+    charts.trendsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Package Bookings',
+          data: data,
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0, 123, 255, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#f8f9fa'
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#f8f9fa',
+              maxTicksLimit: 6
+            },
+            grid: {
+              color: 'rgba(248, 249, 250, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: '#f8f9fa'
+            },
+            grid: {
+              color: 'rgba(248, 249, 250, 0.1)'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function createPackageRevenueChart(revenueData) {
+    const ctx = document.getElementById('packageRevenueChart').getContext('2d');
+    
+    if (charts.revenueChart) {
+      charts.revenueChart.destroy();
+    }
+    
+    const labels = Object.keys(revenueData || {});
+    const data = Object.values(revenueData || {});
+    
+    charts.revenueChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Revenue (Rs.)',
+          data: data,
+          backgroundColor: 'rgba(255, 193, 7, 0.8)',
+          borderColor: '#ffc107',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#f8f9fa'
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#f8f9fa',
+              maxTicksLimit: 5
+            },
+            grid: {
+              color: 'rgba(248, 249, 250, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: '#f8f9fa',
+              callback: function(value) {
+                return 'Rs. ' + value.toLocaleString();
+              }
+            },
+            grid: {
+              color: 'rgba(248, 249, 250, 0.1)'
+            }
+          }
+        }
+      }
+    });
+  }
 </script>
 
 <!-- Luxury Footer -->
