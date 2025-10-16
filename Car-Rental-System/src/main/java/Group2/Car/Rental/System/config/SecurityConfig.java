@@ -69,7 +69,8 @@ public class SecurityConfig {
                                 "/register", "/forgot-password", "/reset-password",
                                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
-                                "/fleet-manager/dashboard", "/fleet-manager/packages", "/fleet-manager/vehicle-usage-history", 
+                                "/admin/payments",
+                                "/fleet-manager/dashboard", "/fleet-manager/packages", "/fleet-manager/vehicle-usage-history",
                                 "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests

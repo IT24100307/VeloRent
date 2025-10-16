@@ -63,7 +63,12 @@ public class PaymentService {
             payment.setPaymentDate(LocalDateTime.now());
             payment.setAmount(paymentRequest.getAmount() != null ? paymentRequest.getAmount() : booking.getTotalCost());
             payment.setPaymentMethod(paymentRequest.getPaymentMethod());
-            payment.setPaymentStatus("Completed");
+            // For cash, mark payment as Pending until admin confirms; otherwise Completed
+            if ("cash".equalsIgnoreCase(paymentRequest.getPaymentMethod())) {
+                payment.setPaymentStatus("Pending");
+            } else {
+                payment.setPaymentStatus("Completed");
+            }
             payment.setBooking(booking);
 
             // Update booking status based on payment method
@@ -127,14 +132,23 @@ public class PaymentService {
             payment.setAmount(booking.getTotalCost());
             payment.setPaymentMethod(paymentMethod);
             payment.setTransactionId(transactionId);
-            payment.setPaymentStatus("Completed");
+            // Cash payments should remain Pending until admin confirms
+            if ("cash".equalsIgnoreCase(paymentMethod)) {
+                payment.setPaymentStatus("Pending");
+            } else {
+                payment.setPaymentStatus("Completed");
+            }
             payment.setBooking(booking);
 
             // Save the payment
             Payment savedPayment = paymentRepository.save(payment);
 
-            // Update booking status to confirmed with payment
-            booking.setBookingStatus("Confirmed");
+            // Update booking status depending on payment method
+            if ("cash".equalsIgnoreCase(paymentMethod)) {
+                booking.setBookingStatus("Payment Pending");
+            } else {
+                booking.setBookingStatus("Confirmed");
+            }
             bookingRepository.save(booking);
 
             response.put("success", true);
