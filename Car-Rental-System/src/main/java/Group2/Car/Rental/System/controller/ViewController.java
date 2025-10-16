@@ -127,4 +127,10 @@ public class ViewController {
     public String rentalHistory() {
         return "rental-history";
     }
+
+    // New: admin payments page
+    @GetMapping("/admin/payments")
+    public String adminPayments() {
+        return "admin/payments";
+    }
 }

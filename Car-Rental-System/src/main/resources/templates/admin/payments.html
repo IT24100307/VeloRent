@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Payments | VeloRent</title>
+  <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="/css/luxury-theme.css" />
+  <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+  <style>
+    body { background: var(--luxury-black); color: var(--text-luxury-light); }
+    header { background: var(--luxury-charcoal); border-bottom: 1px solid rgba(212,175,55,.2); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .logo { color: var(--luxury-gold); font-weight: 700; font-size: 1.3rem; }
+    .nav-links a { color: var(--text-luxury-light); text-decoration: none; margin-left: 14px; }
+    .nav-links a:hover { color: var(--luxury-gold); }
+
+    .page-title { color: var(--luxury-gold); font-family: var(--font-luxury-primary); display:flex; align-items:center; gap:10px; }
+    .summary { display:grid; grid-template-columns: repeat(4,1fr); gap:14px; margin: 18px 0 22px; }
+    .card { background: var(--luxury-charcoal); border:1px solid rgba(212,175,55,.2); border-radius: 12px; padding: 16px; }
+    .card .label { color: var(--text-luxury-muted); text-transform: uppercase; font-size: .8rem; letter-spacing: .6px; }
+    .card .value { font-size: 1.4rem; font-weight: 700; color: var(--text-luxury-light); margin-top: 4px; }
+    .method-list { margin-top: 8px; }
+    .method-item { display:flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed rgba(212,175,55,.15); }
+    .method-item:last-child { border-bottom: none; }
+
+    table.dataTable thead th { color: var(--luxury-gold); border-bottom: 2px solid var(--luxury-gold); }
+    .badge { padding: 6px 10px; border-radius: 999px; font-size: .75rem; }
+    .badge.success { background: #1e824c; color: #fff; }
+    .badge.pending { background: #d4af37; color: #000; }
+    .badge.failed { background: #c0392b; color: #fff; }
+
+    @media (max-width: 960px){ .summary{ grid-template-columns:repeat(2,1fr);} }
+    @media (max-width: 540px){ .summary{ grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<header>
+  <nav class="container" style="display:flex; align-items:center; justify-content:space-between; padding:14px 0;">
+    <div class="logo"><i class="fas fa-crown"></i> VeloRent Admin</div>
+    <div class="nav-links">
+      <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="/admin/payments" style="color: var(--luxury-gold)"><i class="fas fa-credit-card"></i> Payments</a>
+      <a href="/admin/feedback"><i class="fas fa-comments"></i> Feedback</a>
+      <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin: 20px 0">
+    <h1 class="page-title"><i class="fas fa-credit-card"></i> Payments</h1>
+    <div>
+      <a class="btn" href="/admin/dashboard" style="background: var(--gradient-gold); color:#000; border-radius:8px; padding:10px 16px; text-decoration:none;">Back</a>
+      <button id="exportBtn" class="btn" style="background: var(--gradient-gold); color:#000; border-radius:8px; padding:10px 16px; margin-left:8px;">
+        <i class="fas fa-file-excel"></i> Export to Excel
+      </button>
+      <button id="printBtn" class="btn btn-secondary" style="border:1px solid var(--luxury-gold); color: var(--luxury-gold); background:transparent; border-radius:8px; padding:10px 16px; margin-left:8px;">
+        <i class="fas fa-print"></i> Print
+      </button>
+    </div>
+  </div>
+
+  <section class="summary">
+    <div class="card">
+      <div class="label">Total Revenue</div>
+      <div id="totalRevenue" class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Total Payments</div>
+      <div id="totalPayments" class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Last Payment</div>
+      <div id="lastPayment" class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">By Status</div>
+      <div id="byStatus" class="method-list"></div>
+    </div>
+    <div class="card">
+      <div class="label">By Method</div>
+      <div id="byMethod" class="method-list"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <h3 class="page-title" style="font-size:1.1rem"><i class="fas fa-list"></i> Payment History</h3>
+    </div>
+    <div style="overflow:auto">
+      <table id="paymentsTable" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Booking</th>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>Method</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+<script src="/css/DataTables/datatables.min.js"></script>
+<script src="/js/luxury-theme.js"></script>
+<script src="/js/luxury-theme-enhancer.js"></script>
+<script src="/js/admin-payments.js"></script>
+</body>
+</html>
