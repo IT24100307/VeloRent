@@ -44,27 +44,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Extract the JWT token from the Authorization header
         jwt = authHeader.substring(7);
-        userEmail = jwtService.extractEmailFromToken(jwt);
+        try {
+            userEmail = jwtService.extractEmailFromToken(jwt);
 
-        // If we have a user email and the user is not already authenticated
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Load user details from the database
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            // If we have a user email and the user is not already authenticated
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // Load user details from the database
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            // Validate the token
-            if (jwtService.validateToken(jwt, userDetails)) {
-                // Create authentication token
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                // Update Security Context
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                // Validate the token
+                if (jwtService.validateToken(jwt, userDetails)) {
+                    // Create authentication token
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    // Update Security Context
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception ex) {
+            // If token parsing/validation fails, just continue the filter chain
+            // without setting authentication. Do NOT block the request.
         }
         filterChain.doFilter(request, response);
     }

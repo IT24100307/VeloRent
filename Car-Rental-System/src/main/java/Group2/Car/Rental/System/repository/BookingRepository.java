@@ -3,6 +3,7 @@ package Group2.Car.Rental.System.repository;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Vehicle;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -86,4 +87,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
            "GROUP BY u.id, u.first_name, u.last_name " +
            "ORDER BY COUNT(b.booking_id) DESC", nativeQuery = true)
     String getMostFrequentCustomerByVehicle(@Param("vehicleId") Integer vehicleId);
+
+    // Eagerly fetch associations for admin/fleet listing and order by created date desc then id desc
+    @EntityGraph(attributePaths = {"customer", "customer.user", "vehicle", "vehiclePackage"})
+    List<Booking> findAllByOrderByCreatedAtDescBookingIdDesc();
 }

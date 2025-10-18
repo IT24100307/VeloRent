@@ -23,7 +23,7 @@ import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true) // Re-enabled with explicit configuration
 public class SecurityConfig {
 
     private final UserRepository userRepository;
@@ -38,11 +38,23 @@ public class SecurityConfig {
         http
                 // Disable CSRF protection for API endpoints
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/api/auth/**", "/api/test/**", "/api/admin/**",
-                        "/api/vehicles/**", "/api/profile/**", "/profile/api/**",
-                        "/api/payments/**", "/api/bookings/**", "/api/fleet/**",
-                        "/api/upload/**", "/api/feedback/**")) // allow feedback form posts without CSRF token
-        .authorizeHttpRequests(auth -> auth
+            .ignoringRequestMatchers(
+                        "/api/auth/**", 
+                        "/api/test/**", 
+                        "/api/admin/**",
+                        "/api/vehicles/**", 
+                        "/api/profile/**", 
+                        "/profile/api/**",
+                        "/api/payments/**", 
+                        "/api/bookings/**", 
+                        "/api/fleet/**",
+                        "/api/upload/**", 
+                        "/api/feedback/**",
+                        // Explicitly ignore CSRF for view endpoints that only render pages
+                        "/packages", 
+                        "/packages/**"
+                        )) // allow feedback form posts without CSRF token
+    .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
                         .requestMatchers("/api/test/**").permitAll() // Allow access to test endpoints
                         .requestMatchers("/api/admin/**").permitAll()
@@ -50,6 +62,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/feedback/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/admin/offers/**").permitAll()// Temporarily allow access to admin endpoints for debugging
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
+                        // Require auth specifically for fleet bookings API
+                        .requestMatchers("/api/fleet/bookings/**").authenticated()
+                        // Keep other fleet endpoints publicly accessible as before
                         .requestMatchers("/api/fleet/**").permitAll() // Allow access to fleet manager package APIs
             // Allow public GET access to images so <img> tags can load without Authorization header
             .requestMatchers(HttpMethod.GET, "/api/upload/images/**").permitAll()
@@ -57,7 +72,6 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/upload/**").authenticated()
             .requestMatchers(HttpMethod.PUT, "/api/upload/**").authenticated()
             .requestMatchers(HttpMethod.DELETE, "/api/upload/**").authenticated()
-                        .requestMatchers("/fleet-manager/**").permitAll() // Allow access to all fleet manager pages
                         .requestMatchers("/api/public/**").permitAll() // Allow access to public endpoints
 
                         .requestMatchers("/api/payments/**").permitAll() // Allow access to payment endpoints
@@ -65,15 +79,36 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/profile/**").permitAll()
 
-                        .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/uploads/**", "/login",
-                                "/register", "/forgot-password", "/reset-password",
-                                "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
+                        // Allow GET access to packages page; client script will redirect unauthenticated users to login
+                        .requestMatchers(HttpMethod.GET, "/packages", "/packages/**").permitAll()
+
+            // Allow Spring Boot default error page to be shown (prevents 403 on internal errors)
+            .requestMatchers("/error").permitAll()
+            // Allow favicon to avoid 403 on browsers auto-requesting it
+            .requestMatchers(HttpMethod.GET, "/favicon.ico").permitAll()
+
+            .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/uploads/**", "/login",
+                "/register", "/forgot-password", "/reset-password",
+                "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
                                 "/admin/payments",
-                                "/fleet-manager/dashboard", "/fleet-manager/packages", "/fleet-manager/vehicle-usage-history",
+                                "/fleet-manager/**",
                                 "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
+                )
+                // Return JSON for 401/403 to avoid HTML error pages breaking fetch().json()
+                .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(401);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\"}");
+                    })
+                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+                        response.setStatus(403);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"success\":false,\"message\":\"Forbidden\"}");
+                    })
                 )
                 // Use stateless session for JWT
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

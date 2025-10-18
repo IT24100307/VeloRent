@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fleet/maintenance")
-@PreAuthorize("hasRole('FLEET_MANAGER')")
+@PreAuthorize("hasRole('ROLE_FLEET_MANAGER')")
 public class MaintenanceController {
     
     @Autowired

@@ -2,6 +2,8 @@ package Group2.Car.Rental.System.controller;
 
 import Group2.Car.Rental.System.dto.FeedbackDTO;
 import Group2.Car.Rental.System.service.FeedbackService;
+import Group2.Car.Rental.System.service.VehiclePackageService;
+import Group2.Car.Rental.System.entity.VehiclePackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,9 @@ public class ViewController {
 
     @Autowired
     private FeedbackService feedbackService;
+    
+    @Autowired
+    private VehiclePackageService vehiclePackageService;
 
     @GetMapping("/login")
     public String login() {
@@ -52,6 +57,18 @@ public class ViewController {
         // This is a placeholder. In a real application, you would check if the user is
         // authenticated and redirect to login if not.
         return "dashboard";
+    }
+
+    @GetMapping("/packages")
+    public String packages(Model model) {
+        try {
+            List<VehiclePackage> activePackages = vehiclePackageService.getVisiblePackages();
+            model.addAttribute("packages", activePackages);
+        } catch (Exception e) {
+            model.addAttribute("packages", java.util.Collections.emptyList());
+            model.addAttribute("error", "Unable to load packages at this time. Please try again later.");
+        }
+        return "packages";
     }
 
     // Return the index page for the root path
