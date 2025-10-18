@@ -29,6 +29,96 @@ import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
+    /**
+     * List all bookings for admin/fleet use.
+     */
+    @Transactional(readOnly = true)
+    public java.util.List<Group2.Car.Rental.System.dto.BookingAdminSummaryDTO> getAllBookingsAdmin() {
+        java.util.List<Group2.Car.Rental.System.dto.BookingAdminSummaryDTO> list = new java.util.ArrayList<>();
+        // Fetch with associations and a stable order: newest first by createdAt then bookingId
+        java.util.List<Booking> bookings;
+        try {
+            bookings = bookingRepository.findAllByOrderByCreatedAtDescBookingIdDesc();
+        } catch (Exception ex) {
+            // Fallback if method not supported by db or createdAt nulls
+            bookings = bookingRepository.findAll();
+            // Sort in-memory as last resort
+            bookings.sort((a, b) -> {
+                java.time.LocalDateTime ca = a.getCreatedAt();
+                java.time.LocalDateTime cb = b.getCreatedAt();
+                int cmp = java.util.Objects.compare(cb, ca, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                if (cmp != 0) return cmp;
+                return java.util.Objects.compare(b.getBookingId(), a.getBookingId(), java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+            });
+        }
+        for (Booking b : bookings) {
+            Group2.Car.Rental.System.dto.BookingAdminSummaryDTO dto = new Group2.Car.Rental.System.dto.BookingAdminSummaryDTO();
+            dto.setBookingId(b.getBookingId());
+            dto.setBookingType(b.getBookingType());
+            dto.setBookingStatus(b.getBookingStatus());
+            dto.setStartDate(b.getStartDate());
+            dto.setEndDate(b.getEndDate());
+            dto.setCreatedAt(b.getCreatedAt());
+            dto.setTotalCost(b.getTotalCost());
+            if (b.getCustomer() != null) {
+                dto.setCustomerId(b.getCustomer().getUserId() != null ? b.getCustomer().getUserId().intValue() : null);
+                if (b.getCustomer().getUser() != null) {
+                    String first = b.getCustomer().getUser().getFirstName();
+                    String last = b.getCustomer().getUser().getLastName();
+                    dto.setCustomerName(((first != null ? first : "") + " " + (last != null ? last : "")).trim());
+                    dto.setCustomerEmail(b.getCustomer().getUser().getEmail());
+                }
+            }
+            if ("VEHICLE".equalsIgnoreCase(b.getBookingType()) && b.getVehicle() != null) {
+                dto.setVehicleId(b.getVehicle().getVehicleId());
+                dto.setVehicleMake(b.getVehicle().getMake());
+                dto.setVehicleModel(b.getVehicle().getModel());
+                dto.setRegistrationNumber(b.getVehicle().getRegistrationNumber());
+            }
+            if ("PACKAGE".equalsIgnoreCase(b.getBookingType()) && b.getVehiclePackage() != null) {
+                dto.setPackageId(b.getVehiclePackage().getPackageId());
+                dto.setPackageName(b.getVehiclePackage().getPackageName());
+            }
+            list.add(dto);
+        }
+        return list;
+    }
+
+    /**
+     * Delete a booking if it has no completed payment; otherwise return false.
+     */
+    @Transactional
+    public java.util.Map<String, Object> deleteBookingIfNoPayments(Integer bookingId) {
+        java.util.Map<String, Object> res = new java.util.HashMap<>();
+        java.util.Optional<Booking> opt = bookingRepository.findById(bookingId);
+        if (opt.isEmpty()) {
+            res.put("success", false);
+            res.put("message", "Booking not found");
+            return res;
+        }
+        Booking booking = opt.get();
+        Payment payment = paymentRepository.findByBooking(booking);
+        if (payment != null && "Completed".equalsIgnoreCase(payment.getPaymentStatus())) {
+            res.put("success", false);
+            res.put("message", "Cannot delete: payment exists");
+            return res;
+        }
+        // Safe to delete; also free vehicle if needed
+        try {
+            if (booking.getVehicle() != null) {
+                Vehicle v = booking.getVehicle();
+                v.setStatus("Available");
+                vehicleRepository.save(v);
+            }
+            bookingRepository.deleteById(bookingId);
+            res.put("success", true);
+            res.put("message", "Booking deleted");
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", "Error deleting: " + e.getMessage());
+        }
+        return res;
+    }
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -241,6 +331,11 @@ public class BookingService {
                 }
             }
 
+            // Also mark the package as temporarily unavailable so it can't be booked again immediately
+            // We keep it visible on the storefront, but without the ability to book
+            vehiclePackage.setStatus("Partially Reserved");
+            vehiclePackageRepository.save(vehiclePackage);
+
             // Create response
             BookingResponse bookingResponse = new BookingResponse(
                 savedBooking.getBookingId(),
@@ -372,6 +467,10 @@ public class BookingService {
                     vehicleRepository.save(packageVehicle);
                 }
             }
+
+            // Make package temporarily unavailable after successful booking with payment
+            vehiclePackage.setStatus("Partially Reserved");
+            vehiclePackageRepository.save(vehiclePackage);
 
             // Create response with both booking and payment details
             Map<String, Object> bookingPayload = new HashMap<>();
@@ -535,6 +634,9 @@ public class BookingService {
                         vehicleRepository.save(packageVehicle);
                     }
                 }
+                // Restore package availability when returned
+                vehiclePackage.setStatus("Activated");
+                vehiclePackageRepository.save(vehiclePackage);
                 response.put("message", "Package returned successfully - all vehicles are now available");
             }
 

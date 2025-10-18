@@ -17,7 +17,7 @@
         color: var(--text-luxury-light) !important;
         line-height: 1.6;
         min-height: 100vh;
-        padding-top: 80px;
+        padding-top: 20px;
         font-family: var(--font-luxury-secondary);
       }
 
@@ -25,6 +25,7 @@
         max-width: 1000px;
         margin: 0 auto;
         padding: 40px 20px;
+        padding-top: 20px;
       }
 
       /* Enhanced Navigation Styling */
@@ -34,6 +35,7 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
         padding: 1rem 0;
+        z-index: 1030 !important;
       }
 
       .navbar-brand-luxury {
@@ -76,7 +78,9 @@
       .payment-header {
         text-align: center;
         margin-bottom: 40px;
+        margin-top: 30px;
         position: relative;
+        z-index: 1010;
       }
 
       .payment-title {
@@ -91,6 +95,8 @@
         align-items: center;
         justify-content: center;
         gap: 20px;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
 
       .payment-title::before {
@@ -538,6 +544,8 @@
         font-weight: 600;
         border: 2px solid;
         position: relative;
+        z-index: 1020;
+        margin-top: 20px;
       }
 
       .message.error {
@@ -550,6 +558,29 @@
         background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(46, 204, 113, 0.05) 100%);
         color: #27ae60;
         border-color: rgba(46, 204, 113, 0.5);
+      }
+
+      /* Message Container Positioning */
+      #message-container {
+        position: relative;
+        z-index: 1020;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      #message-container .message {
+        animation: slideDown 0.3s ease-out;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* Responsive Design */
@@ -581,47 +612,11 @@
       </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
-      <div class="container">
-        <a class="navbar-brand-luxury" href="/dashboard">
-          <i class="fas fa-crown mr-2"></i> VeloRent Payment
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link-luxury" href="/feedback"><i class="fas fa-info-circle mr-1"></i>About Us</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
-            </li>
-          </ul>
-          <div class="auth-buttons">
-            <div class="dropdown">
-              <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
-                <i class="fas fa-user-circle mr-1"></i>
-                <span id="user-initials">U</span>
-              </button>
-              <div class="dropdown-menu" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury);">
-                <a class="dropdown-item hover-gold" href="#" id="logout-btn" style="color: var(--text-luxury-light); padding: 0.75rem 1rem;">
-                  <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+    
 
     <div class="container">
       <main>
-        <div id="message-container"></div>
+        <div id="message-container" style="margin-top: 20px; position: relative; z-index: 1020;"></div>
 
         <div class="payment-header">
           <h1 class="payment-title" id="payment-title">Complete Your Payment</h1>
@@ -792,7 +787,8 @@
           .map((n) => n.charAt(0))
           .join("")
           .toUpperCase();
-        document.getElementById("user-initials").textContent = userInitials;
+        const initialsEl = document.getElementById("user-initials");
+        if (initialsEl) initialsEl.textContent = userInitials;
 
         function setTotals(subtotal) {
           document.getElementById("subtotal").textContent = `Rs. ${Number(subtotal).toFixed(2)}`;
@@ -973,7 +969,46 @@
                 return;
               }
 
-              // Create package booking with payment in a single transaction
+              // If we already have a booking created (from packages page), process payment on it
+              const urlParams = new URLSearchParams(window.location.search);
+              const existingBookingId = urlParams.get('bookingId') || packageBookingData.bookingId;
+
+              if (existingBookingId) {
+                console.log('Processing payment for existing package booking:', existingBookingId);
+                const payRes = await fetch(`/api/bookings/package/${existingBookingId}/payment`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    paymentMethod,
+                    transactionId: paymentMethod === 'card' ? `CARD-${Date.now()}` : undefined
+                  })
+                });
+
+                const payText = await payRes.text();
+                console.log('Package payment response:', payText);
+                let payJson;
+                try { payJson = JSON.parse(payText); } catch(e) { throw new Error('Invalid payment response format'); }
+                if (!payRes.ok || !payJson.success) {
+                  throw new Error(payJson.message || 'Failed to process payment for booking');
+                }
+
+                showMessage(`Payment ${paymentMethod === 'card' ? 'completed' : 'recorded (pending)'}! Redirecting to dashboard...`, 'success');
+                // Clear local storage keys related to package flow
+                localStorage.removeItem('selectedPackage');
+                localStorage.removeItem('pendingPackageBooking');
+
+                setTimeout(() => {
+                  window.location.href = "/dashboard?message=" +
+                    encodeURIComponent(`Your package has been ${paymentMethod === 'card' ? 'confirmed' : 'placed and is pending payment'}.`) +
+                    "&type=success";
+                }, 1500);
+                return;
+              }
+
+              // Fallback: no existing booking, create booking with payment in one step
               console.log("Creating package booking with payment:", JSON.stringify(packageBookingData));
               const response = await fetch('/api/bookings/package/with-payment', {
                 method: 'POST',
@@ -1237,18 +1272,38 @@
         function showMessage(message, type) {
           const messageContainer = document.getElementById("message-container");
           messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
-
-          // Scroll to top to show message
+          
+          // Ensure the message container is visible
+          messageContainer.style.display = 'block';
+          messageContainer.style.position = 'relative';
+          messageContainer.style.zIndex = '1020';
+          
+          // Scroll to top to show message, accounting for fixed navbar
           window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+          // Auto-hide message after 5 seconds
+          setTimeout(() => {
+            const messageElement = messageContainer.querySelector('.message');
+            if (messageElement) {
+              messageElement.style.opacity = '0';
+              messageElement.style.transition = 'opacity 0.5s ease-out';
+              setTimeout(() => {
+                messageContainer.innerHTML = '';
+              }, 500);
+            }
+          }, 5000);
         }
 
 
         // Setup logout button
-        document.getElementById("logout-btn").addEventListener("click", (e) => {
-          e.preventDefault();
-          localStorage.clear();
-          window.location.href = "/login?message=" + encodeURIComponent("You have been logged out") + "&type=success";
-        });
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = "/login?message=" + encodeURIComponent("You have been logged out") + "&type=success";
+          });
+        }
       });
     </script>
 
