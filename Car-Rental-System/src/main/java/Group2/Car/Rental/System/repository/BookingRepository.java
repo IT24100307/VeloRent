@@ -4,6 +4,7 @@ import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Vehicle;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -94,9 +95,16 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
 
     @Query(value = "SELECT CAST(b.start_date AS DATE) as day, COUNT(DISTINCT b.vehicle_id) as usage " +
-        "FROM bookings b WHERE b.start_date >= :startDate AND b.booking_status = 'ACTIVE' " +
+        "FROM bookings b WHERE b.start_date >= :startDate AND b.booking_status IN ('Confirmed','Rented','Booked') " +
         "GROUP BY CAST(b.start_date AS DATE) ORDER BY day", nativeQuery = true)
     List<Object[]> getVehicleUsageByDay(@Param("startDate") LocalDateTime startDate);
+
+    // Count distinct vehicles that are in use (booked or rented) overlapping a time window
+    @Query("SELECT COUNT(DISTINCT b.vehicle.vehicleId) FROM Booking b " +
+        "WHERE b.vehicle IS NOT NULL AND b.startDate <= :end AND b.endDate >= :start " +
+        "AND b.bookingStatus IN ('Confirmed','Rented','Booked')")
+    Long countDistinctVehiclesInUseBetween(@Param("start") LocalDateTime start,
+                         @Param("end") LocalDateTime end);
 
     // Convenience queries for notifications
     List<Booking> findTop20ByBookingStatusOrderByCreatedAtDesc(String status);

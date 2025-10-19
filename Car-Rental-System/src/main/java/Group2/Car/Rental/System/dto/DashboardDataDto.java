@@ -20,6 +20,13 @@ public class DashboardDataDto {
     private List<Map<String, Object>> incomeData;
     private List<Map<String, Object>> maintenanceData;
     private List<Map<String, Object>> usageData;
+    // Totals (all time)
+    private double totalVehicleIncome;
+    private double totalPackageIncome;
+    private double totalMaintenanceCost;
+    // Monthly series for line chart
+    private List<Map<String, Object>> monthlyIncome; // keys: month (YYYY-MM), total, vehicleIncome, packageIncome
+    private List<Map<String, Object>> monthlyMaintenance; // keys: month (YYYY-MM), total
 
 
 }

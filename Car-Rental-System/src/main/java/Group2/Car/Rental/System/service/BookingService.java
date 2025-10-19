@@ -956,31 +956,33 @@ public class BookingService {
                     .filter(v -> "Maintenance".equals(v.getStatus()) || "Out of Service".equals(v.getStatus()))
                     .count();
             
-            // Get currently rented vehicles from active bookings
-            long currentlyRentedFromBookings = 0;
+            // Count reserved vehicles using vehicle status (Booked or Rented)
+            long currentlyReservedFromVehicleStatus = allVehicles.stream()
+                    .filter(v -> "Booked".equalsIgnoreCase(v.getStatus()) || "Rented".equalsIgnoreCase(v.getStatus()))
+                    .count();
+
+            // Fallback: also try to infer from active bookings if status data is unreliable
+            long activeFromBookings = 0;
             try {
-                // Count unique vehicles with active (Confirmed) bookings
-                currentlyRentedFromBookings = bookingRepository.findByBookingStatus("Confirmed").stream()
+                activeFromBookings = bookingRepository.findByBookingStatus("Confirmed").stream()
                         .filter(booking -> booking.getVehicle() != null)
-                        .filter(booking -> {
-                            LocalDateTime now = LocalDateTime.now();
-                            return booking.getStartDate().isBefore(now) && booking.getEndDate().isAfter(now);
-                        })
                         .map(booking -> booking.getVehicle().getVehicleId())
                         .distinct()
                         .count();
             } catch (Exception e) {
-                System.err.println("Error counting rented vehicles from bookings: " + e.getMessage());
+                System.err.println("Error counting reserved vehicles from bookings: " + e.getMessage());
             }
             
             stats.put("totalVehicles", totalVehicles);
             stats.put("availableVehicles", (int) availableFromVehicleStatus);
-            stats.put("currentlyRentedVehicles", (int) currentlyRentedFromBookings);
+            // Prefer status-based count; fall back to bookings-derived if zero
+            int reservedCount = (int) (currentlyReservedFromVehicleStatus > 0 ? currentlyReservedFromVehicleStatus : activeFromBookings);
+            stats.put("currentlyRentedVehicles", reservedCount);
             stats.put("maintenanceVehicles", (int) maintenanceFromVehicleStatus);
             
             System.out.println("Dashboard Stats - Total: " + totalVehicles + 
                              ", Available: " + availableFromVehicleStatus + 
-                             ", Currently Rented: " + currentlyRentedFromBookings + 
+                             ", Currently Reserved: " + reservedCount + 
                              ", Maintenance: " + maintenanceFromVehicleStatus);
                              
         } catch (Exception e) {

@@ -26,6 +26,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    @SuppressWarnings("unused")
     private final CustomerRepository customerRepository;
     private final StaffRepository staffRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,6 +34,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final TwoFactorAuthService twoFactorAuthService;
 
+    @SuppressWarnings("unused")
     private final Map<String, String> otpStore = new HashMap<>();
 
     public AuthService(UserRepository userRepository, RoleRepository roleRepository,
@@ -196,10 +198,12 @@ public class AuthService {
         // Determine the redirect URL based on role
         if (roleName.equals("ROLE_CUSTOMER")) {
             response.put("redirect", "/dashboard");
-        }else if (roleName.equals("ROLE_OWNER")) {
+        } else if (roleName.equals("ROLE_FLEET_MANAGER")) {
+            response.put("redirect", "/fleet-manager/dashboard");
+        } else if (roleName.equals("ROLE_OWNER")) {
             response.put("redirect", "/owner/dashboard");
         } else {
-            // For admin roles (ROLE_FLEET_MANAGER, ROLE_OWNER, ROLE_SYSTEM_ADMIN)
+            // Default for system admins
             response.put("redirect", "/admin/dashboard");
         }
 
