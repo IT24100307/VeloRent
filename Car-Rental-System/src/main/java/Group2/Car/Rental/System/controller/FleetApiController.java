@@ -1,10 +1,11 @@
 package Group2.Car.Rental.System.controller;
 
 import Group2.Car.Rental.System.dto.VehicleUsageHistoryDTO;
+import Group2.Car.Rental.System.dto.NotificationDTO;
 import Group2.Car.Rental.System.service.BookingService;
+import Group2.Car.Rental.System.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,9 @@ public class FleetApiController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Test endpoint to check if API is working
@@ -86,6 +90,21 @@ public class FleetApiController {
             java.util.Map<String, Object> error = new java.util.HashMap<>();
             error.put("error", "Unable to retrieve customer details");
             return ResponseEntity.ok(error);
+        }
+    }
+
+    /**
+     * Get aggregated recent notifications for the fleet manager dashboard
+     */
+    @GetMapping("/notifications")
+    public ResponseEntity<List<NotificationDTO>> getNotifications() {
+        try {
+            List<NotificationDTO> notifications = notificationService.getRecentNotifications();
+            return ResponseEntity.ok(notifications);
+        } catch (Exception e) {
+            System.err.println("Error building notifications: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.ok(java.util.Collections.emptyList());
         }
     }
 }
