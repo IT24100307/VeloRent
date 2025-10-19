@@ -16,6 +16,8 @@ import Group2.Car.Rental.System.repository.VehiclePackageRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
+import Group2.Car.Rental.System.entity.VehiclePackage;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -88,38 +90,51 @@ public class VehicleController {
     public ResponseEntity<?> deleteVehicle(@PathVariable Integer id) {
         return vehicleService.getVehicleById(id)
                 .map(vehicle -> {
-                    // Validate references before deletion
-                    Long bookingRefs = 0L;
-                    try {
-                        bookingRefs = bookingRepository.countBookingsByVehicle(id);
-                    } catch (Exception ignored) { }
-
-                    long maintenanceRefs = 0L;
-                    try {
-                        maintenanceRefs = maintenanceRecordRepository.countByVehicleId(id);
-                    } catch (Exception ignored) { }
-
-                    int packageRefs = 0;
-                    try {
-                        packageRefs = vehiclePackageRepository.findPackagesContainingVehicle(id).size();
-                    } catch (Exception ignored) { }
-
-                    if ((bookingRefs != null && bookingRefs > 0) || maintenanceRefs > 0 || packageRefs > 0) {
+                    // Only allow deleting vehicles that are currently Available
+                    if (vehicle.getStatus() == null || !"Available".equalsIgnoreCase(vehicle.getStatus())) {
                         Map<String, Object> body = new HashMap<>();
                         body.put("success", false);
-                        body.put("message", String.format(
-                                "Cannot delete vehicle because it is referenced by %d booking(s), %d maintenance record(s), and %d package(s). Remove these references first.",
-                                bookingRefs == null ? 0 : bookingRefs, maintenanceRefs, packageRefs));
+                        body.put("message", "Only vehicles with status 'Available' can be deleted.");
+                        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+                    }
+
+                    // Block deletion if there are active/pending bookings; ignore past/returned/cancelled
+                    long activeBookingRefs = 0L;
+                    for (String status : Arrays.asList("Confirmed", "Rented", "Booked", "ACTIVE")) {
+                        try {
+                            Long c = bookingRepository.countBookingsByVehicleAndStatus(id, status);
+                            activeBookingRefs += (c == null ? 0L : c);
+                        } catch (Exception ignored) { }
+                    }
+
+                    if (activeBookingRefs > 0) {
+                        Map<String, Object> body = new HashMap<>();
+                        body.put("success", false);
+                        body.put("message", "Cannot delete vehicle while it has active or pending bookings.");
                         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
                     }
 
                     try {
+                        // Detach from any packages to clear join table references
+                        try {
+                            for (VehiclePackage pkg : vehiclePackageRepository.findPackagesContainingVehicle(id)) {
+                                pkg.getVehicles().removeIf(v -> v.getVehicleId().equals(id));
+                                vehiclePackageRepository.save(pkg);
+                            }
+                        } catch (Exception ignored) { }
+
+                        // Delete maintenance records for this vehicle (safe cleanup)
+                        try {
+                            maintenanceRecordRepository.deleteByVehicleId(id);
+                        } catch (Exception ignored) { }
+
+                        // Finally delete the vehicle
                         vehicleService.deleteVehicle(id);
                         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                     } catch (DataIntegrityViolationException dive) {
                         Map<String, Object> body = new HashMap<>();
                         body.put("success", false);
-                        body.put("message", "Cannot delete vehicle due to existing references. Remove related bookings, maintenance records, and package associations first.");
+                        body.put("message", "Cannot delete vehicle due to existing references. Remove related bookings first.");
                         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
                     } catch (Exception e) {
                         Map<String, Object> body = new HashMap<>();

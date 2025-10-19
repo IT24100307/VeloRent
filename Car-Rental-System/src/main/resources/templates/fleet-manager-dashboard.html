@@ -118,9 +118,10 @@
         backdrop-filter: blur(10px);
         padding: 1.2rem 0;
         min-height: 80px;
-        z-index: 10000 !important;
+        z-index: 11000 !important; /* keep above page chrome */
         position: fixed;
         top: 0; left: 0; right: 0;
+        isolation: isolate; /* prevent pseudo elements from blending in */
     }
         .navbar-brand-luxury {
             font-size: 1.8rem !important;
@@ -137,11 +138,26 @@
             border-radius: var(--radius-luxury-small) !important;
             transition: var(--transition-smooth) !important;
             text-decoration: none !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent !important;
+            position: relative;
         }
 
         .nav-link-luxury:hover {
             background: rgba(212, 175, 55, 0.2) !important;
             color: var(--luxury-gold) !important;
+        }
+
+        /* Fix: remove global underline/after effect that causes a gold artifact in navbar */
+        .navbar-luxury .nav-link-luxury::after { content: none !important; display: none !important; }
+        .navbar-luxury .nav-link-luxury:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35);
+            background: rgba(212, 175, 55, 0.12) !important;
+            color: var(--luxury-gold) !important;
+            border-radius: var(--radius-luxury-small);
         }
 
         /* Luxury Cards */
@@ -1620,6 +1636,10 @@
                     : `<i class="fas fa-car"></i>`;
 
                 const row = document.createElement("tr");
+                const actionsHtml = vehicle.status === 'Available'
+                    ? `<button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>
+                       <button class="btn btn-danger" onclick="showDeleteConfirmation(${vehicle.vehicleId})"><i class="fas fa-trash"></i></button>`
+                    : `<button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>`;
                 row.innerHTML = `
                     <td>
                         <div class="vehicle-image">
@@ -1639,10 +1659,7 @@
                             `Rs. ${vehicle.rentalRatePerDay || '0.00'}`}
                     </td>
                     <td><span class="status-badge ${statusClass}">${vehicle.status || 'Unknown'}</span></td>
-                    <td class="action-buttons">
-                        <button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger" onclick="showDeleteConfirmation(${vehicle.vehicleId})"><i class="fas fa-trash"></i></button>
-                    </td>
+                    <td class="action-buttons">${actionsHtml}</td>
                 `;
                 vehiclesTableBody.appendChild(row);
             });
@@ -1698,6 +1715,10 @@
                     : `<i class="fas fa-car"></i>`;
 
                 const row = document.createElement("tr");
+                const actionsHtml = vehicle.status === 'Available'
+                    ? `<button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>
+                       <button class="btn btn-danger" onclick="showDeleteConfirmation(${vehicle.vehicleId})"><i class="fas fa-trash"></i></button>`
+                    : `<button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>`;
                 row.innerHTML = `
                     <td>
                         <div class="vehicle-image">
@@ -1717,10 +1738,7 @@
                             `Rs. ${vehicle.rentalRatePerDay || '0.00'}`}
                     </td>
                     <td><span class="status-badge ${statusClass}">${vehicle.status || 'Unknown'}</span></td>
-                    <td class="action-buttons">
-                        <button class="btn btn-accent" onclick="showEditVehicleModal(${vehicle.vehicleId})"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger" onclick="showDeleteConfirmation(${vehicle.vehicleId})"><i class="fas fa-trash"></i></button>
-                    </td>
+                    <td class="action-buttons">${actionsHtml}</td>
                 `;
                 vehiclesTableBody.appendChild(row);
             });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard | Car Rental System</title>
+  <title>Owner Dashboard | VeloRent</title>
   <link
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
           rel="stylesheet"
@@ -136,6 +136,52 @@
       justify-content: center;
       color: black;
     }
+
+    /* Owner KPI cards (premium look) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 8px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      position: relative;
+      padding: 22px 22px 18px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(212,175,55,0.28);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.02);
+      backdrop-filter: blur(4px);
+      transition: transform .2s ease, box-shadow .2s ease;
+      overflow: hidden;
+    }
+    .kpi-card:before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 14px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(212,175,55,0.55), rgba(255,255,255,0.04));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.45); }
+    .kpi-icon {
+      width: 42px; height: 42px; border-radius: 50%; display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(circle at 30% 30%, rgba(212,175,55,0.8), rgba(212,175,55,0.25));
+      color: #0b0b0b; box-shadow: inset 0 0 10px rgba(0,0,0,0.25);
+    }
+    .kpi-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .kpi-title { font-weight:700; letter-spacing:.4px; color: var(--luxury-gold); }
+    .kpi-value { font-size: 28px; font-weight: 800; color: #ffffff; margin: 2px 0 6px; }
+    .kpi-sub { font-size:12px; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing:.6px; }
+    .kpi-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; margin-top:8px; }
+    .kpi-chip.gold { background: rgba(212,175,55,0.15); color: #f2d16b; border:1px solid rgba(212,175,55,0.35); }
+    .kpi-chip.teal { background: rgba(22,160,133,0.15); color: #55d6c2; border:1px solid rgba(22,160,133,0.35); }
+    .kpi-chip.navy { background: rgba(11,61,145,0.15); color: #7fb2ff; border:1px solid rgba(11,61,145,0.35); }
   </style>
 </head>
 <body>
@@ -148,22 +194,26 @@
 </div>
 
 <header>
-  <nav class="container">
-    <div class="logo">
-      <i class="fas fa-crown mr-2"></i>VeloRent Admin
-    </div>
-    <div class="nav-links">
-      <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
-      <a href="#"><i class="fas fa-car mr-1"></i>Vehicles</a>
-      <a href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a>
-      <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
-      <a href="#"><i class="fas fa-chart-bar mr-1"></i>Reports</a>
-      <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
+  <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
+    <div class="container">
+      <a class="navbar-brand-luxury" href="/owner/dashboard"><i class="fas fa-crown mr-2"></i> VeloRent Admin</a>
+      <div class="collapse navbar-collapse" id="navbarOwner">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item"><a class="nav-link-luxury" href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/admin/payments"><i class="fas fa-credit-card mr-1"></i>Payments</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/bookings"><i class="fas fa-calendar-check mr-1"></i>Bookings</a></li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link-luxury" href="#" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
 </header>
 
-<main class="container content">
+<main class="container content" style="padding-top: 180px;">
   <div class="dashboard-header">
     <h1 class="dashboard-title">Owner Dashboard</h1>
     <div class="dashboard-actions">
@@ -173,65 +223,70 @@
     </div>
   </div>
 
-  <div class="container-fluid p-4">
-    <h1 class="text-center mb-4">Vehicle Rental Dashboard</h1>
+  <div class="container">
+    <h1 class="text-center mb-4" style="color: var(--luxury-gold); font-family: var(--font-luxury-primary);">Vehicle Rental Dashboard</h1>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-      <div class="col-md-3">
-        <div class="card text-white bg-primary">
-          <div class="card-body">
-            <h5 class="card-title">Customers</h5>
-            <h2 th:text="${data.customerCount}">0</h2>
-          </div>
-        </div>
+    <!-- Stats Cards (Luxury style to match Fleet) -->
+    <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 40px;">
+      <div class="luxury-card stat-card">
+        <h3 class="card-title"><i class="fas fa-users mr-2"></i>Customers</h3>
+        <div class="stat-number" id="owner-customers" th:text="${data.customerCount}">0</div>
       </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-success">
-          <div class="card-body">
-            <h5 class="card-title">Total Vehicles</h5>
-            <h2 th:text="${data.vehicleCount}">0</h2>
-          </div>
-        </div>
+      <div class="luxury-card stat-card">
+        <h3 class="card-title"><i class="fas fa-car mr-2"></i>Total Vehicles</h3>
+        <div class="stat-number" id="owner-total" th:text="${data.vehicleCount}">0</div>
+        <div class="stat-label">In Fleet</div>
       </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-warning">
-          <div class="card-body">
-            <h5 class="card-title">In Use</h5>
-            <h2 th:text="${data.inUseVehicleCount}">0</h2>
-          </div>
-        </div>
+      <div class="luxury-card stat-card">
+        <h3 class="card-title"><i class="fas fa-key mr-2"></i>In Use</h3>
+        <div class="stat-number" id="owner-inuse" th:text="${data.inUseVehicleCount}">0</div>
+        <div class="stat-label">Booked or Rented</div>
       </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-info">
-          <div class="card-body">
-            <h5 class="card-title">Available</h5>
-            <h2 th:text="${data.freeVehicleCount}">0</h2>
-          </div>
-        </div>
+      <div class="luxury-card stat-card">
+        <h3 class="card-title"><i class="fas fa-check-circle mr-2"></i>Available</h3>
+        <div class="stat-number" id="owner-available" th:text="${data.freeVehicleCount}">0</div>
+        <div class="stat-label">Ready to Rent</div>
       </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="row">
-      <!-- Line Chart: Income vs Maintenance -->
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header chartTit">Income & Maintenance Cost (Last 7 Days)</div>
-          <div class="card-body">
-            <canvas id="lineChart"></canvas>
-          </div>
+    <!-- Totals Row (All Time) -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-icon"><i class="fas fa-car"></i></div>
+          <div class="kpi-title">Total Vehicle Rental Income</div>
         </div>
+        <div class="kpi-value" id="total-vehicle-income">LKR 0.00</div>
+        <div class="kpi-sub">All time</div>
+        <div class="kpi-chip navy" id="vehicle-last7">Last 7 days: LKR 0.00</div>
       </div>
-      <!-- Bar Chart: Vehicle Usage -->
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header chartTit">Vehicle Usage (Last 7 Days)</div>
-          <div class="card-body">
-            <canvas id="barChart"></canvas>
-          </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-icon"><i class="fas fa-box"></i></div>
+          <div class="kpi-title">Total Package Income</div>
         </div>
+        <div class="kpi-value" id="total-package-income">LKR 0.00</div>
+        <div class="kpi-sub">All time</div>
+        <div class="kpi-chip gold" id="package-last7">Last 7 days: LKR 0.00</div>
       </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-icon"><i class="fas fa-tools"></i></div>
+          <div class="kpi-title">Total Maintenance Cost</div>
+        </div>
+        <div class="kpi-value" id="total-maintenance-cost">LKR 0.00</div>
+        <div class="kpi-sub">All time</div>
+        <div class="kpi-chip teal" id="maintenance-last7">Last 7 days: LKR 0.00</div>
+      </div>
+    </div>
+
+    <!-- Financial Overview: Last 30 Days Trend Line Chart -->
+    <div class="luxury-card" style="padding: 22px; margin-top: 6px;">
+      <h3 class="card-title">Financial Trend (Last 30 Days)</h3>
+      <p class="mb-2" style="opacity:.85">Income (Vehicle + Packages) vs Maintenance Cost</p>
+      <canvas id="monthlyTrendChart"></canvas>
     </div>
   </div>
 
@@ -240,80 +295,199 @@
 
 </main>
 <script th:inline="javascript">
-  if(! localStorage.getItem("userRole") || !localStorage.getItem("userRole").includes("OWNER")){
-    window.location.href = "/dashboard" ;
-  }
-  /*<![CDATA[*/
-  var data = /*[[${data}]]*/ {};
-  /*]]>*/
-
-  // Prepare labels and data for charts
-  var labels = [];
-  var incomeData = [];
-  var maintenanceData = [];
-  var usageData = [];
-
-  // Assuming data is populated for last 7 days, even if sparse
-  var today = new Date();
-  for (var i = 6; i >= 0; i--) {
-    var date = new Date(today);
-    date.setDate(date.getDate() - i);
-    var dateStr = date.toISOString().split('T')[0];
-    labels.push(dateStr);
-
-    var incomeDay = data.incomeData.find(d => d.day === dateStr) || {total: 0};
-    incomeData.push(incomeDay.total);
-
-    var maintDay = data.maintenanceData.find(d => d.day === dateStr) || {total: 0};
-    maintenanceData.push(maintDay.total);
-
-    var usageDay = data.usageData.find(d => d.day === dateStr) || {usage: 0};
-    usageData.push(usageDay.usage);
+  // Logout function
+  function handleLogout(e) {
+    e.preventDefault();
+    localStorage.clear();
+    window.location.href = "/login?message=" + encodeURIComponent("You have been logged out") + "&type=success";
   }
 
-  // Line Chart
-  var ctxLine = document.getElementById('lineChart').getContext('2d');
-  new Chart(ctxLine, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Income',
-        data: incomeData,
-        borderColor: 'green',
-        backgroundColor: 'rgba(0,255,0,0.1)',
-        tension: 0.1
-      }, {
-        label: 'Maintenance Cost',
-        data: maintenanceData,
-        borderColor: 'red',
-        backgroundColor: 'rgba(255,0,0,0.1)',
-        tension: 0.1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: { y: { beginAtZero: true } }
+  (function(){
+    if(! localStorage.getItem("userRole") || !localStorage.getItem("userRole").includes("OWNER")){
+      window.location.href = "/dashboard" ;
+      return;
     }
-  });
 
-  // Bar Chart
-  var ctxBar = document.getElementById('barChart').getContext('2d');
-  new Chart(ctxBar, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Vehicles in Use',
-        data: usageData,
-        backgroundColor: 'blue'
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: { y: { beginAtZero: true } }
+    const fallbackData = /*[[${data}]]*/ {};
+
+    function buildLast7DayLabels(){
+      // Build labels using LOCAL time to match server-side LocalDate strings (YYYY-MM-DD)
+      const pad = (n) => (n < 10 ? '0' + n : '' + n);
+      const toYMD = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      const labels=[]; const today = new Date();
+      for (let i=6;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); labels.push(toYMD(d)); }
+      return labels;
     }
-  });
+
+    function renderStats(d){
+      document.getElementById('owner-customers').textContent = d.customerCount || 0;
+      document.getElementById('owner-total').textContent = d.vehicleCount || 0;
+      document.getElementById('owner-inuse').textContent = d.inUseVehicleCount || 0;
+      document.getElementById('owner-available').textContent = d.freeVehicleCount || 0;
+    }
+
+    function renderCharts(d){
+      // No charts now; show formatted totals (all time)
+      const currency = new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR', maximumFractionDigits: 2 });
+      const safe = (v)=> Number.isFinite(Number(v)) ? Number(v) : 0;
+
+      function animateValue(el, end){
+        const duration = 900; // ms
+        const start = 0;
+        const startTime = performance.now();
+        function tick(now){
+          const p = Math.min(1, (now - startTime)/duration);
+          const val = start + (end - start)*p;
+          el.textContent = currency.format(val);
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      animateValue(document.getElementById('total-vehicle-income'), safe(d.totalVehicleIncome));
+      animateValue(document.getElementById('total-package-income'), safe(d.totalPackageIncome));
+      animateValue(document.getElementById('total-maintenance-cost'), safe(d.totalMaintenanceCost));
+
+      // Fill small chips with last-7-day context
+      const labels = buildLast7DayLabels();
+      const income = Array.isArray(d.incomeData) ? d.incomeData : [];
+      const maintenance = Array.isArray(d.maintenanceData) ? d.maintenanceData : [];
+      const findByDay = (arr, day) => arr.find(x => (x?.day ?? x?.date ?? x?.DAY) === day) || {};
+      const last7Vehicle = labels.reduce((s, day)=> s + safe(findByDay(income, day).vehicleIncome), 0);
+      const last7Package = labels.reduce((s, day)=> s + safe(findByDay(income, day).packageIncome), 0);
+      const last7Maint = labels.reduce((s, day)=> s + safe((findByDay(maintenance, day).total ?? findByDay(maintenance, day).cost)), 0);
+      document.getElementById('vehicle-last7').textContent = `Last 7 days: ${currency.format(last7Vehicle)}`;
+      document.getElementById('package-last7').textContent = `Last 7 days: ${currency.format(last7Package)}`;
+      document.getElementById('maintenance-last7').textContent = `Last 7 days: ${currency.format(last7Maint)}`;
+    }
+
+    fetch('/api/owner/dashboardData')
+      .then(r => r.ok ? r.json() : fallbackData)
+      .then(d => { 
+        console.log('Dashboard data received:', d); 
+        renderStats(d); 
+        renderCharts(d);
+  renderTotalsChart(d);
+  renderMonthlyTrend(d);
+      })
+      .catch(err => { 
+        console.error('Error fetching dashboard data:', err); 
+        renderStats(fallbackData); 
+        renderCharts(fallbackData); 
+      });
+  })();
+
+  function renderTotalsChart(d){
+    const ctx = document.getElementById('totalsChart');
+    if(!ctx) return;
+    const safe = (v)=> Number.isFinite(Number(v)) ? Number(v) : 0;
+    const currency = new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR', maximumFractionDigits: 2 });
+    const vehicle = safe(d.totalVehicleIncome);
+    const pack = safe(d.totalPackageIncome);
+    const incomeTotal = vehicle + pack;
+    const maintenanceTotal = safe(d.totalMaintenanceCost);
+
+    new Chart(ctx.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Total Income', 'Maintenance Cost'],
+        datasets: [{
+          label: 'All-time totals',
+          data: [incomeTotal, maintenanceTotal],
+          backgroundColor: [
+            'rgba(212,175,55,0.8)',
+            'rgba(22,160,133,0.8)'
+          ],
+          borderColor: [
+            '#d4af37',
+            '#16a085'
+          ],
+          borderWidth: 1.5,
+          borderRadius: 6,
+          maxBarThickness: 68
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: 10 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx){
+                const val = ctx.parsed.y ?? ctx.parsed ?? 0;
+                return `${ctx.label}: ${currency.format(val)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#e8e8e8' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: '#e8e8e8',
+              callback: (v)=> currency.format(v)
+            },
+            grid: { color: 'rgba(255,255,255,0.06)' }
+          }
+        }
+      }
+    });
+  }
+
+  function renderMonthlyTrend(d){
+    const ctx = document.getElementById('monthlyTrendChart');
+    if(!ctx) return;
+    const currency = new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR', maximumFractionDigits: 0 });
+    // Use last 30 daily points already delivered as incomeData (total) and maintenanceData(total)
+    const labels = (Array.isArray(d.incomeData) ? d.incomeData : []).map(x => x.day);
+    const incomeData = labels.map(day => {
+      const r = (d.incomeData||[]).find(x=>x.day===day);
+      return (r?.total) ?? (Number(r?.vehicleIncome||0)+Number(r?.packageIncome||0));
+    })
+    const maintData = labels.map(day => (d.maintenanceData||[]).find(x=>x.day===day)?.total ?? 0);
+
+    new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Income',
+            data: incomeData,
+            borderColor: '#0b3d91',
+            backgroundColor: 'rgba(11,61,145,0.08)',
+            tension: 0.35,
+            pointRadius: 0,
+            borderWidth: 3
+          },
+          {
+            label: 'Maintenance',
+            data: maintData,
+            borderColor: '#16a085',
+            backgroundColor: 'rgba(22,160,133,0.08)',
+            tension: 0.35,
+            pointRadius: 0,
+            borderWidth: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        layout: { padding: 10 },
+        plugins: {
+          legend: { labels: { color: '#f1f1f1' } },
+          tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${currency.format(ctx.parsed.y||0)}` } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color:'#dcdcdc', callback: (v, i) => labels[i].slice(5) } },
+          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color:'#dcdcdc', callback:(v)=> currency.format(v) } }
+        }
+      }
+    });
+  }
 </script>
 
 <!-- Luxury Theme JavaScript -->
