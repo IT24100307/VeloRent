@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
     <!-- Luxury Theme CSS -->
     <link rel="stylesheet" href="/css/luxury-theme.css" />
+    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
     <style>
         /* Luxury Theme CSS Variables */
         :root {
@@ -1171,7 +1172,7 @@
                 <p class="welcome-message" style="font-size: 1.3rem; color: var(--text-luxury-light); margin-bottom: 10px;">
                     Welcome to the Fleet Management Dashboard, <span id="user-name" style="color: var(--luxury-gold); font-weight: 700;">Fleet Manager</span>!
                 </p>
-                <span id="user-role" style="font-size: 1rem; color: var(--text-luxury-muted); font-weight: 500;">Your role: Fleet Manager</span>
+                <span id="user-role" style="font-size: 14px; color: var(--light-text);font-weight: 500;">Your role: <span id="roleView"></span></span>
             </div>
 
             <!-- Dashboard Stats -->
@@ -1469,10 +1470,11 @@
 
             const userRole = localStorage.getItem("userRole");
             // Check if user has the Fleet Manager role
-            if (!userRole || !(userRole.includes("FLEET_MANAGER") || userRole.includes("FLEETMANAGER"))) {
+            if (!userRole || !(userRole.includes("FLEET_MANAGER") || userRole.includes("FLEETMANAGER")|| userRole.includes("OWNER"))) {
                 window.location.href = "/dashboard?message=" + encodeURIComponent("You do not have permission to access this page") + "&type=error";
                 return;
             }
+            $('#roleView').html(userRole.replace("ROLE_","").replace("_"," "));
 
             // Update user information
             const userName = localStorage.getItem("userName") || "User";

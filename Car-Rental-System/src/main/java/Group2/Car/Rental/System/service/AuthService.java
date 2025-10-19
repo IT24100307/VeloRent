@@ -196,6 +196,8 @@ public class AuthService {
         // Determine the redirect URL based on role
         if (roleName.equals("ROLE_CUSTOMER")) {
             response.put("redirect", "/dashboard");
+        }else if (roleName.equals("ROLE_OWNER")) {
+            response.put("redirect", "/owner/dashboard");
         } else {
             // For admin roles (ROLE_FLEET_MANAGER, ROLE_OWNER, ROLE_SYSTEM_ADMIN)
             response.put("redirect", "/admin/dashboard");
@@ -282,6 +284,8 @@ public class AuthService {
             response.put("redirect", "/dashboard");
         } else if (roleName.equals("ROLE_FLEET_MANAGER")) {
             response.put("redirect", "/fleet-manager/dashboard");
+        }else if (roleName.equals("ROLE_OWNER")) {
+            response.put("redirect", "/owner/dashboard");
         } else {
             // For admin roles (ROLE_OWNER, ROLE_SYSTEM_ADMIN)
             response.put("redirect", "/admin/dashboard");

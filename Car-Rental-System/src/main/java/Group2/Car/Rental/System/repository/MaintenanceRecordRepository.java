@@ -33,4 +33,10 @@ public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRe
     
     // Find all maintenance records ordered by date
     List<MaintenanceRecord> findAllByOrderByMaintenanceDateDesc();
+
+//    @Query("SELECT DATE(m.maintenanceDate) as day, SUM(m.cost) as total FROM MaintenanceRecord m WHERE m.maintenanceDate >= :startDate GROUP BY DATE(m.maintenanceDate) ORDER BY m.maintenanceDate")
+    @Query(value = "SELECT CAST(m.maintenance_date AS DATE) as day, SUM(m.cost) as total " +
+        "FROM maintenance_records m WHERE m.maintenance_date >= :startDate " +
+        "GROUP BY CAST(m.maintenance_date AS DATE) ORDER BY day", nativeQuery = true)
+    List<Object[]> getMaintenanceCostByDay(@Param("startDate") LocalDate startDate);
 }

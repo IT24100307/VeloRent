@@ -122,8 +122,12 @@ async function handleLogin(event) {
                     const params = getQueryParams();
                     let redirectUrl = params.returnUrl ? decodeURIComponent(params.returnUrl) : '/dashboard';
 
-                    // If no return URL specified, determine redirect URL based on user role
-                    if (!params.returnUrl) {
+
+                    if(response.data.redirect){
+                        // If redirect url get from response
+                        redirectUrl = response.data.redirect
+                    }else if (!params.returnUrl ) {
+                        // If no return URL specified, determine redirect URL based on user role
                         if (response.data.role) {
                             const role = response.data.role;
                             if (role.includes('FLEET_MANAGER')) {

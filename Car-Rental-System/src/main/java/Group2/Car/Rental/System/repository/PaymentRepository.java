@@ -4,9 +4,11 @@ import Group2.Car.Rental.System.entity.Payment;
 import Group2.Car.Rental.System.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -26,4 +28,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
     @Query("SELECT p.paymentStatus, COUNT(p) FROM Payment p GROUP BY p.paymentStatus")
     List<Object[]> countByStatus();
+
+    //@Query("SELECT DATE(p.paymentDate) as day, SUM(p.amount) as total FROM Payment p WHERE p.paymentDate >= :startDate GROUP BY DATE(p.paymentDate) ORDER BY p.paymentDate")
+    @Query(value = "SELECT CAST(p.payment_date AS DATE) as day, SUM(p.amount) as total " +
+            "FROM payments p WHERE p.payment_date >= :startDate " +
+            "GROUP BY CAST(p.payment_date AS DATE) ORDER BY day", nativeQuery = true)
+    List<Object[]> getIncomeByDay(@Param("startDate") LocalDateTime startDate);
 }

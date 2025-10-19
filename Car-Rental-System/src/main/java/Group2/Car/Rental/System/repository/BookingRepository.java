@@ -87,6 +87,17 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
            "ORDER BY COUNT(b.booking_id) DESC", nativeQuery = true)
     String getMostFrequentCustomerByVehicle(@Param("vehicleId") Integer vehicleId);
 
+
+    // Eagerly fetch associations for admin/fleet listing and order by created date desc then id desc
+    @EntityGraph(attributePaths = {"customer", "customer.user", "vehicle", "vehiclePackage"})
+    List<Booking> findAllByOrderByCreatedAtDescBookingIdDesc();
+
+
+    @Query(value = "SELECT CAST(b.start_date AS DATE) as day, COUNT(DISTINCT b.vehicle_id) as usage " +
+        "FROM bookings b WHERE b.start_date >= :startDate AND b.booking_status = 'ACTIVE' " +
+        "GROUP BY CAST(b.start_date AS DATE) ORDER BY day", nativeQuery = true)
+    List<Object[]> getVehicleUsageByDay(@Param("startDate") LocalDateTime startDate);
+
     // Convenience queries for notifications
     List<Booking> findTop20ByBookingStatusOrderByCreatedAtDesc(String status);
 
@@ -94,4 +105,5 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     // Upcoming confirmed bookings starting within a window (for countdown notifications)
     List<Booking> findTop20ByBookingStatusAndStartDateBetweenOrderByStartDateAsc(String status, LocalDateTime from, LocalDateTime to);
+
 }

@@ -1,6 +1,8 @@
 package Group2.Car.Rental.System.controller;
 
+import Group2.Car.Rental.System.dto.DashboardDataDto;
 import Group2.Car.Rental.System.dto.FeedbackDTO;
+import Group2.Car.Rental.System.service.DashboardService;
 import Group2.Car.Rental.System.service.FeedbackService;
 import Group2.Car.Rental.System.service.VehiclePackageService;
 import Group2.Car.Rental.System.entity.VehiclePackage;
@@ -21,6 +23,9 @@ public class ViewController {
     
     @Autowired
     private VehiclePackageService vehiclePackageService;
+
+    @Autowired
+    private DashboardService dashboardService;
 
     @GetMapping("/login")
     public String login() {
@@ -149,5 +154,12 @@ public class ViewController {
     @GetMapping("/admin/payments")
     public String adminPayments() {
         return "admin/payments";
+    }
+
+    @GetMapping("/owner/dashboard")
+    public String dashboard(Model model) {
+        DashboardDataDto data = dashboardService.getDashboardData();
+        model.addAttribute("data", data);
+        return "/owner/dashboard"; // Thymeleaf template
     }
 }

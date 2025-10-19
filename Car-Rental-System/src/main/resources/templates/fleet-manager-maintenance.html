@@ -826,7 +826,7 @@
             }
 
             const userRole = localStorage.getItem("userRole");
-            if (!userRole || !(userRole.includes("FLEET_MANAGER") || userRole.includes("FLEETMANAGER"))) {
+            if (!userRole || !(userRole.includes("FLEET_MANAGER") || userRole.includes("FLEETMANAGER") || userRole.includes("OWNER"))) {
                 window.location.href = "/dashboard?message=" + encodeURIComponent("You do not have permission to access this page") + "&type=error";
                 return;
             }
