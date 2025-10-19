@@ -3,7 +3,6 @@ package Group2.Car.Rental.System.repository;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Vehicle;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -88,13 +87,23 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
            "ORDER BY COUNT(b.booking_id) DESC", nativeQuery = true)
     String getMostFrequentCustomerByVehicle(@Param("vehicleId") Integer vehicleId);
 
+
     // Eagerly fetch associations for admin/fleet listing and order by created date desc then id desc
     @EntityGraph(attributePaths = {"customer", "customer.user", "vehicle", "vehiclePackage"})
     List<Booking> findAllByOrderByCreatedAtDescBookingIdDesc();
 
-//    @Query("SELECT DATE(b.startDate) as day, COUNT(DISTINCT b.vehicle) as usage FROM Booking b WHERE b.startDate >= :startDate AND b.bookingStatus = 'Confirmed' GROUP BY DATE(b.startDate) ORDER BY b.startDate")
+
     @Query(value = "SELECT CAST(b.start_date AS DATE) as day, COUNT(DISTINCT b.vehicle_id) as usage " +
         "FROM bookings b WHERE b.start_date >= :startDate AND b.booking_status = 'ACTIVE' " +
         "GROUP BY CAST(b.start_date AS DATE) ORDER BY day", nativeQuery = true)
     List<Object[]> getVehicleUsageByDay(@Param("startDate") LocalDateTime startDate);
+
+    // Convenience queries for notifications
+    List<Booking> findTop20ByBookingStatusOrderByCreatedAtDesc(String status);
+
+    List<Booking> findTop20ByBookingStatusOrderByBookingIdDesc(String status);
+
+    // Upcoming confirmed bookings starting within a window (for countdown notifications)
+    List<Booking> findTop20ByBookingStatusAndStartDateBetweenOrderByStartDateAsc(String status, LocalDateTime from, LocalDateTime to);
+
 }

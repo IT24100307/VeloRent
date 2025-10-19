@@ -35,22 +35,16 @@ public class BookingService {
     @Transactional(readOnly = true)
     public java.util.List<Group2.Car.Rental.System.dto.BookingAdminSummaryDTO> getAllBookingsAdmin() {
         java.util.List<Group2.Car.Rental.System.dto.BookingAdminSummaryDTO> list = new java.util.ArrayList<>();
-        // Fetch with associations and a stable order: newest first by createdAt then bookingId
-        java.util.List<Booking> bookings;
-        try {
-            bookings = bookingRepository.findAllByOrderByCreatedAtDescBookingIdDesc();
-        } catch (Exception ex) {
-            // Fallback if method not supported by db or createdAt nulls
-            bookings = bookingRepository.findAll();
-            // Sort in-memory as last resort
-            bookings.sort((a, b) -> {
-                java.time.LocalDateTime ca = a.getCreatedAt();
-                java.time.LocalDateTime cb = b.getCreatedAt();
-                int cmp = java.util.Objects.compare(cb, ca, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
-                if (cmp != 0) return cmp;
-                return java.util.Objects.compare(b.getBookingId(), a.getBookingId(), java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
-            });
-        }
+        // Fetch all bookings and sort them
+        java.util.List<Booking> bookings = bookingRepository.findAll();
+        // Sort in-memory: newest first by createdAt then bookingId
+        bookings.sort((a, b) -> {
+            java.time.LocalDateTime ca = a.getCreatedAt();
+            java.time.LocalDateTime cb = b.getCreatedAt();
+            int cmp = java.util.Objects.compare(cb, ca, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+            if (cmp != 0) return cmp;
+            return java.util.Objects.compare(b.getBookingId(), a.getBookingId(), java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+        });
         for (Booking b : bookings) {
             Group2.Car.Rental.System.dto.BookingAdminSummaryDTO dto = new Group2.Car.Rental.System.dto.BookingAdminSummaryDTO();
             dto.setBookingId(b.getBookingId());

@@ -991,70 +991,78 @@
             box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            body {
-                padding-top: 100px;
-            }
-            
-            .dashboard-title {
-                font-size: 1.8rem !important;
-                flex-direction: column;
-                gap: 10px !important;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr !important;
-            }
-
-            .dashboard-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .table-responsive {
-                overflow-x: auto;
-            }
-
-            th, td {
-                padding: 10px;
-            }
-            
-            .modal-content {
-                width: 95% !important;
-                margin: 2% auto !important;
-                padding: 20px !important;
-                max-height: 95vh !important;
-            }
-            
-            .navbar-luxury {
-                padding: 0.8rem 0;
-                min-height: 70px;
-            }
+        /* Notifications */
+        .notifications-wrapper { position: relative; }
+        .notification-bell {
+            background: transparent;
+            color: var(--text-luxury-light);
+            border: 2px solid var(--luxury-gold);
+            border-radius: var(--radius-luxury-small);
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
         }
-
+        .notification-bell:hover { background: rgba(212, 175, 55, 0.2); color: var(--luxury-gold); }
+        .notification-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50%;
+            width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700;
+            box-shadow: 0 0 0 2px var(--luxury-charcoal);
+        }
+        .notifications-dropdown {
+            position: absolute;
+            right: 0;
+            top: 150%;
+            width: 360px;
+            max-height: 420px;
+            overflow-y: auto;
+            background: var(--luxury-dark);
+            border: 1px solid rgba(212,175,55,0.25);
+            border-radius: var(--radius-luxury);
+            box-shadow: var(--shadow-luxury);
+            display: none;
+            z-index: 12000;
+        }
+        .notifications-dropdown.open { display: block; }
+        .notif-header { display:flex; align-items:center; justify-content:space-between; gap:8px; padding: 12px 14px; border-bottom: 1px solid rgba(212,175,55,0.2); color: var(--luxury-gold); font-weight: 700; }
+        .notif-list { list-style: none; margin: 0; padding: 0; }
+        .notif-item { display: flex; gap: 10px; padding: 12px 14px; border-bottom: 1px solid rgba(212,175,55,0.12); align-items: flex-start; }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item i { width: 22px; text-align: center; font-size: 16px; margin-top: 2px; }
+        .notif-content { flex: 1; }
+        .notif-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .notif-title { font-weight: 600; font-size: 0.95rem; }
+        .notif-message { color: var(--text-luxury-muted); font-size: 0.85rem; margin-top: 2px; }
+        .notif-time { color: var(--text-luxury-muted); font-size: 0.75rem; margin-top: 6px; }
+        .notif-empty { padding: 16px; color: var(--text-luxury-muted); text-align: center; }
+        .notif-success { color: #2ecc71; }
+        .notif-danger { color: #e74c3c; }
+        .notif-warning { color: #f1c40f; }
+        /* Mark all read button */
+        .mark-all-btn { background: transparent; color: var(--text-luxury-light); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 4px 8px; font-size: 12px; display:flex; align-items:center; gap:6px; cursor:pointer; transition: var(--transition-smooth); }
+        .mark-all-btn i { color: var(--luxury-gold); }
+        .mark-all-btn:hover { background: rgba(212, 175, 55, 0.12); color: var(--luxury-gold); }
+        /* Unread styling */
+        .notif-item.is-unread .notif-title { font-weight: 800; }
+        .notif-item.is-unread .notif-message { color: #cbd5e1; }
+        /* Pin button */
+        .pin-btn { background: transparent; border: 1px solid rgba(212,175,55,0.25); color: var(--text-luxury-light); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.75rem; line-height: 1; display: inline-flex; align-items: center; gap: 6px; }
+        .pin-btn:hover { background: rgba(212,175,55,0.12); color: var(--luxury-gold); }
+        .pin-btn.pin-active { color: var(--luxury-gold); border-color: var(--luxury-gold); }
         @media (max-width: 576px) {
-            .dashboard-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .dashboard-actions {
-                flex-direction: column;
-            }
-
-            .dashboard-actions .btn {
-                width: 100%;
-            }
-            
-            .dashboard-title {
-                font-size: 1.5rem !important;
-            }
-            
-            .page-header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
+            .notifications-dropdown { width: 92vw; right: -10px; }
         }
+
+        /* Booking Details Modal */
+        .notif-item.is-clickable { cursor: pointer; }
+        .detail-label { color: var(--text-luxury-muted); font-size: 0.9rem; }
+        .detail-value { color: var(--text-luxury-light); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -1094,6 +1102,25 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav">
+                    <!-- Notifications Bell -->
+                    <li class="nav-item notifications-wrapper" style="margin-right: 12px;">
+                        <button id="notif-bell" class="notification-bell" aria-label="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span id="notif-count" class="notification-count" style="display:none;">0</span>
+                        </button>
+                        <div id="notif-dropdown" class="notifications-dropdown">
+                            <div class="notif-header">
+                                <div><i class="fas fa-bell mr-1"></i> Notifications</div>
+                                <button id="mark-all-read" class="mark-all-btn" title="Mark all as read">
+                                    <i class="fas fa-check-double"></i>
+                                    <span>Mark all</span>
+                                </button>
+                            </div>
+                             <ul id="notif-list" class="notif-list">
+                                 <li class="notif-empty">Loading...</li>
+                             </ul>
+                         </div>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link-luxury" href="#" onclick="handleLogout(event)" style="color: var(--text-luxury-light) !important; transition: var(--transition-smooth);" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
                             <i class="fas fa-sign-out-alt mr-1"></i>Logout
@@ -1381,9 +1408,50 @@
             </div>
         </div>
 
-        <footer>
+        <!-- Booking Details Modal -->
+        <div id="booking-details-modal" class="modal" style="display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);">
+            <div class="modal-content" style="background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-black) 100%); margin: 5% auto; padding: 30px; border-radius: var(--radius-luxury-large); width: 90%; max-width: 720px; border: 2px solid rgba(212, 175, 55, 0.3); box-shadow: var(--shadow-luxury); position: relative; overflow: hidden;">
+                <div style="content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-gold);"></div>
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+                    <h2 class="modal-title" style="color: var(--luxury-gold); font-family: var(--font-luxury-primary); font-weight: 700; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; margin: 0;"><i class="fas fa-hourglass-half mr-2"></i> Booking Starts Soon</h2>
+                    <span class="close" id="close-booking-details" style="color: var(--luxury-gold); font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                </div>
+                <div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background: rgba(212, 175, 55, 0.06); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 10px; padding: 16px;">
+                            <div style="color: var(--luxury-gold); font-weight: 700; margin-bottom: 10px;">Vehicle</div>
+                            <div><span class="detail-label">ID:</span> <span class="detail-value" id="bdVehicleId">-</span></div>
+                            <div><span class="detail-label">Make:</span> <span class="detail-value" id="bdMake">Loading...</span></div>
+                            <div><span class="detail-label">Model:</span> <span class="detail-value" id="bdModel">Loading...</span></div>
+                            <div><span class="detail-label">Registration:</span> <span class="detail-value" id="bdReg">Loading...</span></div>
+                            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+                                <div class="vehicle-image" style="width: 120px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2); background: rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;">
+                                    <img id="bdImage" src="" alt="Vehicle" style="max-width: 100%; max-height: 100%; display:none;"/>
+                                    <i id="bdImageIcon" class="fas fa-image" style="color: var(--text-luxury-muted);"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(212, 175, 55, 0.06); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 10px; padding: 16px;">
+                            <div style="color: var(--luxury-gold); font-weight: 700; margin-bottom: 10px;">Customer</div>
+                            <div><span class="detail-label">Name:</span> <span class="detail-value" id="bdCustName">Loading...</span></div>
+                            <div><span class="detail-label">Email:</span> <span class="detail-value" id="bdCustEmail">Loading...</span></div>
+                            <div><span class="detail-label">Phone:</span> <span class="detail-value" id="bdCustPhone">Loading...</span></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; background: rgba(0,0,0,0.2); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 10px; padding: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                        <div><div class="detail-label">Booking ID</div><div class="detail-value" id="bdBookingId">-</div></div>
+                        <div><div class="detail-label">Start</div><div class="detail-value" id="bdStart">-</div></div>
+                        <div><div class="detail-label">End</div><div class="detail-value" id="bdEnd">-</div></div>
+                        <div><div class="detail-label">Total</div><div class="detail-value" id="bdTotal">-</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Removed duplicate simple footer here to avoid two footers on the page -->
+        <!-- <footer>
             <p>&copy; 2025 Car Rental System. All rights reserved.</p>
-        </footer>
+        </footer> -->
     </div>
 
     <script>
@@ -1821,7 +1889,7 @@
                 if (progressElement) {
                     progressElement.style.display = 'none';
                 }
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -1829,16 +1897,16 @@
             })
             .then(data => {
                 console.log('Upload response data:', data);
-                
+
                 if (data.success) {
                     // Update preview with full URL
                     const fullImageUrl = window.location.origin + data.fileUrl;
                     console.log('Full image URL:', fullImageUrl);
                     updateImagePreview(fullImageUrl, previewId);
-                    
+
                     // Set hidden URL field
-                    const hiddenInput = formType === 'add' ? 
-                        document.getElementById('imageUrl') : 
+                    const hiddenInput = formType === 'add' ?
+                        document.getElementById('imageUrl') :
                         document.getElementById('edit-imageUrl');
                     if (hiddenInput) {
                         hiddenInput.value = data.fileUrl;
@@ -1846,7 +1914,7 @@
                     } else {
                         console.error('Hidden input not found');
                     }
-                    
+
                     // Update file label
                     const label = fileInput.nextElementSibling;
                     if (label) {
@@ -1856,7 +1924,7 @@
                             label.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
                         }
                     }
-                    
+
                     showMessage('Image uploaded successfully!', 'success');
                 } else {
                     console.error('Upload failed:', data);
@@ -1988,17 +2056,27 @@
             fetch(`/api/vehicles/${vehicleIdToDelete}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
                 }
             })
-            .then(response => {
+            .then(async (response) => {
                 deleteButton.innerHTML = originalButtonText;
                 deleteButton.disabled = false;
 
                 if (!response.ok) {
-                    throw new Error('Failed to delete vehicle');
+                    let errorMessage = 'Failed to delete vehicle';
+                    try {
+                        const data = await response.json();
+                        if (data && (data.message || data.error)) {
+                            errorMessage = data.message || data.error;
+                        }
+                    } catch (e) { /* ignore JSON parse errors */ }
+                    throw new Error(errorMessage);
                 }
-
+                return null;
+            })
+            .then(() => {
                 closeDeleteModal();
                 fetchVehicles();
                 showMessage("Vehicle deleted successfully!", "success");
@@ -2006,7 +2084,7 @@
             .catch(error => {
                 console.error('Error deleting vehicle:', error);
                 closeDeleteModal();
-                showMessage("Failed to delete vehicle. Please try again.", "error");
+                showMessage(error.message || "Failed to delete vehicle. Please try again.", "error");
 
                 deleteButton.innerHTML = originalButtonText;
                 deleteButton.disabled = false;
@@ -2023,17 +2101,17 @@
         // Page loader functionality
         document.addEventListener('DOMContentLoaded', function() {
             const loader = document.querySelector('.page-loader');
-            
+
             // Initialize user info
             const userName = localStorage.getItem('userName') || 'Fleet Manager';
             const userEmail = localStorage.getItem('userEmail') || 'fleet@velorent.com';
             const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-            
+
             document.getElementById('user-name').textContent = userName;
             document.getElementById('user-name-dropdown').textContent = userName;
             document.getElementById('user-email-dropdown').textContent = userEmail;
             document.getElementById('user-initials').textContent = userInitials;
-            
+
             // Hide loader after content is loaded
             setTimeout(() => {
                 if (loader) {
@@ -2044,6 +2122,428 @@
                 }
             }, 1000);
         });
+
+        // Notifications logic
+        const notifState = { open: false, items: [], lastFetch: 0 };
+        const READ_STORAGE_KEY = 'fm_notif_read_keys';
+        let notifReadSet = loadReadSet();
+        // NEW: pinned notifications local storage
+        const PIN_STORAGE_KEY = 'fm_notif_pinned_keys';
+        let notifPinnedSet = loadPinnedSet();
+        // Auto-refresh controls
+        let notifAutoTimer = null;
+        let notifFetchInFlight = false;
+        const NOTIF_POLL_MS = 15000; // 15s polling
+
+        function getNotifKey(n){
+            return (n && (n.id || n.key || `${n.title||''}|${n.message||''}|${n.timestamp||''}`)).toString();
+        }
+        function loadReadSet(){
+            try { return new Set(JSON.parse(localStorage.getItem(READ_STORAGE_KEY) || '[]')); }
+            catch(e){ return new Set(); }
+        }
+        function saveReadSet(){
+            try { localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(Array.from(notifReadSet))); } catch(e){}
+        }
+        // NEW pinned helpers
+        function loadPinnedSet(){
+            try { return new Set(JSON.parse(localStorage.getItem(PIN_STORAGE_KEY) || '[]')); }
+            catch(e){ return new Set(); }
+        }
+        function savePinnedSet(){
+            try { localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(Array.from(notifPinnedSet))); } catch(e){}
+        }
+        function togglePin(key){
+            if (!key) return;
+            if (notifPinnedSet.has(key)) notifPinnedSet.delete(key); else notifPinnedSet.add(key);
+            savePinnedSet();
+            renderNotifications();
+        }
+        function markAllAsRead(){
+            (notifState.items || []).forEach(n => notifReadSet.add(getNotifKey(n)));
+            saveReadSet();
+            renderNotifications();
+        }
+        function startNotifAutoRefresh(){
+            stopNotifAutoRefresh();
+            // Fetch immediately to prime UI
+            fetchNotifications({ silent: true });
+            notifAutoTimer = setInterval(() => {
+                // Skip if dropdown recently fetched but still refresh to keep badge fresh
+                fetchNotifications({ silent: true });
+            }, NOTIF_POLL_MS);
+        }
+        function stopNotifAutoRefresh(){
+            if (notifAutoTimer) {
+                clearInterval(notifAutoTimer);
+                notifAutoTimer = null;
+            }
+        }
+
+        function toggleNotifDropdown(force) {
+            const dropdown = document.getElementById('notif-dropdown');
+            const isOpen = typeof force === 'boolean' ? force : !notifState.open;
+            notifState.open = isOpen;
+            dropdown.classList.toggle('open', isOpen);
+            if (isOpen) {
+                // Always re-render to re-arm countdown even if we don't fetch
+                renderNotifications();
+                // Refresh when opened if older than 10s
+                if (!notifState.lastFetch || Date.now() - notifState.lastFetch > 10000) {
+                    fetchNotifications({ silent: false });
+                }
+            }
+        }
+
+        function fetchNotifications(options) {
+            const opts = options || {};
+            const list = document.getElementById('notif-list');
+            // Show loading only when dropdown is open and caller didn't request silent fetch
+            if (notifState.open && !opts.silent) {
+                list.innerHTML = '<li class="notif-empty">Loading...</li>';
+            }
+            if (notifFetchInFlight) return; // prevent overlapping fetches
+            notifFetchInFlight = true;
+            const token = localStorage.getItem('token');
+            fetch('/api/fleet/notifications', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(r => r.ok ? r.json() : [])
+            .then(items => {
+                notifState.items = Array.isArray(items) ? items : [];
+                notifState.lastFetch = Date.now();
+                renderNotifications();
+            })
+            .catch(() => {
+                if (notifState.open) {
+                    list.innerHTML = '<li class="notif-empty">Failed to load notifications</li>';
+                }
+            })
+            .finally(() => {
+                notifFetchInFlight = false;
+             });
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            list.innerHTML = '';
+            const countEl = document.getElementById('notif-count');
+            const items = notifState.items;
+            if (!items || items.length === 0) {
+                list.innerHTML = '<li class="notif-empty">No notifications</li>';
+                countEl.style.display = 'none';
+                return;
+            }
+            // compute unread count based on local read-set
+            const unreadCount = items.reduce((acc, n) => acc + (notifReadSet.has(getNotifKey(n)) ? 0 : 1), 0);
+            if (unreadCount > 0) {
+                countEl.textContent = Math.min(unreadCount, 9);
+                countEl.style.display = 'flex';
+            } else {
+                countEl.style.display = 'none';
+            }
+
+            // NEW: split into pinned and unpinned while preserving arrival order
+            const keyed = items.map(n => ({ n, key: getNotifKey(n), pinned: notifPinnedSet.has(getNotifKey(n)) }));
+            const pinned = keyed.filter(x => x.pinned);
+            const others = keyed.filter(x => !x.pinned);
+            const ordered = pinned.concat(others);
+
+            // Keep references to countdown targets for live updates
+            const countdownTargets = [];
+
+            ordered.forEach(({n, key, pinned}) => {
+                const iconClass = n.icon ? n.icon : 'fa-info-circle';
+                const sevClass = n.severity === 'success' ? 'notif-success' : n.severity === 'danger' ? 'notif-danger' : n.severity === 'warning' ? 'notif-warning' : '';
+                const time = n.timestamp ? new Date(n.timestamp) : null;
+                const timeText = time ? time.toLocaleString() : '';
+                const li = document.createElement('li');
+                const isUnread = !notifReadSet.has(key);
+                li.className = 'notif-item' + (isUnread ? ' is-unread' : '');
+
+                // Optional countdown UI
+                const targetIso = n.targetTime ? n.targetTime : null;
+                const hasCountdown = n.type === 'booking_countdown' && targetIso;
+                const countdownHtml = hasCountdown ? `<div class="notif-time" data-ct-target="${escapeAttr(targetIso)}">Starting in --:--:--</div>` : '';
+
+                const pinClass = pinned ? 'pin-active' : '';
+
+                li.innerHTML = `
+                    <i class="fas ${iconClass} ${sevClass}"></i>
+                    <div class="notif-content">
+                        <div class="notif-title-row">
+                            <div class="notif-title">${escapeHtml(n.title || 'Notification')}</div>
+                            <button class="pin-btn ${pinClass}" title="${pinned ? 'Unpin' : 'Pin'}" aria-pressed="${pinned}" data-pin-key="${escapeAttr(key)}">
+                                <i class="fas fa-thumbtack"></i>
+                            </button>
+                        </div>
+                        <div class="notif-message">${escapeHtml(n.message || '')}</div>
+                        ${countdownHtml}
+                        <div class="notif-time">${timeText}</div>
+                    </div>`;
+
+                // Attach context for booking countdowns so clicks can open details
+                if (hasCountdown) {
+                    if (typeof n.vehicleId !== 'undefined' && n.vehicleId !== null) {
+                        li.setAttribute('data-vehicle-id', n.vehicleId);
+                    }
+                    if (typeof n.bookingId !== 'undefined' && n.bookingId !== null) {
+                        li.setAttribute('data-booking-id', n.bookingId);
+                    }
+                }
+
+                // Bind pin toggle
+                const btn = li.querySelector('[data-pin-key]');
+                if (btn) {
+                    btn.addEventListener('click', function(e){ e.stopPropagation(); togglePin(key); });
+                }
+
+                if (hasCountdown) {
+                    const el = li.querySelector('[data-ct-target]');
+                    if (el) countdownTargets.push(el);
+                }
+                list.appendChild(li);
+            });
+
+            // Arm countdown updater only when dropdown is open and there are targets
+            setupCountdownUpdater(countdownTargets);
+        }
+
+        function escapeHtml(str){
+            if(!str) return '';
+            return str.replace(/[&<>"']/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]);});
+        }
+        function escapeAttr(str){
+            return String(str).replace(/"/g,'&quot;');
+        }
+
+        // Countdown handling
+        let notifCountdownTimer = null;
+        function setupCountdownUpdater(targets){
+            // Clear any previous interval
+            if (notifCountdownTimer) {
+                clearInterval(notifCountdownTimer);
+                notifCountdownTimer = null;
+            }
+            if (!targets || targets.length === 0 || !notifState.open) return;
+
+            const updateAll = () => {
+                const now = Date.now();
+                let active = 0;
+                targets.forEach(el => {
+                    const iso = el.getAttribute('data-ct-target');
+                    if (!iso) return;
+                    const t = new Date(iso).getTime();
+                    const diff = t - now;
+                    if (isNaN(t)) {
+                        el.textContent = 'Starting soon';
+                        return;
+                    }
+                    if (diff <= 0) {
+                        el.textContent = 'Starting now';
+                    } else {
+                        el.textContent = 'Starting in ' + formatDuration(diff);
+                        active++;
+                    }
+                });
+                if (active === 0) {
+                    // Nothing left to count down
+                    clearInterval(notifCountdownTimer);
+                    notifCountdownTimer = null;
+                }
+            };
+            // Initial tick and start interval
+            updateAll();
+            notifCountdownTimer = setInterval(updateAll, 1000);
+        }
+        function pad2(n){ return (n<10?'0':'') + n; }
+        function formatDuration(ms){
+            const totalSeconds = Math.floor(ms/1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            if (days > 0) return `${days}d ${pad2(hours)}h ${pad2(minutes)}m ${pad2(seconds)}s`;
+            if (hours > 0) return `${hours}h ${pad2(minutes)}m ${pad2(seconds)}s`;
+            return `${minutes}m ${pad2(seconds)}s`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            const bell = document.getElementById('notif-bell');
+            const dropdown = document.getElementById('notif-dropdown');
+            const markAllBtn = document.getElementById('mark-all-read');
+            if (bell) {
+                bell.addEventListener('click', function(e){ e.stopPropagation(); toggleNotifDropdown(); });
+            }
+            if (markAllBtn) {
+                markAllBtn.addEventListener('click', function(e){ e.stopPropagation(); markAllAsRead(); });
+            }
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e){
+                if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+                    toggleNotifDropdown(false);
+                    // Stop countdown when closed
+                    if (notifCountdownTimer) { clearInterval(notifCountdownTimer); notifCountdownTimer = null; }
+                }
+            });
+            // Auto refresh notifications with visibility-aware polling
+            document.addEventListener('visibilitychange', function(){
+                if (document.hidden) {
+                    stopNotifAutoRefresh();
+                    if (notifCountdownTimer) { clearInterval(notifCountdownTimer); notifCountdownTimer = null; }
+                } else {
+                    startNotifAutoRefresh();
+                    // If dropdown is open, immediately re-render to re-arm countdown
+                    if (notifState.open) {
+                        renderNotifications();
+                    }
+                }
+            });
+            // Kick off auto refresh immediately
+            startNotifAutoRefresh();
+            // Also fetch once shortly after load in case of slow token init
+            setTimeout(() => fetchNotifications({ silent: true }), 800);
+        });
+
+        // Extend renderNotifications to make booking_countdown items clickable for details
+        // The function renderNotifications is defined earlier; we override minimal behavior by monkey-patching after definition
+        (function(){
+            const origRender = (typeof renderNotifications === 'function') ? renderNotifications : null;
+            if (!origRender) return;
+            // Redefine to wrap and then enhance
+            window.renderNotifications = function(){
+                origRender();
+                try {
+                    const list = document.getElementById('notif-list');
+                    if (!list) return;
+                    // Bind clicks on booking_countdown items
+                    Array.from(list.querySelectorAll('.notif-item')).forEach(function(li){
+                        const titleEl = li.querySelector('.notif-title');
+                        const msgEl = li.querySelector('.notif-message');
+                        const isCountdown = msgEl && /starts at/i.test(msgEl.textContent || '') && titleEl && /Booking Starts Soon/i.test(titleEl.textContent || '');
+                        if (!isCountdown) return;
+                        // Add clickable class and handler only once
+                        if (!li.classList.contains('is-clickable')){
+                            li.classList.add('is-clickable');
+                            li.addEventListener('click', function(e){
+                                if (e.target && e.target.closest && e.target.closest('.pin-btn')) { return; }
+                                // Try to fetch context from data attributes injected by render (if added in future)
+                                let vehicleId = li.getAttribute('data-vehicle-id');
+                                let bookingId = li.getAttribute('data-booking-id');
+                                // Fallback: try to derive from embedded dataset when API provides it via JSON in future
+                                // As a fallback for now, trigger details without bookingId if missing
+                                openBookingDetailsModal(vehicleId ? parseInt(vehicleId,10) : null, bookingId ? parseInt(bookingId,10) : null);
+                            });
+                        }
+                    });
+                } catch (e) { /* no-op */ }
+            };
+        })();
+
+        async function openBookingDetailsModal(vehicleId, bookingId){
+            // Show modal and set placeholders
+            const modal = document.getElementById('booking-details-modal');
+            if (!modal) return;
+            document.getElementById('bdVehicleId').textContent = vehicleId != null ? vehicleId : '-';
+            document.getElementById('bdMake').textContent = 'Loading...';
+            document.getElementById('bdModel').textContent = 'Loading...';
+            document.getElementById('bdReg').textContent = 'Loading...';
+            document.getElementById('bdImage').style.display = 'none';
+            document.getElementById('bdImage').src = '';
+            document.getElementById('bdImageIcon').style.display = 'inline-block';
+
+            document.getElementById('bdCustName').textContent = 'Loading...';
+            document.getElementById('bdCustEmail').textContent = 'Loading...';
+            document.getElementById('bdCustPhone').textContent = 'Loading...';
+            document.getElementById('bdBookingId').textContent = bookingId != null ? bookingId : '-';
+            document.getElementById('bdStart').textContent = 'Loading...';
+            document.getElementById('bdEnd').textContent = 'Loading...';
+            document.getElementById('bdTotal').textContent = 'Loading...';
+
+            const token = localStorage.getItem('token');
+
+            // Fetch details in parallel when possible
+            const fetches = [];
+            if (vehicleId) {
+                fetches.push(fetch(`/api/vehicles/${vehicleId}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} })
+                    .then(r => r.ok ? r.json() : null)
+                    .catch(() => null));
+                fetches.push(fetch(`/api/fleet/vehicle/${vehicleId}/current-customer`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} })
+                    .then(r => r.ok ? r.json() : null)
+                    .catch(() => null));
+            }
+
+            try {
+                const [vehicle, cust] = fetches.length ? await Promise.all(fetches) : [null, null];
+                // Vehicle details
+                if (vehicle) {
+                    document.getElementById('bdMake').textContent = vehicle.make || '-';
+                    document.getElementById('bdModel').textContent = vehicle.model || '-';
+                    document.getElementById('bdReg').textContent = vehicle.registrationNumber || '-';
+                    if (vehicle.imageUrl) {
+                        const img = document.getElementById('bdImage');
+                        img.src = vehicle.imageUrl;
+                        img.onload = function(){ document.getElementById('bdImageIcon').style.display = 'none'; img.style.display = 'block'; };
+                        img.onerror = function(){ document.getElementById('bdImageIcon').style.display = 'inline-block'; img.style.display = 'none'; };
+                    }
+                } else {
+                    document.getElementById('bdMake').textContent = '-';
+                    document.getElementById('bdModel').textContent = '-';
+                    document.getElementById('bdReg').textContent = '-';
+                }
+                // Customer/booking details
+                if (cust && !cust.error) {
+                    document.getElementById('bdCustName').textContent = cust.customerName || '-';
+                    document.getElementById('bdCustEmail').textContent = cust.customerEmail || '-';
+                    document.getElementById('bdCustPhone').textContent = cust.customerPhone || '-';
+                    document.getElementById('bdBookingId').textContent = (cust.bookingId != null ? cust.bookingId : (bookingId != null ? bookingId : '-'));
+                    document.getElementById('bdStart').textContent = cust.startDate ? new Date(cust.startDate).toLocaleString() : '-';
+                    document.getElementById('bdEnd').textContent = cust.endDate ? new Date(cust.endDate).toLocaleString() : '-';
+                    document.getElementById('bdTotal').textContent = cust.totalCost != null ? `RS ${Number(cust.totalCost).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '-';
+                } else {
+                    // Unknown or not yet active
+                    if (cust && cust.vehicleStatus) {
+                        document.getElementById('bdCustName').textContent = '(No active rental)';
+                    } else {
+                        document.getElementById('bdCustName').textContent = '-';
+                    }
+                    document.getElementById('bdCustEmail').textContent = '-';
+                    document.getElementById('bdCustPhone').textContent = '-';
+                    document.getElementById('bdStart').textContent = '-';
+                    document.getElementById('bdEnd').textContent = '-';
+                    document.getElementById('bdTotal').textContent = '-';
+                }
+            } catch(e) {
+                document.getElementById('bdMake').textContent = '-';
+                document.getElementById('bdModel').textContent = '-';
+                document.getElementById('bdReg').textContent = '-';
+                document.getElementById('bdCustName').textContent = '-';
+                document.getElementById('bdCustEmail').textContent = '-';
+                document.getElementById('bdCustPhone').textContent = '-';
+                document.getElementById('bdStart').textContent = '-';
+                document.getElementById('bdEnd').textContent = '-';
+                document.getElementById('bdTotal').textContent = '-';
+            }
+
+            modal.style.display = 'block';
+            document.body.classList.add('modal-open');
+            setModalOffset('booking-details-modal');
+        }
+
+        function closeBookingDetailsModal(){
+            const modal = document.getElementById('booking-details-modal');
+            if (!modal) return;
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+        // Wire close interactions
+        (function(){
+            const modal = document.getElementById('booking-details-modal');
+            const closeBtn = document.getElementById('close-booking-details');
+            if (closeBtn) closeBtn.addEventListener('click', closeBookingDetailsModal);
+            if (modal) modal.addEventListener('click', function(e){ if (e.target === modal) closeBookingDetailsModal(); });
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeBookingDetailsModal(); });
+        })();
     </script>
 
     <!-- Luxury Footer -->
@@ -2081,18 +2581,15 @@
             if(!content) return;
             var nav = document.querySelector('.navbar-luxury');
             var navH = (nav && nav.offsetHeight) ? nav.offsetHeight : 0;
-            // Default top margin to keep content visible and centered-ish
             var vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var desiredTop = Math.max(20, Math.min(60, Math.floor((vh - content.offsetHeight)/4)));
             content.style.marginTop = (navH + desiredTop) + 'px';
         }catch(e){ /* no-op */ }
     }
     window.addEventListener('resize', function(){
-        ['add-vehicle-modal','edit-vehicle-modal','delete-modal'].forEach(function(id){
+        ['add-vehicle-modal','edit-vehicle-modal','delete-modal','booking-details-modal'].forEach(function(id){
             var el = document.getElementById(id);
             if (el && el.style.display === 'block') setModalOffset(id);
         });
     });
 </script>
-</body>
-</html>

@@ -1555,17 +1555,27 @@
             fetch(`/api/vehicles/${vehicleIdToDelete}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
                 }
             })
-            .then(response => {
+            .then(async (response) => {
                 deleteButton.innerHTML = originalButtonText;
                 deleteButton.disabled = false;
 
                 if (!response.ok) {
-                    throw new Error('Failed to delete vehicle');
+                    let errorMessage = 'Failed to delete vehicle';
+                    try {
+                        const data = await response.json();
+                        if (data && (data.message || data.error)) {
+                            errorMessage = data.message || data.error;
+                        }
+                    } catch (e) { /* ignore JSON parse errors */ }
+                    throw new Error(errorMessage);
                 }
-
+                return null;
+            })
+            .then(() => {
                 closeDeleteModal();
                 fetchVehicles();
                 showMessage("Vehicle deleted successfully!", "success");
@@ -1573,7 +1583,7 @@
             .catch(error => {
                 console.error('Error deleting vehicle:', error);
                 closeDeleteModal();
-                showMessage("Failed to delete vehicle. Please try again.", "error");
+                showMessage(error.message || "Failed to delete vehicle. Please try again.", "error");
 
                 deleteButton.innerHTML = originalButtonText;
                 deleteButton.disabled = false;
