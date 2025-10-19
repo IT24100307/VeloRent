@@ -1464,11 +1464,6 @@
               <a class="nav-link-luxury" href="/dashboard">Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link-luxury" href="/packages">
-                <i class="fas fa-box mr-1"></i>Packages
-              </a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link-luxury" href="/feedback" role="button">About Us</a>
             </li>
             <li class="nav-item">
@@ -1541,6 +1536,7 @@
 
           <!-- Packages Slider Section (replaces welcome when packages exist) -->
           <div class="packages-section" id="packages-section" style="display:none;">
+            <h3>🎉 Active Luxury Packages</h3>
             <div class="packages-slider">
               <div class="packages-track" id="packages-track"><!-- slides injected --></div>
               <div class="packages-nav">
@@ -1776,9 +1772,7 @@
             </div>
             <div class="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 15px;">
               <button type="button" class="btn" onclick="closePackageDetailsModal()" style="background: transparent; border: 2px solid var(--luxury-gold); color: var(--luxury-gold);">Close</button>
-              <a href="/packages" id="pkg-modal-view-all" class="btn btn-accent" style="background: var(--gradient-gold); color: var(--luxury-black); text-decoration: none; display: inline-flex; align-items: center;">
-                <i class="fas fa-eye mr-2"></i>View All Packages
-              </a>
+              <button type="button" class="btn btn-accent" id="pkg-modal-buy" style="background: var(--gradient-gold); color: var(--luxury-black);">Book Now</button>
             </div>
           </div>
         </div>
@@ -2078,7 +2072,7 @@
         console.log("Profile link update - userEmail:", userEmail);
         console.log("Profile nav link found:", !!profileNavLink);
         console.log("Profile dropdown link found:", !!profileDropdownLink);
-        
+
         if (profileNavLink && userEmail) {
           profileNavLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
           console.log("Updated profile nav link href:", profileNavLink.href);
@@ -2137,7 +2131,7 @@
         const priceFilter = document.getElementById("price-filter");
         const sortSelect = document.getElementById("sort-select");
         const clearFiltersBtn = document.getElementById("clear-filters");
-        
+
         // Debug: Check if elements are found
         console.log('Filter elements found:', {
           vehicleSearch: !!vehicleSearch,
@@ -2148,7 +2142,7 @@
           sortSelect: !!sortSelect,
           clearFiltersBtn: !!clearFiltersBtn
         });
-        
+
         // Ensure dropdowns are clickable
         [makeFilter, modelFilter, yearFilter, priceFilter, sortSelect].forEach(element => {
           if (element) {
@@ -2159,7 +2153,7 @@
             });
           }
         });
-        
+
         // Add event listeners for all filters
         if (vehicleSearch) vehicleSearch.addEventListener("input", filterAndSortVehicles);
         if (makeFilter) makeFilter.addEventListener("change", filterAndSortVehicles);
@@ -2171,19 +2165,19 @@
 
         // Make populateFilterDropdowns available globally
         window.populateFilterDropdowns = populateFilterDropdowns;
-        
+
         // Initial filter setup - this will be called from loadAvailableVehicles
         // after vehicles are loaded
-        
+
         // Populate filter dropdowns
         function populateFilterDropdowns() {
           if (!allVehicles || allVehicles.length === 0) return;
-          
+
           // Get unique values
           const makes = [...new Set(allVehicles.map(v => v.make).filter(Boolean))].sort();
           const models = [...new Set(allVehicles.map(v => v.model).filter(Boolean))].sort();
           const years = [...new Set(allVehicles.map(v => v.year).filter(Boolean))].sort((a, b) => b - a);
-          
+
           // Populate make filter
           if (makeFilter) {
             makeFilter.innerHTML = '<option value="">All Makes</option>';
@@ -2191,7 +2185,7 @@
               makeFilter.innerHTML += `<option value="${make}">${make}</option>`;
             });
           }
-          
+
           // Populate model filter
           if (modelFilter) {
             modelFilter.innerHTML = '<option value="">All Models</option>';
@@ -2199,7 +2193,7 @@
               modelFilter.innerHTML += `<option value="${model}">${model}</option>`;
             });
           }
-          
+
           // Populate year filter
           if (yearFilter) {
             yearFilter.innerHTML = '<option value="">All Years</option>';
@@ -2208,7 +2202,7 @@
             });
           }
         }
-        
+
         // Clear all filters
         function clearAllFilters() {
           if (vehicleSearch) vehicleSearch.value = '';
@@ -2219,20 +2213,20 @@
           if (sortSelect) sortSelect.value = 'default';
           filterAndSortVehicles();
         }
-        
+
         // Enhanced filter and sort function
         function filterAndSortVehicles() {
           console.log('filterAndSortVehicles called, allVehicles count:', allVehicles.length);
-          
+
           const searchTerm = vehicleSearch ? vehicleSearch.value.toLowerCase() : '';
           const makeValue = makeFilter ? makeFilter.value : '';
           const modelValue = modelFilter ? modelFilter.value : '';
           const yearValue = yearFilter ? yearFilter.value : '';
           const priceValue = priceFilter ? priceFilter.value : '';
           const sortValue = sortSelect ? sortSelect.value : 'default';
-          
+
           console.log('Filter values:', { searchTerm, makeValue, modelValue, yearValue, priceValue, sortValue });
-          
+
           let filteredVehicles = allVehicles.filter(vehicle => {
             // Search filter
             if (searchTerm && searchTerm.trim() !== '') {
@@ -2243,19 +2237,19 @@
                 vehicle.status || '',
                 vehicle.registrationNumber || ''
               ].join(' ').toLowerCase().trim();
-              
+
               if (!searchableText.includes(searchTerm.trim())) return false;
             }
-            
+
             // Make filter
             if (makeValue && vehicle.make !== makeValue) return false;
-            
+
             // Model filter
             if (modelValue && vehicle.model !== modelValue) return false;
-            
+
             // Year filter
             if (yearValue && vehicle.year != yearValue) return false;
-            
+
             // Price filter
             if (priceValue) {
               const price = parseFloat(vehicle.has_discount ? vehicle.discountedRatePerDay : vehicle.rentalRatePerDay) || 0;
@@ -2274,10 +2268,10 @@
                   break;
               }
             }
-            
+
             return true;
           });
-          
+
           // Apply sorting
           switch(sortValue) {
             case 'price-low':
@@ -2315,7 +2309,7 @@
               // Keep original order
               break;
           }
-          
+
           // Update results count
           const resultsCount = document.getElementById('results-count');
           if (resultsCount) {
@@ -2327,13 +2321,13 @@
               resultsCount.textContent = `Showing ${filtered} of ${total} vehicles`;
             }
           }
-          
+
           displayVehicles(filteredVehicles);
         }
-        
+
         // Make function available globally
         window.filterAndSortVehicles = filterAndSortVehicles;
-        
+
         // Test function
         window.testFilters = function() {
           console.log('Testing filters...');
@@ -2364,7 +2358,7 @@
             // Hide welcome, show section with luxury title
             if (welcome) welcome.style.display = 'none';
             section.style.display = 'block';
-            
+
             // Update section title dynamically
             const sectionTitle = section.querySelector('h3');
             if (sectionTitle && !sectionTitle.innerHTML.includes('🎉')) {
@@ -2374,23 +2368,23 @@
             track.innerHTML = '';
             const indicators = document.createElement('div');
             indicators.className = 'packages-indicators';
-            
+
             visible.forEach((p, idx) => {
               const slide = document.createElement('div');
               const isPartiallyReserved = (p.status || '').toLowerCase() === 'partially reserved';
               slide.className = `package-slide ${isPartiallyReserved ? 'partially-reserved' : ''}`;
               const imgSrc = p.imageUrl || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
-              
+
               // Set background image
               slide.style.backgroundImage = `url(${imgSrc})`;
-              
+
               // Add availability message for partially reserved packages
-              const availabilityMessage = isPartiallyReserved ? 
+              const availabilityMessage = isPartiallyReserved ?
                 `<div class="availability-notice">
                   <i class="fas fa-clock"></i>
                   <small>Temporarily unavailable - Some vehicles are currently rented individually</small>
                 </div>` : '';
-              
+
               slide.innerHTML = `
                 <div class="package-content">
                   <div class="package-info">
@@ -2401,36 +2395,41 @@
                   </div>
                   <div class="package-actions">
                     <button class="btn view-details-btn" data-pkg-idx="${idx}">View Details</button>
+                    <button class="btn ${isPartiallyReserved ? 'btn-disabled' : 'btn-accent'}"
+                            data-pkg-buy-idx="${idx}"
+                            ${isPartiallyReserved ? 'disabled title="Package temporarily unavailable"' : ''}>
+                      ${isPartiallyReserved ? 'Unavailable' : 'Book Now'}
+                    </button>
                   </div>
                 </div>`;
               track.appendChild(slide);
-              
+
               // Create indicator
               const indicator = document.createElement('div');
               indicator.className = `package-indicator ${idx === 0 ? 'active' : ''}`;
               indicator.onclick = () => goToSlide(idx);
               indicators.appendChild(indicator);
             });
-            
+
             // Add indicators to slider
             const packageSlider = document.querySelector('.packages-slider');
             packageSlider.appendChild(indicators);
 
             // Enhanced Controls with Indicators
             let current = 0; const total = visible.length;
-            
+
             function updateIndicators() {
               document.querySelectorAll('.package-indicator').forEach((ind, i) => {
                 ind.classList.toggle('active', i === current);
               });
             }
-            
-            function go(i){ 
-              current = (i + total) % total; 
+
+            function go(i){
+              current = (i + total) % total;
               track.style.transform = `translateX(-${current*100}%)`;
               updateIndicators();
             }
-            
+
             function goToSlide(i) {
               current = i;
               track.style.transform = `translateX(-${current*100}%)`;
@@ -2439,36 +2438,36 @@
               clearInterval(timer);
               if (total > 1) timer = setInterval(() => go(current+1), 5000);
             }
-            
+
             const prev = document.getElementById('pkg-prev');
             const next = document.getElementById('pkg-next');
-            prev.onclick = () => { 
-              clearInterval(timer); 
-              go(current-1); 
-              if (total > 1) timer = setInterval(() => go(current+1), 5000); 
+            prev.onclick = () => {
+              clearInterval(timer);
+              go(current-1);
+              if (total > 1) timer = setInterval(() => go(current+1), 5000);
             };
-            next.onclick = () => { 
-              clearInterval(timer); 
-              go(current+1); 
-              if (total > 1) timer = setInterval(() => go(current+1), 5000); 
+            next.onclick = () => {
+              clearInterval(timer);
+              go(current+1);
+              if (total > 1) timer = setInterval(() => go(current+1), 5000);
             };
-            
+
             // Start auto-slide timer only if there are multiple packages
             let timer;
             if (total > 1) {
               timer = setInterval(() => go(current+1), 5000);
-              
+
               // Pause on hover
               const packageSliderElement = document.querySelector('.packages-slider');
               packageSliderElement.addEventListener('mouseenter', () => clearInterval(timer));
-              packageSliderElement.addEventListener('mouseleave', () => { 
-                if (total > 1) timer = setInterval(() => go(current+1), 5000); 
+              packageSliderElement.addEventListener('mouseleave', () => {
+                if (total > 1) timer = setInterval(() => go(current+1), 5000);
               });
             }
-            
+
             // Make goToSlide available globally for indicators
             window.goToSlide = goToSlide;
-            
+
             // Initialize first slide
             updateIndicators();
 
@@ -2502,28 +2501,28 @@
           document.getElementById('pkg-modal-price').textContent = `Rs. ${pkg.price || 0}`;
           document.getElementById('pkg-modal-duration').textContent = `${pkg.duration || 0} days`;
           document.getElementById('pkg-modal-status').textContent = pkg.status || 'Activated';
-          
+
           // Enhanced vehicle display
           const ul = document.getElementById('pkg-modal-vehicles');
           ul.innerHTML = '';
-          
+
           if (Array.isArray(pkg.vehicles) && pkg.vehicles.length){
             pkg.vehicles.forEach(v => {
               const li = document.createElement('li');
               li.style.cssText = 'margin-bottom: 12px; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 6px; border-left: 3px solid var(--luxury-gold);';
-              
+
               const vehicleInfo = document.createElement('div');
               vehicleInfo.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px;">
                   <div style="flex: 1;">
                     <strong style="color: var(--luxury-gold);">${v.make || 'Unknown'} ${v.model || 'Model'}</strong>
                     <div style="color: var(--text-luxury-muted); font-size: 0.9rem;">
-                      Year: ${v.year || 'N/A'} | 
+                      Year: ${v.year || 'N/A'} |
                       Rate: Rs. ${v.rentalRatePerDay || 0}/day |
                       Status: <span style="color: ${v.status === 'AVAILABLE' ? '#27ae60' : '#e74c3c'};">${v.status || 'Unknown'}</span>
                     </div>
                   </div>
-                  <button onclick="viewVehicleDetails(${v.vehicleId})" 
+                  <button onclick="viewVehicleDetails(${v.vehicleId})"
                           style="background: var(--gradient-gold); color: var(--luxury-black); border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
                     View Details
                   </button>
@@ -2538,8 +2537,9 @@
             li.textContent = 'No vehicles available in this package';
             ul.appendChild(li);
           }
-          
-          // View All Packages link is handled via href; no JS wiring needed
+
+          const buyBtn = document.getElementById('pkg-modal-buy');
+          buyBtn.onclick = () => buyPackage(pkg);
           document.getElementById('package-details-modal').style.display = 'block';
         }
         window.closePackageDetailsModal = function(){ document.getElementById('package-details-modal').style.display = 'none'; };

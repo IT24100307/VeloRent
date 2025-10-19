@@ -39,19 +39,19 @@ public class SecurityConfig {
                 // Disable CSRF protection for API endpoints
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(
-                        "/api/auth/**", 
-                        "/api/test/**", 
+                        "/api/auth/**",
+                        "/api/test/**",
                         "/api/admin/**",
-                        "/api/vehicles/**", 
-                        "/api/profile/**", 
+                        "/api/vehicles/**",
+                        "/api/profile/**",
                         "/profile/api/**",
-                        "/api/payments/**", 
-                        "/api/bookings/**", 
+                        "/api/payments/**",
+                        "/api/bookings/**",
                         "/api/fleet/**",
-                        "/api/upload/**", 
+                        "/api/upload/**",
                         "/api/feedback/**",
                         // Explicitly ignore CSRF for view endpoints that only render pages
-                        "/packages", 
+                        "/packages",
                         "/packages/**"
                         )) // allow feedback form posts without CSRF token
     .authorizeHttpRequests(auth -> auth
