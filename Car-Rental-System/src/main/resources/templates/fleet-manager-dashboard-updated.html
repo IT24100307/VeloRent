@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Bootstrap CSS (for navbar layout like Packages page) -->
     <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
-    
+    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
     <!-- Luxury Theme CSS -->
     <link rel="stylesheet" href="/css/luxury-theme.css" />
     <style>
@@ -755,7 +755,7 @@
                 <p class="welcome-message">
                     Welcome to the Fleet Management Dashboard, <span id="user-name">User</span>!
                     <br>
-                    <span id="user-role" style="font-size: 14px; color: var(--light-text)">Your role: Fleet Manager</span>
+                    <span id="user-role" style="font-size: 14px; color: var(--light-text)">Your role: <span id="roleView"></span></span>
                 </p>
 
                 <!-- Dashboard Stats -->
@@ -1007,10 +1007,12 @@
 
             const userRole = localStorage.getItem("userRole");
             // Check if user has the Fleet Manager role
-            if (!userRole || !(userRole.includes("FLEET_MANAGER") || userRole.includes("FLEETMANAGER"))) {
+            if (!userRole || !(userRole.includes("FLEET_MANAGER") || userRole.includes("FLEETMANAGER")|| userRole.includes("OWNER"))) {
                 window.location.href = "/dashboard?message=" + encodeURIComponent("You do not have permission to access this page") + "&type=error";
                 return;
             }
+
+            $('#roleView').html(userRole.replace("ROLE_","").replace("_"," "));
 
             // Update user information
             const userName = localStorage.getItem("userName") || "User";

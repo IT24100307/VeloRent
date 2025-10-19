@@ -91,4 +91,10 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     // Eagerly fetch associations for admin/fleet listing and order by created date desc then id desc
     @EntityGraph(attributePaths = {"customer", "customer.user", "vehicle", "vehiclePackage"})
     List<Booking> findAllByOrderByCreatedAtDescBookingIdDesc();
+
+//    @Query("SELECT DATE(b.startDate) as day, COUNT(DISTINCT b.vehicle) as usage FROM Booking b WHERE b.startDate >= :startDate AND b.bookingStatus = 'Confirmed' GROUP BY DATE(b.startDate) ORDER BY b.startDate")
+    @Query(value = "SELECT CAST(b.start_date AS DATE) as day, COUNT(DISTINCT b.vehicle_id) as usage " +
+        "FROM bookings b WHERE b.start_date >= :startDate AND b.booking_status = 'ACTIVE' " +
+        "GROUP BY CAST(b.start_date AS DATE) ORDER BY day", nativeQuery = true)
+    List<Object[]> getVehicleUsageByDay(@Param("startDate") LocalDateTime startDate);
 }

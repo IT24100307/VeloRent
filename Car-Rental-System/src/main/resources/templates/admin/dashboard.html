@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
     <style>
       /* Admin Dashboard Luxury Theme Overrides */
 
@@ -662,6 +663,7 @@
         <h1 class="dashboard-title">Admin Dashboard</h1>
         <div class="dashboard-actions">
           <a href="/dashboard" class="btn back-btn">Back to Dashboard</a>
+          <a href="/owner/dashboard" class="btn back-btn" id="toOwner" style="display: none;">To Owner Dashboard</a>
           <button class="btn btn-secondary" id="refreshBtn">Refresh Data</button>
         </div>
       </div>
@@ -907,6 +909,13 @@
     </main>
 
     <script>
+
+      if(localStorage.getItem("userRole") && localStorage.getItem("userRole").includes("OWNER")){
+        $("#toOwner").show();
+      }else{
+        $("#toOwner").hide();
+      }
+
       document.addEventListener('DOMContentLoaded', function() {
         loadCustomers();
         loadFleetManagers();

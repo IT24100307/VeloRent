@@ -1475,7 +1475,7 @@
               <a class="nav-link-luxury" href="/security-settings">Security</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link-luxury" href="/admin/dashboard" id="admin-dashboard-btn" style="display: none;">
+              <a class="nav-link-luxury" id="admin-dashboard-btn" style="display: none;">
                 <i class="fas fa-shield-alt mr-1"></i>Admin Panel
               </a>
             </li>
@@ -1992,6 +1992,13 @@
     <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/dashboard-vehicles.js}"></script>
     <script>
+      $('#admin-dashboard-btn').on('click', function() {
+        if(localStorage.getItem("userRole") && localStorage.getItem("userRole").includes("OWNER")){
+          window.location.href = "/owner/dashboard" ;
+        }else{
+          window.location.href = "/admin/dashboard" ;
+        }
+      });
       document.addEventListener("DOMContentLoaded", () => {
         // Check if user is logged in
         const token = localStorage.getItem("token");
@@ -2057,6 +2064,8 @@
           }
         }
 
+
+
         // Set user name and email in profile dropdown
         const userName = localStorage.getItem("userName") || "User";
         const userEmail = localStorage.getItem("userEmail") || "user@example.com";
@@ -2099,7 +2108,7 @@
         }
 
         // If fleet manager, redirect to the fleet manager dashboard
-        if (userRole && userRole.includes("FLEET_MANAGER")) {
+        if (userRole && (userRole.includes("FLEET_MANAGER"))) {
           window.location.href = "/fleet-manager/dashboard";
         }
 

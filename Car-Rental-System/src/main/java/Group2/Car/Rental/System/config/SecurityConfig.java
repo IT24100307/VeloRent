@@ -93,7 +93,7 @@ public class SecurityConfig {
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
                                 "/admin/payments",
                                 "/fleet-manager/**",
-                                "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history")
+                                "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history","/owner/dashboard")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )

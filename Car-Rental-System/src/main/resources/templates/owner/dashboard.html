@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Car Rental System</title>
+  <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+          rel="stylesheet"
+  />
+  <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+
+  <!--    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.css" />-->
+  <!--    <script src="/css/bootstrap/js/bootstrap.js"></script>-->
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/css/fontawesome/css/all.css" />
+  <!-- Luxury Theme CSS (Main styling) -->
+  <link rel="stylesheet" href="/css/luxury-theme.css" />
+
+  <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+  <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+  <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <style>
+    /* Admin Offer Dashboard Luxury Theme Overrides */
+    .dt-search{
+      display: flex ;
+      justify-content: end;
+      padding-bottom: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-luxury-secondary);
+    }
+
+    body {
+      background: var(--luxury-black) !important;
+      color: var(--text-luxury-light) !important;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: var(--luxury-charcoal);
+      color: var(--text-luxury-light);
+      padding: 1rem;
+      box-shadow: var(--shadow-luxury);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: var(--text-luxury-light);
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-luxury-small);
+      transition: var(--transition-smooth);
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+
+    .nav-links a:hover {
+      background: var(--luxury-gold);
+      color: var(--luxury-black);
+      border-color: var(--luxury-gold);
+      transform: translateY(-1px);
+    }
+
+    main {
+      margin-top: 30px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .dashboard-title {
+      font-size: 28px;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+    
+    .dashboard-title::before {
+      content: '\f02b';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      margin-right: 15px;
+      color: var(--luxury-gold);
+      font-size: 1.2em;
+    }
+
+    .dashboard-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+
+    .chartTit{
+      display: flex;
+      justify-content: center;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+<!-- Page Loader -->
+<div class="page-loader">
+  <div class="loader-content">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">VeloRent Admin</div>
+  </div>
+</div>
+
+<header>
+  <nav class="container">
+    <div class="logo">
+      <i class="fas fa-crown mr-2"></i>VeloRent Admin
+    </div>
+    <div class="nav-links">
+      <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+      <a href="#"><i class="fas fa-car mr-1"></i>Vehicles</a>
+      <a href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a>
+      <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
+      <a href="#"><i class="fas fa-chart-bar mr-1"></i>Reports</a>
+      <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
+    </div>
+  </nav>
+</header>
+
+<main class="container content">
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Owner Dashboard</h1>
+    <div class="dashboard-actions">
+      <a href="/admin/dashboard" class="btn btn-primary btn-back">Admin Dashboard</a>
+      <a href="/fleet-manager/dashboard" class="btn btn-primary btn-back">Fleet Manager Dashboard</a>
+      <a href="/dashboard" class="btn btn-primary btn-back">Customer Dashboard</a>
+    </div>
+  </div>
+
+  <div class="container-fluid p-4">
+    <h1 class="text-center mb-4">Vehicle Rental Dashboard</h1>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card text-white bg-primary">
+          <div class="card-body">
+            <h5 class="card-title">Customers</h5>
+            <h2 th:text="${data.customerCount}">0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-success">
+          <div class="card-body">
+            <h5 class="card-title">Total Vehicles</h5>
+            <h2 th:text="${data.vehicleCount}">0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-warning">
+          <div class="card-body">
+            <h5 class="card-title">In Use</h5>
+            <h2 th:text="${data.inUseVehicleCount}">0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-info">
+          <div class="card-body">
+            <h5 class="card-title">Available</h5>
+            <h2 th:text="${data.freeVehicleCount}">0</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+      <!-- Line Chart: Income vs Maintenance -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header chartTit">Income & Maintenance Cost (Last 7 Days)</div>
+          <div class="card-body">
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <!-- Bar Chart: Vehicle Usage -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header chartTit">Vehicle Usage (Last 7 Days)</div>
+          <div class="card-body">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+</main>
+<script th:inline="javascript">
+  if(! localStorage.getItem("userRole") || !localStorage.getItem("userRole").includes("OWNER")){
+    window.location.href = "/dashboard" ;
+  }
+  /*<![CDATA[*/
+  var data = /*[[${data}]]*/ {};
+  /*]]>*/
+
+  // Prepare labels and data for charts
+  var labels = [];
+  var incomeData = [];
+  var maintenanceData = [];
+  var usageData = [];
+
+  // Assuming data is populated for last 7 days, even if sparse
+  var today = new Date();
+  for (var i = 6; i >= 0; i--) {
+    var date = new Date(today);
+    date.setDate(date.getDate() - i);
+    var dateStr = date.toISOString().split('T')[0];
+    labels.push(dateStr);
+
+    var incomeDay = data.incomeData.find(d => d.day === dateStr) || {total: 0};
+    incomeData.push(incomeDay.total);
+
+    var maintDay = data.maintenanceData.find(d => d.day === dateStr) || {total: 0};
+    maintenanceData.push(maintDay.total);
+
+    var usageDay = data.usageData.find(d => d.day === dateStr) || {usage: 0};
+    usageData.push(usageDay.usage);
+  }
+
+  // Line Chart
+  var ctxLine = document.getElementById('lineChart').getContext('2d');
+  new Chart(ctxLine, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Income',
+        data: incomeData,
+        borderColor: 'green',
+        backgroundColor: 'rgba(0,255,0,0.1)',
+        tension: 0.1
+      }, {
+        label: 'Maintenance Cost',
+        data: maintenanceData,
+        borderColor: 'red',
+        backgroundColor: 'rgba(255,0,0,0.1)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  // Bar Chart
+  var ctxBar = document.getElementById('barChart').getContext('2d');
+  new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Vehicles in Use',
+        data: usageData,
+        backgroundColor: 'blue'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+</script>
+
+<!-- Luxury Theme JavaScript -->
+<script src="/js/luxury-theme.js"></script>
+<script src="/js/luxury-theme-enhancer.js"></script>
+
+</body>
+</html>
