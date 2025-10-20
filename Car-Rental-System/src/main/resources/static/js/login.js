@@ -88,7 +88,7 @@ async function handleLogin(event) {
         });
         
         // Handle the response
-        if (response.data.success) {
+        if (response.data && response.data.success) {
             // Check if 2FA is required
             if (response.data.message === "Please complete 2FA verification." || 
                 response.data.message.includes("2FA") || 
@@ -105,7 +105,10 @@ async function handleLogin(event) {
                 }, 1000);
             } else {
                 // Regular login success
-                showMessage(response.data.message || 'Login successful!', 'success');
+                const successMsg = response.data.message || 'Login successful!';
+                showMessage(successMsg, 'success');
+                // Notify listeners (e.g., page script) that login succeeded
+                window.dispatchEvent(new CustomEvent('loginResult', { detail: { success: true } }));
                 
                 // Clear any existing user data to prevent conflicts between different accounts
                 localStorage.clear();
@@ -160,18 +163,28 @@ async function handleLogin(event) {
                         localStorage.setItem('customerId', response.data.customerId);
                     }
 
-                    // Redirect after a short delay
+                    // Persist a flash message for the next page
+                    try {
+                        sessionStorage.setItem('flashMessage', JSON.stringify({
+                            message: successMsg,
+                            type: 'success'
+                        }));
+                    } catch (e) { /* storage may be unavailable */ }
+
+                    // Redirect after a short delay so the success message is visible
                     setTimeout(() => {
                         window.location.href = redirectUrl;
-                    }, 1000);
+                    }, 1500);
                 } else {
                     showMessage('Authentication successful but no token received. Please try again.', 'error');
+                    window.dispatchEvent(new CustomEvent('loginResult', { detail: { success: false } }));
                 }
             }
         } else {
             // Display specific error message from server
-            const errorMessage = response.data.message || 'Login failed. Please check your credentials.';
+            const errorMessage = (response.data && response.data.message) || 'Login failed. Please check your credentials.';
             showMessage(errorMessage, 'error');
+            window.dispatchEvent(new CustomEvent('loginResult', { detail: { success: false } }));
             
             // Focus on appropriate field based on error type
             if (errorMessage.includes('email') || errorMessage.includes('account')) {
@@ -182,11 +195,8 @@ async function handleLogin(event) {
         }
     } catch (error) {
         // Handle network errors or other exceptions
-        if (error.response && error.response.data && error.response.data.message) {
-            showMessage(error.response.data.message, 'error');
-        } else {
-            showMessage('Unable to connect to server. Please check your internet connection and try again.', 'error');
-        }
+        showMessage('Unable to connect to server. Please check your internet connection and try again.', 'error');
+        window.dispatchEvent(new CustomEvent('loginResult', { detail: { success: false } }));
         console.error('Login error:', error);
     } finally {
         // Reset button state
