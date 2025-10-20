@@ -135,6 +135,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     console.log('VeloRent Luxury Theme - Page enhancements applied successfully');
+
+    // Display flash message if present (set during login success)
+    try {
+        const raw = sessionStorage.getItem('flashMessage');
+        if (raw) {
+            const { message, type } = JSON.parse(raw);
+            if (message) {
+                if (window.showLuxuryNotification) {
+                    window.showLuxuryNotification(message, type || 'info', 3500);
+                } else {
+                    alert(message);
+                }
+            }
+            sessionStorage.removeItem('flashMessage');
+        }
+    } catch (_) { /* ignore */ }
 });
 
 // Global function to show luxury notifications

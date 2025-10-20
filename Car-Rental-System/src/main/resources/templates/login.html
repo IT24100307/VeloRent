@@ -159,11 +159,16 @@
               ${message}
             </div>
           `;
+          // Ensure the container is visible in case it was previously hidden by clearMessage
+          messageContainer.style.display = 'block';
+          // Keep the message in view
+          messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           
           // Auto-hide success messages
           if (type === 'success') {
             setTimeout(() => {
               messageContainer.innerHTML = '';
+              messageContainer.style.display = 'none';
             }, 5000);
           }
         }

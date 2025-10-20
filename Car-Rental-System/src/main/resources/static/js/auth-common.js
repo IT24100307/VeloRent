@@ -2,19 +2,40 @@
 
 /**
  * Shows a message with the specified type
+ * Uses luxury themed alerts when available.
  * @param {string} message - The message to display
- * @param {string} type - The type of message ('error' or 'success')
- * @param {string} containerId - The ID of the container to show the message in
+ * @param {'error'|'success'|'warning'|'info'} [type='info'] - Message type
+ * @param {string} [containerId='message-container'] - Target container
  */
-function showMessage(message, type, containerId = 'message-container') {
+function showMessage(message, type = 'info', containerId = 'message-container') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    container.textContent = message;
-    container.className = `message ${type}`;
-    container.style.display = 'block';
+    // If the login page injected styles, prefer that markup
+    const useLuxury = container.classList.contains('message-container') || containerId === 'message-container';
+    if (useLuxury) {
+        let alertClass = 'alert-info-luxury';
+        let icon = 'fas fa-info-circle';
+        if (type === 'error') { alertClass = 'alert-error-luxury'; icon = 'fas fa-exclamation-triangle'; }
+        else if (type === 'success') { alertClass = 'alert-success-luxury'; icon = 'fas fa-check-circle'; }
+        else if (type === 'warning') { alertClass = 'alert-warning-luxury'; icon = 'fas fa-exclamation-circle'; }
 
-    // Scroll to message
+        container.innerHTML = `
+            <div class="alert-luxury ${alertClass}">
+              <i class="${icon} mr-2"></i>${message}
+            </div>`;
+        container.style.display = 'block';
+
+        if (type === 'success') {
+            setTimeout(() => clearMessage(containerId), 5000);
+        }
+    } else {
+        // Fallback basic rendering
+        container.textContent = message;
+        container.className = `message ${type}`;
+        container.style.display = 'block';
+    }
+
     container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -25,8 +46,8 @@ function showMessage(message, type, containerId = 'message-container') {
 function clearMessage(containerId = 'message-container') {
     const container = document.getElementById(containerId);
     if (container) {
-        container.textContent = '';
-        container.className = 'message';
+        container.innerHTML = '';
+        // Keep existing classes (like message-container) and just hide
         container.style.display = 'none';
     }
 }
@@ -43,7 +64,7 @@ function setButtonLoading(button, isLoading) {
         const originalText = button.getAttribute('data-text') || button.textContent;
         button.setAttribute('data-text', originalText);
         
-        // Add spinner and "Please wait..." text
+    // Add spinner and "Please wait..." text
         button.innerHTML = '<span class="loading-spinner"></span> Please wait...';
     } else {
         button.classList.remove('loading');
@@ -105,17 +126,18 @@ async function callApi(endpoint, method, data = null) {
         // Clear the timeout since the request completed
         clearTimeout(timeoutId);
 
-        // If the response is not ok, throw an error with the status
-        if (!response.ok) {
-            throw new Error(`Server responded with status: ${response.status}`);
+        // Attempt to parse JSON body even on non-2xx responses so we can surface backend messages
+        let result = null;
+        try {
+            result = await response.json();
+        } catch (e) {
+            // Ignore parse errors
         }
-
-        const result = await response.json();
-        console.log(`Received response from ${endpoint}:`, result);
+        console.log(`Received response from ${endpoint} [${response.status}]`, result);
 
         return {
             status: response.status,
-            data: result
+            data: result ?? { success: response.ok, message: response.statusText }
         };
     } catch (error) {
         console.error('API call failed:', error);
@@ -126,13 +148,13 @@ async function callApi(endpoint, method, data = null) {
 
         if (error.name === 'AbortError') {
             errorMessage = 'Request timed out. Server might be overloaded. Please try again later.';
-        } else if (error.message.includes('status: 401')) {
+        } else if (error.message && error.message.includes('status: 401')) {
             errorMessage = 'Authentication failed. Please log in again.';
             errorStatus = 401;
-        } else if (error.message.includes('status: 403')) {
+        } else if (error.message && error.message.includes('status: 403')) {
             errorMessage = 'You do not have permission to perform this action.';
             errorStatus = 403;
-        } else if (error.message.includes('status: 404')) {
+        } else if (error.message && error.message.includes('status: 404')) {
             errorMessage = 'The requested resource was not found.';
             errorStatus = 404;
         }
@@ -160,8 +182,8 @@ function isValidEmail(email) {
  * @returns {boolean} - Whether the password is valid
  */
 function isValidPassword(password) {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    return password.length >= 8;
+    // Align with UI rule: at least 6 characters
+    return password.length >= 6;
 }
 
 /**
@@ -196,7 +218,7 @@ function validateForm(form) {
     const password = form.querySelector('input[type="password"]');
     if (password && password.required && !isValidPassword(password.value)) {
         password.style.borderColor = 'var(--error-color)';
-        showMessage('Password must be at least 8 characters', 'error');
+        showMessage('Password must be at least 6 characters', 'error');
         return false;
     }
     
