@@ -57,4 +57,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "GROUP BY YEAR(p.payment_date), MONTH(p.payment_date) " +
             "ORDER BY YEAR(p.payment_date), MONTH(p.payment_date)", nativeQuery = true)
     List<Object[]> getMonthlyIncomeSince(@Param("startDate") LocalDateTime startDate);
+
+    // NEW: recent payments for a specific customer by status
+    List<Payment> findTop20ByBooking_Customer_UserIdAndPaymentStatusOrderByPaymentDateDesc(Integer customerId, String paymentStatus);
 }
