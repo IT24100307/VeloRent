@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import Group2.Car.Rental.System.util.PricingEngine;
 
 @Service
 public class BookingService {
@@ -132,6 +133,9 @@ public class BookingService {
     @Autowired
     private VehiclePackageService vehiclePackageService;
 
+    @Autowired
+    private PaymentService paymentService;
+
     /**
      * Create a new booking
      * @param bookingRequest the booking request DTO
@@ -187,7 +191,10 @@ public class BookingService {
             Booking newBooking = new Booking();
             newBooking.setStartDate(startDate);
             newBooking.setEndDate(endDate);
-            newBooking.setTotalCost(bookingRequest.getTotalCost());
+            // Calculate total via Singleton PricingEngine (ignore client-provided total for integrity)
+            BigDecimal computedTotal = PricingEngine.getInstance()
+                .calculateVehicleTotalCost(vehicle, startDate, endDate);
+            newBooking.setTotalCost(computedTotal);
             newBooking.setCustomer(customer);
             newBooking.setVehicle(vehicle);
             newBooking.setBookingStatus("Confirmed");
@@ -286,21 +293,9 @@ public class BookingService {
                 }
             }
 
-            // Calculate total cost based on package duration and price
-            long daysBetween = ChronoUnit.DAYS.between(
-                packageBookingRequest.getStartDate().toLocalDate(),
-                packageBookingRequest.getEndDate().toLocalDate()
-            );
-
-            // For packages, we can either charge per day or use the fixed package price
-            // Here I'm using the package price as base and multiply by days if needed
-            BigDecimal totalCost = vehiclePackage.getPrice();
-            if (daysBetween > vehiclePackage.getDuration()) {
-                // If booking is longer than package duration, calculate additional cost
-                BigDecimal dailyRate = vehiclePackage.getPrice().divide(BigDecimal.valueOf(vehiclePackage.getDuration()));
-                BigDecimal additionalDays = BigDecimal.valueOf(daysBetween - vehiclePackage.getDuration());
-                totalCost = totalCost.add(dailyRate.multiply(additionalDays));
-            }
+            // Calculate total cost via Singleton PricingEngine
+            BigDecimal totalCost = PricingEngine.getInstance()
+                .calculatePackageTotalCost(vehiclePackage, packageBookingRequest.getStartDate(), packageBookingRequest.getEndDate());
 
             // Create the booking
             Booking booking = new Booking(
@@ -410,20 +405,9 @@ public class BookingService {
                 return response;
             }
 
-            // Calculate total cost based on package duration and price
-            long daysBetween = ChronoUnit.DAYS.between(
-                packageBookingRequest.getStartDate().toLocalDate(),
-                packageBookingRequest.getEndDate().toLocalDate()
-            );
-
-            // For packages, we can either charge per day or use the fixed package price
-            BigDecimal totalCost = vehiclePackage.getPrice();
-            if (daysBetween > vehiclePackage.getDuration()) {
-                // If booking is longer than package duration, calculate additional cost
-                BigDecimal dailyRate = vehiclePackage.getPrice().divide(BigDecimal.valueOf(vehiclePackage.getDuration()));
-                BigDecimal additionalDays = BigDecimal.valueOf(daysBetween - vehiclePackage.getDuration());
-                totalCost = totalCost.add(dailyRate.multiply(additionalDays));
-            }
+            // Calculate total cost via Singleton PricingEngine
+            BigDecimal totalCost = PricingEngine.getInstance()
+                .calculatePackageTotalCost(vehiclePackage, packageBookingRequest.getStartDate(), packageBookingRequest.getEndDate());
 
             // Create the booking with final status based on payment method
             Booking booking = new Booking(
@@ -444,15 +428,15 @@ public class BookingService {
             // Save the booking first
             Booking savedBooking = bookingRepository.save(booking);
 
-            // Create and save the payment in the same transaction
-            Payment payment = new Payment();
-            payment.setPaymentDate(LocalDateTime.now());
-            payment.setAmount(totalCost);
-            payment.setPaymentMethod(paymentMethod);
-            payment.setPaymentStatus("Completed");
-            payment.setBooking(savedBooking);
-
-            Payment savedPayment = paymentRepository.save(payment);
+            // Process payment via Strategy-based PaymentService
+            Map<String, Object> paymentProcessRes = paymentService.processPackagePayment(
+                savedBooking.getBookingId(), paymentMethod, null
+            );
+            if (!(Boolean.TRUE.equals(paymentProcessRes.get("success")))) {
+                response.put("success", false);
+                response.put("message", String.valueOf(paymentProcessRes.getOrDefault("message", "Payment failed")));
+                return response;
+            }
 
             // Mark all vehicles in the package as "Rented" to remove them from available vehicles list
             if (vehiclePackage.getVehicles() != null && !vehiclePackage.getVehicles().isEmpty()) {
@@ -477,11 +461,7 @@ public class BookingService {
             bookingPayload.put("packageName", vehiclePackage.getPackageName());
             bookingPayload.put("customerId", customer.getUserId());
 
-            Map<String, Object> paymentDetails = new HashMap<>();
-            paymentDetails.put("paymentId", savedPayment.getPaymentId());
-            paymentDetails.put("amount", savedPayment.getAmount());
-            paymentDetails.put("paymentMethod", savedPayment.getPaymentMethod());
-            paymentDetails.put("paymentDate", savedPayment.getPaymentDate());
+            Map<String, Object> paymentDetails = (Map<String, Object>) paymentProcessRes.get("payment");
 
             response.put("success", true);
             response.put("message", "Package booking and payment processed successfully");
