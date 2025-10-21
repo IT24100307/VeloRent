@@ -906,6 +906,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Delete User Confirmation Modal -->
+      <div id="deleteUserModal" class="modal">
+        <div class="modal-content">
+          <h3 class="modal-title">Confirm Delete</h3>
+          <p>Are you sure you want to delete the account for <span id="deleteUserName">this user</span>? This action cannot be undone.</p>
+          <div class="modal-actions">
+            <button id="cancelDeleteUserBtn" class="btn">Cancel</button>
+            <button id="confirmDeleteUserBtn" class="btn btn-danger">Delete User</button>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script>
@@ -949,6 +961,18 @@
           const roleId = document.getElementById('roleSelect').value;
           if (userId && roleId) {
             changeUserRole(userId, roleId);
+          }
+        });
+
+        // Add event listeners for delete user modal
+        document.getElementById('cancelDeleteUserBtn').addEventListener('click', function() {
+          document.getElementById('deleteUserModal').style.display = 'none';
+        });
+
+        document.getElementById('confirmDeleteUserBtn').addEventListener('click', function() {
+          const userId = this.getAttribute('data-user-id');
+          if (userId) {
+            deleteUser(userId);
           }
         });
 
@@ -1022,8 +1046,19 @@
           showChangeRoleModal(user.id, `${user.firstName} ${user.lastName}`, user.role);
         };
 
+        // Create delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteButton.classList.add('btn-action', 'btn-delete');
+        deleteButton.title = 'Delete User';
+        deleteButton.onclick = function(e) {
+          e.stopPropagation(); // Prevent row click event
+          showDeleteConfirmModal(user.id, `${user.firstName} ${user.lastName}`);
+        };
+
         actionButtons.appendChild(detailsButton);
         actionButtons.appendChild(changeRoleButton);
+        actionButtons.appendChild(deleteButton);
         actionCell.appendChild(actionButtons);
 
         return actionCell;
@@ -1559,6 +1594,50 @@
         .catch(error => {
           console.error('Error updating customer data:', error);
           alert('Failed to update customer data. Please try again later.');
+        });
+      }
+
+      // Functions for admin user deletion
+      function showDeleteConfirmModal(userId, userName) {
+        // Set user name in the modal
+        document.getElementById('deleteUserName').textContent = userName;
+
+        // Set user ID on the confirm button
+        document.getElementById('confirmDeleteUserBtn').setAttribute('data-user-id', userId);
+
+        // Show the modal
+        document.getElementById('deleteUserModal').style.display = 'block';
+      }
+
+      function deleteUser(userId) {
+        fetch(`/api/admin/users/${userId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete user');
+          }
+          // Hide the modal
+          document.getElementById('deleteUserModal').style.display = 'none';
+
+          // Reload all user lists to reflect the change
+          loadFleetManagers();
+          loadSystemAdmins();
+          loadOwners();
+
+          // Hide user details if currently shown
+          document.getElementById('userDetails').style.display = 'none';
+
+          // Show success message
+          alert('User deleted successfully');
+        })
+        .catch(error => {
+          console.error('Error deleting user:', error);
+          alert('Failed to delete user. Please try again later.');
+
+          // Hide the modal
+          document.getElementById('deleteUserModal').style.display = 'none';
         });
       }
     </script>
