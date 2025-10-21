@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import Group2.Car.Rental.System.payment.strategy.PaymentStrategyFactory;
+import Group2.Car.Rental.System.payment.strategy.PaymentStrategy;
+import Group2.Car.Rental.System.payment.strategy.PaymentStrategyResult;
 
 @Service
 public class PaymentService {
@@ -21,6 +24,9 @@ public class PaymentService {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private PaymentStrategyFactory paymentStrategyFactory;
 
     /**
      * Process a payment for a booking
@@ -58,25 +64,16 @@ public class PaymentService {
                 return response;
             }
 
-            // Create the payment
-            Payment payment = new Payment();
-            payment.setPaymentDate(LocalDateTime.now());
-            payment.setAmount(paymentRequest.getAmount() != null ? paymentRequest.getAmount() : booking.getTotalCost());
-            payment.setPaymentMethod(paymentRequest.getPaymentMethod());
-            // For cash, mark payment as Pending until admin confirms; otherwise Completed
-            if ("cash".equalsIgnoreCase(paymentRequest.getPaymentMethod())) {
-                payment.setPaymentStatus("Pending");
-            } else {
-                payment.setPaymentStatus("Completed");
-            }
-            payment.setBooking(booking);
+            // Resolve strategy and process payment
+            PaymentStrategy strategy = paymentStrategyFactory.resolve(paymentRequest.getPaymentMethod());
+            PaymentStrategyResult result = strategy.process(
+                    booking,
+                    paymentRequest.getAmount() != null ? paymentRequest.getAmount() : booking.getTotalCost(),
+                    null // no transactionId in PaymentRequest
+            );
 
-            // Update booking status based on payment method
-            if ("cash".equalsIgnoreCase(paymentRequest.getPaymentMethod())) {
-                booking.setBookingStatus("Payment Pending");
-            } else {
-                booking.setBookingStatus("Confirmed");
-            }
+            Payment payment = result.getPayment();
+            booking.setBookingStatus(result.getBookingStatus());
 
             // Save payment first, then update booking
             Payment savedPayment = paymentRepository.save(payment);
@@ -126,29 +123,21 @@ public class PaymentService {
                 return response;
             }
 
-            // Create the payment
-            Payment payment = new Payment();
-            payment.setPaymentDate(LocalDateTime.now());
-            payment.setAmount(booking.getTotalCost());
-            payment.setPaymentMethod(paymentMethod);
-            payment.setTransactionId(transactionId);
-            // Cash payments should remain Pending until admin confirms
-            if ("cash".equalsIgnoreCase(paymentMethod)) {
-                payment.setPaymentStatus("Pending");
-            } else {
-                payment.setPaymentStatus("Completed");
-            }
-            payment.setBooking(booking);
+            // Resolve strategy and process payment for package
+            PaymentStrategy strategy = paymentStrategyFactory.resolve(paymentMethod);
+            PaymentStrategyResult result = strategy.process(
+                    booking,
+                    booking.getTotalCost(),
+                    transactionId
+            );
+
+            Payment payment = result.getPayment();
 
             // Save the payment
             Payment savedPayment = paymentRepository.save(payment);
 
-            // Update booking status depending on payment method
-            if ("cash".equalsIgnoreCase(paymentMethod)) {
-                booking.setBookingStatus("Payment Pending");
-            } else {
-                booking.setBookingStatus("Confirmed");
-            }
+            // Update booking status depending on strategy
+            booking.setBookingStatus(result.getBookingStatus());
             bookingRepository.save(booking);
 
             response.put("success", true);
