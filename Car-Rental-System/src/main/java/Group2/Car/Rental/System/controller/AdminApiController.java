@@ -51,6 +51,9 @@ public class AdminApiController {
     @Autowired
     private FeedbackRepository feedbackRepository;
 
+    @Autowired
+    private Group2.Car.Rental.System.service.AuthService authService;
+
     @GetMapping("/customers")
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         // Get all users with customer information
@@ -71,6 +74,44 @@ public class AdminApiController {
         logger.info("CustomerDTOs created: {}", customerDTOs.size());
 
         return ResponseEntity.ok(customerDTOs);
+    }
+
+    // Create an admin user (Fleet Manager, System Admin, or Owner)
+    @PostMapping("/users")
+    public ResponseEntity<?> createAdminUser(@RequestBody Group2.Car.Rental.System.dto.CreateAdminUserDTO dto) {
+        try {
+            // Reuse registration flow but skip registration codes by directly calling service with a tailored RegisterDto
+            Group2.Car.Rental.System.dto.RegisterDto reg = new Group2.Car.Rental.System.dto.RegisterDto();
+            reg.setFirstName(dto.getFirstName());
+            reg.setLastName(dto.getLastName());
+            reg.setEmail(dto.getEmail());
+            reg.setPassword(dto.getPassword());
+            reg.setRoleName(dto.getRoleName());
+            // Allow passing optional staffIdCode
+            reg.setStaffIdCode(dto.getStaffIdCode());
+
+            // The AuthService.register enforces registration codes for admin roles.
+            // For admin-created accounts, set valid codes implicitly by role.
+            switch (dto.getRoleName()) {
+                case "ROLE_FLEET_MANAGER":
+                    reg.setRegistrationCode("FLEET_MGR_SECRET");
+                    break;
+                case "ROLE_SYSTEM_ADMIN":
+                    reg.setRegistrationCode("SYS_ADMIN_SECRET");
+                    break;
+                case "ROLE_OWNER":
+                    reg.setRegistrationCode("OWNER_SECRET");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Invalid role. Use ROLE_FLEET_MANAGER, ROLE_SYSTEM_ADMIN, or ROLE_OWNER");
+            }
+
+            authService.register(reg);
+            return ResponseEntity.ok().body(Map.of("success", true));
+        } catch (Exception ex) {
+            logger.error("Failed to create admin user: {}", ex.getMessage(), ex);
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", ex.getMessage()));
+        }
     }
 
     @GetMapping("/users/fleet-managers")

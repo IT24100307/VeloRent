@@ -729,6 +729,7 @@
                                     <div id="user-name-dropdown">User Name</div>
                                     <div class="user-email" id="user-email-dropdown">user@example.com</div>
                                 </div>
+                                <a id="profile-dropdown-link" href="/profile"><i class="fas fa-user"></i> Profile</a>
                                 <a onclick="handleLogout(event)" style="cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
@@ -998,7 +999,7 @@
         const token = localStorage.getItem("token");
 
         // Document ready function
-        document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
             // Check if user is logged in
             if (!token) {
                 window.location.href = "/login?message=" + encodeURIComponent("Please log in to access the dashboard") + "&type=error";
@@ -1021,6 +1022,10 @@
             document.getElementById("user-name").textContent = userName;
             document.getElementById("user-name-dropdown").textContent = userName;
             document.getElementById("user-email-dropdown").textContent = userEmail;
+            const profileLink = document.getElementById('profile-dropdown-link');
+            if (profileLink) {
+                profileLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+            }
 
             // Set user initials in profile icon
             const userInitials = userName

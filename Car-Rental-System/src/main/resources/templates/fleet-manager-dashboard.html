@@ -1153,7 +1153,7 @@
                                     <div id="user-name-dropdown">Fleet Manager</div>
                                     <small id="user-email-dropdown" style="color: var(--text-luxury-muted);">fleet@velorent.com</small>
                                 </div>
-                                <a class="dropdown-item" href="/profile" style="color: var(--text-luxury-light); padding: 0.75rem 1rem; transition: var(--transition-smooth); text-decoration: none;" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
+                                <a class="dropdown-item" href="/profile" id="profile-dropdown-link" style="color: var(--text-luxury-light); padding: 0.75rem 1rem; transition: var(--transition-smooth); text-decoration: none;" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
                                     <i class="fas fa-user mr-2"></i>Profile
                                 </a>
                             </div>
@@ -1499,6 +1499,10 @@
             document.getElementById("user-name").textContent = userName;
             document.getElementById("user-name-dropdown").textContent = userName;
             document.getElementById("user-email-dropdown").textContent = userEmail;
+            const profileLink = document.getElementById('profile-dropdown-link');
+            if (profileLink) {
+                profileLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+            }
 
             // Set user initials in profile icon
             const userInitials = userName
@@ -1507,6 +1511,27 @@
                 .join("")
                 .toUpperCase();
             document.getElementById("user-initials").textContent = userInitials;
+
+            // Make the profile icon/button navigate to the Profile page directly
+            const initialsEl = document.getElementById('user-initials');
+            if (initialsEl) {
+                initialsEl.style.cursor = 'pointer';
+                const goToProfile = (e) => {
+                    e.preventDefault();
+                    const email = localStorage.getItem('userEmail') || userEmail;
+                    window.location.href = `/profile?email=${encodeURIComponent(email)}`;
+                };
+                // Click on the initials
+                initialsEl.addEventListener('click', goToProfile);
+                // Click on the surrounding button (icon container)
+                const parentBtn = initialsEl.closest('button');
+                if (parentBtn) {
+                    parentBtn.style.cursor = 'pointer';
+                    // Remove bootstrap toggle attribute if present so it doesn't interfere
+                    if (parentBtn.hasAttribute('data-toggle')) parentBtn.removeAttribute('data-toggle');
+                    parentBtn.addEventListener('click', goToProfile);
+                }
+            }
 
             // Setup search functionality
             const searchInput = document.getElementById("vehicle-search");

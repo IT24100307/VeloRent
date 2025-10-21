@@ -205,7 +205,23 @@
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/bookings"><i class="fas fa-calendar-check mr-1"></i>Bookings</a></li>
         </ul>
-        <ul class="navbar-nav">
+        <ul class="navbar-nav" style="align-items:center; gap: 8px;">
+          <li class="nav-item">
+            <div class="dropdown">
+              <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" title="Account" style="margin-left: 8px;">
+                <span id="owner-user-initials">OW</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury); min-width: 240px;">
+                <div class="dropdown-item-text" style="color: var(--luxury-gold); font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+                  <div id="owner-user-name">Owner</div>
+                  <small id="owner-user-email" style="color: var(--text-luxury-muted);">owner@velorent.com</small>
+                </div>
+                <a class="dropdown-item" href="/profile" id="owner-profile-dropdown-link" style="color: var(--text-luxury-light); padding: 0.75rem 1rem; transition: var(--transition-smooth); text-decoration: none;" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
+                  <i class="fas fa-user-circle mr-2"></i> Profile
+                </a>
+              </div>
+            </div>
+          </li>
           <li class="nav-item"><a class="nav-link-luxury" href="#" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a></li>
         </ul>
       </div>
@@ -488,6 +504,34 @@
       }
     });
   }
+</script>
+
+<!-- Profile wiring: populate and link to Profile page -->
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const userName = localStorage.getItem('userName') || 'Owner';
+    const userEmail = localStorage.getItem('userEmail') || 'owner@velorent.com';
+
+    const nameEl = document.getElementById('owner-user-name');
+    const emailEl = document.getElementById('owner-user-email');
+    if (nameEl) nameEl.textContent = userName;
+    if (emailEl) emailEl.textContent = userEmail;
+
+    const initials = userName.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+    const initialsEl = document.getElementById('owner-user-initials');
+    if (initialsEl) {
+      initialsEl.textContent = initials || 'OW';
+      initialsEl.style.cursor = 'pointer';
+      initialsEl.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+      });
+    }
+
+    const profileLink = document.getElementById('owner-profile-dropdown-link');
+    if (profileLink) profileLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+  });
 </script>
 
 <!-- Luxury Theme JavaScript -->
