@@ -1627,7 +1627,7 @@
         <div class="dashboard-header">
           <h1 class="dashboard-title">Dashboard</h1>
           <div class="dashboard-actions">
-            <a href="#" class="btn btn-accent" id="rent-car-btn"><i class="fas fa-car"></i>Rent a Car</a>
+            <a href="/packages" class="btn btn-accent" id="rent-car-btn"><i class="fas fa-car"></i>View All Packges</a>
             <a href="/rental-history" class="btn" id="rental-history-btn"><i class="fas fa-history"></i>Rental History</a>
             <!-- Add vehicle button - hidden by default, shown for fleet managers -->
             <button
@@ -1654,7 +1654,7 @@
 
           <!-- Packages Slider Section (replaces welcome when packages exist) -->
           <div class="packages-section" id="packages-section" style="display:none;">
-            <h3>🎉 Active Luxury Packages</h3>
+            <h3 style="display:none;"></h3>
             <div class="packages-slider">
               <div class="packages-track" id="packages-track"><!-- slides injected --></div>
               <div class="packages-nav">
@@ -1890,7 +1890,6 @@
             </div>
             <div class="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 15px;">
               <button type="button" class="btn" onclick="closePackageDetailsModal()" style="background: transparent; border: 2px solid var(--luxury-gold); color: var(--luxury-gold);">Close</button>
-              <button type="button" class="btn btn-accent" id="pkg-modal-buy" style="background: var(--gradient-gold); color: var(--luxury-black);">Book Now</button>
             </div>
           </div>
         </div>
@@ -2130,6 +2129,21 @@
         if (userRoleElement && userRole) {
           userRoleElement.textContent =
             "Your role: " + userRole.replace("ROLE_", "");
+        }
+
+        // Wire 'Rent a Car' navigator to packages with login guard
+        const rentBtn = document.getElementById('rent-car-btn');
+        if (rentBtn) {
+          rentBtn.addEventListener('click', function(e){
+            // If we already set href, just ensure token exists; otherwise redirect to login with return
+            const t = localStorage.getItem('token');
+            if (!t) {
+              e.preventDefault();
+              window.location.href = '/login?message=' + encodeURIComponent('Please log in to view packages') + '&type=error&returnUrl=' + encodeURIComponent('/packages');
+              return false;
+            }
+            // Allow normal navigation to /packages
+          });
         }
 
         // Check for query parameter messages
@@ -2489,9 +2503,7 @@
 
             // Update section title dynamically
             const sectionTitle = section.querySelector('h3');
-            if (sectionTitle && !sectionTitle.innerHTML.includes('🎉')) {
-              sectionTitle.innerHTML = `🎉 Luxury Packages (${visible.length})`;
-            }
+            if (sectionTitle) { sectionTitle.innerHTML = ''; sectionTitle.style.display = 'none'; }
             // Build slides
             track.innerHTML = '';
             const indicators = document.createElement('div');
@@ -2523,11 +2535,6 @@
                   </div>
                   <div class="package-actions">
                     <button class="btn view-details-btn" data-pkg-idx="${idx}">View Details</button>
-                    <button class="btn ${isPartiallyReserved ? 'btn-disabled' : 'btn-accent'}"
-                            data-pkg-buy-idx="${idx}"
-                            ${isPartiallyReserved ? 'disabled title="Package temporarily unavailable"' : ''}>
-                      ${isPartiallyReserved ? 'Unavailable' : 'Book Now'}
-                    </button>
                   </div>
                 </div>`;
               track.appendChild(slide);
@@ -2667,7 +2674,9 @@
           }
 
           const buyBtn = document.getElementById('pkg-modal-buy');
-          buyBtn.onclick = () => buyPackage(pkg);
+          if (buyBtn) {
+            buyBtn.onclick = () => buyPackage(pkg);
+          }
           document.getElementById('package-details-modal').style.display = 'block';
         }
         window.closePackageDetailsModal = function(){ document.getElementById('package-details-modal').style.display = 'none'; };
