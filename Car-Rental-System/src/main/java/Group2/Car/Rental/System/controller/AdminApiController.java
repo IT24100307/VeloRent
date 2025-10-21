@@ -271,6 +271,7 @@ public class AdminApiController {
     public ResponseEntity<List<Map<String, Object>>> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
         List<Map<String, Object>> roleList = roles.stream()
+            .filter(role -> !role.getName().equals("ROLE_CUSTOMER")) // Exclude customer role
             .map(role -> {
                 Map<String, Object> roleMap = new HashMap<>();
                 roleMap.put("id", role.getId());
@@ -280,5 +281,27 @@ public class AdminApiController {
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(roleList);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        logger.info("Request to delete user with ID: {}", id);
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Check if user is an admin (not a customer)
+            if (user.getRole() != null && !user.getRole().getName().equals("ROLE_CUSTOMER")) {
+                logger.info("Deleting admin user with ID: {}", id);
+                userRepository.delete(user);
+                return ResponseEntity.ok().build();
+            } else {
+                logger.warn("Cannot delete customer user through admin endpoint. Use customer endpoint instead.");
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        logger.warn("User not found with ID: {}", id);
+        return ResponseEntity.notFound().build();
     }
 }
