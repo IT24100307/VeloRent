@@ -408,29 +408,43 @@
         margin-right: 10px;
       }
 
+      /* Modal overlay + content: high-contrast and centered */
       .modal {
         display: none;
         position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
+        z-index: 2000; /* above sticky headers and tables */
+        inset: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.75); /* darker for readability */
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        padding: 24px;
+        display: none;
+        /* Center content */
+        align-items: center;
+        justify-content: center;
       }
 
       .modal-content {
-        background-color: var(--card-background);
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 8px;
-        width: 400px;
-        max-width: 90%;
+        background: linear-gradient(180deg, rgba(18,18,18,1) 0%, rgba(10,10,10,1) 100%);
+        color: var(--text-luxury-light);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+        border-radius: 12px;
+        padding: 22px 22px 16px 22px;
+        margin: 0 auto;
+        width: 520px;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
       }
 
       .modal-title {
         margin-bottom: 15px;
-        color: var(--primary-color);
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
       }
 
       .modal-actions {
@@ -446,23 +460,31 @@
 
       .form-group label {
         display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: var(--text-color);
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: var(--text-luxury-light);
+        letter-spacing: 0.3px;
       }
 
       .form-control {
         width: 100%;
-        padding: 10px;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
+        padding: 10px 12px;
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 8px;
         font-size: 1rem;
-        color: var(--text-color);
+        background: #0f0f0f;
+        color: #f2f2f2;
+      }
+
+      .form-control::placeholder {
+        color: #a8a8a8;
+        opacity: 1;
       }
 
       .form-control:focus {
-        border-color: var(--secondary-color);
+        border-color: var(--luxury-gold);
         outline: none;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
       }
 
       .user-section {
@@ -587,6 +609,18 @@
 
       .tab-content.active {
         display: block;
+      }
+
+      /* Make primary action prominent inside modals */
+      .modal-actions .btn-secondary {
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+        border: none;
+      }
+      .modal-actions .btn-secondary:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-luxury);
       }
       
       /* DataTables Luxury Theme Overrides */
@@ -1089,8 +1123,8 @@
         // Set user ID on the confirm button
         document.getElementById('confirmChangeRoleBtn').setAttribute('data-user-id', userId);
 
-        // Show the modal
-        document.getElementById('changeRoleModal').style.display = 'block';
+  // Show the modal (centered)
+  document.getElementById('changeRoleModal').style.display = 'flex';
       }
 
       function populateRoleDropdown(selectElement, currentRole) {
@@ -1472,8 +1506,8 @@
         // Store the customer ID in the confirm button's data attribute
         document.getElementById('confirmDeleteBtn').setAttribute('data-customer-id', customerId);
 
-        // Display the modal
-        document.getElementById('deleteModal').style.display = 'block';
+  // Display the modal (centered)
+  document.getElementById('deleteModal').style.display = 'flex';
 
         // Set up the confirm delete button
         document.getElementById('confirmDeleteBtn').onclick = function() {
@@ -1532,8 +1566,9 @@
             document.getElementById('editCity').value = customer.addressCity || '';
             document.getElementById('editPostalCode').value = customer.addressPostalCode || '';
 
-            // Display the edit modal
-            document.getElementById('editModal').style.display = 'block';
+            // Display the edit modal (centered with flex)
+            const editModalEl = document.getElementById('editModal');
+            editModalEl.style.display = 'flex';
 
             // Handle form submission
             const form = document.getElementById('editCustomerForm');
@@ -1605,8 +1640,8 @@
         // Set user ID on the confirm button
         document.getElementById('confirmDeleteUserBtn').setAttribute('data-user-id', userId);
 
-        // Show the modal
-        document.getElementById('deleteUserModal').style.display = 'block';
+  // Show the modal (centered)
+  document.getElementById('deleteUserModal').style.display = 'flex';
       }
 
       function deleteUser(userId) {
@@ -1640,6 +1675,33 @@
           document.getElementById('deleteUserModal').style.display = 'none';
         });
       }
+    </script>
+
+    <script>
+      // Generic UX: close modals on overlay click or ESC key
+      (function(){
+        const modals = ['deleteModal','editModal','changeRoleModal','deleteUserModal'];
+        modals.forEach(id => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          el.addEventListener('click', (e) => {
+            if (e.target === el) {
+              el.style.display = 'none';
+            }
+          });
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            modals.forEach(id => {
+              const el = document.getElementById(id);
+              if(el && getComputedStyle(el).display !== 'none'){
+                el.style.display = 'none';
+              }
+            });
+          }
+        });
+      })();
     </script>
 
     <!-- Luxury Theme JavaScript -->
