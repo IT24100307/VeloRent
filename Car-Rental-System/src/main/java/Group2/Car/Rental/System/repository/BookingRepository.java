@@ -114,4 +114,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     // Upcoming confirmed bookings starting within a window (for countdown notifications)
     List<Booking> findTop20ByBookingStatusAndStartDateBetweenOrderByStartDateAsc(String status, LocalDateTime from, LocalDateTime to);
 
+    // NEW: Customer-scoped convenience queries
+    List<Booking> findTop20ByCustomer_UserIdAndBookingStatusOrderByCreatedAtDesc(Integer customerId, String status);
 }

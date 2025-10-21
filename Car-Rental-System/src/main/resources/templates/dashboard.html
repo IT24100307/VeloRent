@@ -1022,11 +1022,6 @@
         letter-spacing: 1px;
       }
 
-      .view-details-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4) !important;
-      }
-
       /* Full-screen layout adjustments */
       @media (max-width: 768px) {
         .vehicles-section {
@@ -1438,6 +1433,113 @@
         transform: none !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
       }
+
+      /* Notifications dropdown styles */
+      .notifications-toggle{position:relative;background:transparent!important;color:var(--luxury-gold)!important;border:2px solid var(--luxury-gold)!important;border-radius:var(--radius-luxury-small);display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px}
+      .notifications-badge{position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;border-radius:50%;font-size:11px;line-height:1;padding:4px 6px;min-width:20px;text-align:center;border:2px solid var(--luxury-black)}
+      .notifications-menu{min-width:360px;max-height:420px;overflow-y:auto;background:var(--luxury-dark);border:1px solid rgba(212,175,55,.2)}
+      .notif-item{display:flex;gap:10px;padding:10px 12px;align-items:flex-start;border-bottom:1px solid rgba(212,175,55,.08);color:var(--text-luxury-light)}
+      .notif-item:last-child{border-bottom:none}
+      .notif-icon{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+      .notif-icon.success{background:rgba(39,174,96,.15);color:#2ecc71}
+      .notif-icon.danger{background:rgba(231,76,60,.15);color:#e74c3c}
+      .notif-icon.warning{background:rgba(241,196,15,.15);color:#f1c40f}
+      .notif-icon.info{background:rgba(52,152,219,.15);color:#3498db}
+      .notif-title{font-weight:700;color:var(--luxury-gold);font-size:.95rem}
+      .notif-time{font-size:.75rem;color:var(--text-luxury-muted)}
+      .notif-tick{cursor:pointer;color:var(--luxury-gold);opacity:.8}
+      .notif-tick.read{color:#27ae60;opacity:1}
+      .notif-empty{padding:12px;text-align:center;color:var(--text-luxury-muted)}
+
+      /* Notifications logic */
+      const notifList = document.getElementById('notif-list');
+      const notifBadge = document.getElementById('notif-badge');
+      const notifMarkAllBtn = document.getElementById('notif-mark-all');
+
+      function getReadSet(){
+        try { return new Set(JSON.parse(localStorage.getItem('notifReadIds')||'[]')); } catch(_) { return new Set(); }
+      }
+      function saveReadSet(set){ localStorage.setItem('notifReadIds', JSON.stringify(Array.from(set))); }
+
+      function renderNotifications(notifications){
+        notifList.innerHTML = '';
+        const readSet = getReadSet();
+        let unreadCount = 0;
+
+        if (!Array.isArray(notifications) || notifications.length === 0){
+          notifList.innerHTML = '<div class="notif-empty">No notifications yet</div>';
+        } else {
+          notifications.forEach(n => {
+            const id = n.id || (n.type + '_' + (n.bookingId || '') + '_' + (n.timestamp || ''));
+            const isRead = id && readSet.has(id) ? true : false;
+            if (!isRead) unreadCount++;
+            const icon = (n.icon || 'fa-bell').replace('fa-', '');
+            const sev = (n.severity || 'info').toLowerCase();
+            const time = n.timestamp ? new Date(n.timestamp).toLocaleString() : '';
+            const item = document.createElement('div');
+            item.className = 'notif-item';
+            item.innerHTML = `
+              <div class="notif-icon ${sev}"><i class="fas ${n.icon ? n.icon : 'fa-bell'}"></i></div>
+              <div class="notif-content">
+                <div class="notif-title">${n.title || 'Notification'}</div>
+                <div style="font-size:0.9rem;color:var(--text-luxury-muted);margin-top:4px;">${n.message || ''}</div>
+                <div class="notif-time">${time}</div>
+              </div>
+              <div class="notif-actions">
+                <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
+              </div>`;
+            notifList.appendChild(item);
+          });
+        }
+
+        // Update badge
+        if (unreadCount > 0){
+          notifBadge.style.display = 'inline-block';
+          notifBadge.textContent = unreadCount;
+        } else {
+          notifBadge.style.display = 'none';
+        }
+      }
+
+      async function updateNotifications(){
+        try {
+          const token = localStorage.getItem('token');
+          const headers = { 'Accept': 'application/json' };
+          if (token) headers['Authorization'] = `Bearer ${token}`;
+          const res = await fetch('/api/customer/notifications', { headers });
+          const list = await res.json();
+          renderNotifications(Array.isArray(list) ? list : []);
+        } catch (e) {
+          console.error('Failed to load notifications', e);
+        }
+      }
+
+      // Mark all read
+      if (notifMarkAllBtn){
+        notifMarkAllBtn.addEventListener('click', () => {
+          try {
+            const ids = Array.from(notifList.querySelectorAll('.notif-tick')).map(el => el.getAttribute('data-id')).filter(Boolean);
+            const set = getReadSet(); ids.forEach(id => set.add(id)); saveReadSet(set);
+            updateNotifications();
+          } catch(e){ console.error('Failed to mark all read', e); }
+        });
+      }
+
+      // Tick one notification
+      if (notifList){
+        notifList.addEventListener('click', (e) => {
+          const tick = e.target.closest('.notif-tick');
+          if (!tick) return;
+          const id = tick.getAttribute('data-id');
+          if (!id) return;
+          const set = getReadSet(); set.add(id); saveReadSet(set);
+          updateNotifications();
+        });
+      }
+
+      // Initial load + polling
+      updateNotifications();
+      setInterval(updateNotifications, 30000);
     </style>
   </head>
   <body>
@@ -1476,6 +1578,22 @@
             </li>
           </ul>
           <div class="auth-buttons">
+            <!-- Notifications Dropdown (inserted) -->
+            <div class="dropdown mr-2">
+              <button class="btn notifications-toggle dropdown-toggle" type="button" id="notifDropdownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span id="notif-badge" class="notifications-badge" style="display:none;">0</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right notifications-menu" aria-labelledby="notifDropdownBtn">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(212,175,55,0.1);">
+                  <div style="color:var(--luxury-gold);font-weight:700;">Notifications</div>
+                  <button id="notif-mark-all" class="btn btn-sm btn-luxury" style="padding:6px 10px;">Mark all read</button>
+                </div>
+                <div id="notif-list">
+                  <div class="notif-empty">No notifications yet</div>
+                </div>
+              </div>
+            </div>
             <!-- Profile Dropdown -->
             <div class="dropdown">
               <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
@@ -1985,6 +2103,7 @@
     <script th:src="@{/js/jQuery/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/css/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/dashboard-vehicles.js}"></script>
+    <script th:src="@{/js/notifications.js}"></script>
     <script>
       $('#admin-dashboard-btn').on('click', function() {
         if(localStorage.getItem("userRole") && localStorage.getItem("userRole").includes("OWNER")){
@@ -2952,6 +3071,96 @@
         }
 
         // Removed: All payment-related functions (showPaymentModal, handlePaymentSubmission, card validation, etc.)
+
+        // Notifications logic
+        const notifList = document.getElementById('notif-list');
+        const notifBadge = document.getElementById('notif-badge');
+        const notifMarkAllBtn = document.getElementById('notif-mark-all');
+
+        function getReadSet(){
+          try { return new Set(JSON.parse(localStorage.getItem('notifReadIds')||'[]')); } catch(_) { return new Set(); }
+        }
+        function saveReadSet(set){ localStorage.setItem('notifReadIds', JSON.stringify(Array.from(set))); }
+
+        function renderNotifications(notifications){
+          notifList.innerHTML = '';
+          const readSet = getReadSet();
+          let unreadCount = 0;
+
+          if (!Array.isArray(notifications) || notifications.length === 0){
+            notifList.innerHTML = '<div class="notif-empty">No notifications yet</div>';
+          } else {
+            notifications.forEach(n => {
+              const id = n.id || (n.type + '_' + (n.bookingId || '') + '_' + (n.timestamp || ''));
+              const isRead = id && readSet.has(id) ? true : false;
+              if (!isRead) unreadCount++;
+              const icon = (n.icon || 'fa-bell').replace('fa-', '');
+              const sev = (n.severity || 'info').toLowerCase();
+              const time = n.timestamp ? new Date(n.timestamp).toLocaleString() : '';
+              const item = document.createElement('div');
+              item.className = 'notif-item';
+              item.innerHTML = `
+                <div class="notif-icon ${sev}"><i class="fas ${n.icon ? n.icon : 'fa-bell'}"></i></div>
+                <div class="notif-content">
+                  <div class="notif-title">${n.title || 'Notification'}</div>
+                  <div style="font-size:0.9rem;color:var(--text-luxury-muted);margin-top:4px;">${n.message || ''}</div>
+                  <div class="notif-time">${time}</div>
+                </div>
+                <div class="notif-actions">
+                  <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
+                </div>`;
+              notifList.appendChild(item);
+            });
+          }
+
+          // Update badge
+          if (unreadCount > 0){
+            notifBadge.style.display = 'inline-block';
+            notifBadge.textContent = unreadCount;
+          } else {
+            notifBadge.style.display = 'none';
+          }
+        }
+
+        async function updateNotifications(){
+          try {
+            const token = localStorage.getItem('token');
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch('/api/customer/notifications', { headers });
+            const list = await res.json();
+            renderNotifications(Array.isArray(list) ? list : []);
+          } catch (e) {
+            console.error('Failed to load notifications', e);
+          }
+        }
+
+        // Mark all read
+        if (notifMarkAllBtn){
+          notifMarkAllBtn.addEventListener('click', () => {
+            try {
+              const ids = Array.from(notifList.querySelectorAll('.notif-tick')).map(el => el.getAttribute('data-id')).filter(Boolean);
+              const set = getReadSet(); ids.forEach(id => set.add(id)); saveReadSet(set);
+              updateNotifications();
+            } catch(e){ console.error('Failed to mark all read', e); }
+          });
+        }
+
+        // Tick one notification
+        if (notifList){
+          notifList.addEventListener('click', (e) => {
+            const tick = e.target.closest('.notif-tick');
+            if (!tick) return;
+            const id = tick.getAttribute('data-id');
+            if (!id) return;
+            const set = getReadSet(); set.add(id); saveReadSet(set);
+            updateNotifications();
+          });
+        }
+
+        // Initial load + polling
+        updateNotifications();
+        setInterval(updateNotifications, 30000);
       });
     </script>
 
