@@ -408,29 +408,43 @@
         margin-right: 10px;
       }
 
+      /* Modal overlay + content: high-contrast and centered */
       .modal {
         display: none;
         position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
+        z-index: 2000; /* above sticky headers and tables */
+        inset: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.75); /* darker for readability */
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        padding: 24px;
+        display: none;
+        /* Center content */
+        align-items: center;
+        justify-content: center;
       }
 
       .modal-content {
-        background-color: var(--card-background);
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 8px;
-        width: 400px;
-        max-width: 90%;
+        background: linear-gradient(180deg, rgba(18,18,18,1) 0%, rgba(10,10,10,1) 100%);
+        color: var(--text-luxury-light);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+        border-radius: 12px;
+        padding: 22px 22px 16px 22px;
+        margin: 0 auto;
+        width: 520px;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
       }
 
       .modal-title {
         margin-bottom: 15px;
-        color: var(--primary-color);
+        color: var(--luxury-gold);
+        font-family: var(--font-luxury-primary);
+        font-weight: 700;
       }
 
       .modal-actions {
@@ -446,23 +460,31 @@
 
       .form-group label {
         display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: var(--text-color);
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: var(--text-luxury-light);
+        letter-spacing: 0.3px;
       }
 
       .form-control {
         width: 100%;
-        padding: 10px;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
+        padding: 10px 12px;
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 8px;
         font-size: 1rem;
-        color: var(--text-color);
+        background: #0f0f0f;
+        color: #f2f2f2;
+      }
+
+      .form-control::placeholder {
+        color: #a8a8a8;
+        opacity: 1;
       }
 
       .form-control:focus {
-        border-color: var(--secondary-color);
+        border-color: var(--luxury-gold);
         outline: none;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
       }
 
       .user-section {
@@ -588,6 +610,18 @@
       .tab-content.active {
         display: block;
       }
+
+      /* Make primary action prominent inside modals */
+      .modal-actions .btn-secondary {
+        background: var(--gradient-gold);
+        color: var(--luxury-black);
+        border: none;
+      }
+      .modal-actions .btn-secondary:hover {
+        background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-luxury);
+      }
       
       /* DataTables Luxury Theme Overrides */
       .dataTables_wrapper {
@@ -646,13 +680,23 @@
         <div class="logo">
           <i class="fas fa-crown mr-2"></i>VeloRent Admin
         </div>
-        <div class="nav-links">
+        <div class="nav-links" style="align-items:center; gap: 12px;">
           <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
-          <a href="#"><i class="fas fa-car mr-1"></i>Vehicles</a>
-          <a href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a>
           <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
-          <a href="/admin/payments"><i class="fas fa-credit-card mr-1"></i>Payments</a>
-          <a href="#"><i class="fas fa-chart-bar mr-1"></i>Reports</a>
+          <div class="dropdown">
+            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" title="Account">
+              <span id="admin-user-initials">AD</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury); min-width: 240px;">
+              <div class="dropdown-item-text" style="color: var(--luxury-gold); font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+                <div id="admin-user-name">System Admin</div>
+                <small id="admin-user-email" style="color: var(--text-luxury-muted);">admin@velorent.com</small>
+              </div>
+              <a class="dropdown-item" href="/profile" id="admin-profile-dropdown-link" style="color: var(--text-luxury-light); padding: 0.75rem 1rem; transition: var(--transition-smooth); text-decoration: none;" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
+                <i class="fas fa-user-circle mr-2"></i> Profile
+              </a>
+            </div>
+          </div>
           <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
         </div>
       </nav>
@@ -665,6 +709,7 @@
           <a href="/dashboard" class="btn back-btn">Back to Dashboard</a>
           <a href="/owner/dashboard" class="btn back-btn" id="toOwner" style="display: none;">To Owner Dashboard</a>
           <button class="btn btn-secondary" id="refreshBtn">Refresh Data</button>
+          <button class="btn" id="openCreateAdminBtn"><i class="fas fa-user-plus mr-1"></i>Create Admin</button>
         </div>
       </div>
 
@@ -918,6 +963,50 @@
           </div>
         </div>
       </div>
+
+      <!-- Create Admin Modal -->
+      <div id="createAdminModal" class="modal">
+        <div class="modal-content" style="width: 560px; max-width: 95%;">
+          <h3 class="modal-title">Create Admin Account</h3>
+          <form id="createAdminForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label for="adminFirstName">First Name</label>
+                <input type="text" id="adminFirstName" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label for="adminLastName">Last Name</label>
+                <input type="text" id="adminLastName" class="form-control" required />
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label for="adminEmail">Email</label>
+                <input type="email" id="adminEmail" class="form-control" required />
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label for="adminPassword">Temporary Password</label>
+                <input type="password" id="adminPassword" class="form-control" placeholder="Min 6 characters" minlength="6" required />
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label for="adminRole">Role</label>
+                <select id="adminRole" class="form-control" required>
+                  <option value="" disabled selected>Select Role</option>
+                  <option value="ROLE_FLEET_MANAGER">Fleet Manager</option>
+                  <option value="ROLE_SYSTEM_ADMIN">System Administrator</option>
+                  <option value="ROLE_OWNER">Owner</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label for="adminStaffId">Staff ID (optional)</label>
+                <input type="text" id="adminStaffId" class="form-control" placeholder="Auto-generated if blank" />
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" id="cancelCreateAdminBtn" class="btn">Cancel</button>
+              <button type="submit" class="btn btn-secondary">Create</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </main>
 
     <script>
@@ -929,6 +1018,36 @@
       }
 
       document.addEventListener('DOMContentLoaded', function() {
+        // Populate Admin profile controls and wire navigation
+        try {
+          const userName = localStorage.getItem('userName') || 'System Admin';
+          const userEmail = localStorage.getItem('userEmail') || 'admin@velorent.com';
+          const initials = userName.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+          const nameEl = document.getElementById('admin-user-name');
+          const emailEl = document.getElementById('admin-user-email');
+          const initialsEl = document.getElementById('admin-user-initials');
+          const profileLink = document.getElementById('admin-profile-dropdown-link');
+          if (nameEl) nameEl.textContent = userName;
+          if (emailEl) emailEl.textContent = userEmail;
+          if (profileLink) profileLink.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+          if (initialsEl) {
+            initialsEl.textContent = initials || 'AD';
+            initialsEl.style.cursor = 'pointer';
+            const goToProfile = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = `/profile?email=${encodeURIComponent(userEmail)}`;
+            };
+            initialsEl.addEventListener('click', goToProfile);
+            const parentBtn = initialsEl.closest('button');
+            if (parentBtn) {
+              parentBtn.style.cursor = 'pointer';
+              if (parentBtn.hasAttribute('data-toggle')) parentBtn.removeAttribute('data-toggle');
+              parentBtn.addEventListener('click', goToProfile);
+            }
+          }
+        } catch (e) { /* no-op */ }
+
         loadCustomers();
         loadFleetManagers();
         loadSystemAdmins();
@@ -941,6 +1060,51 @@
           loadFleetManagers();
           loadSystemAdmins();
           loadOwners();
+        });
+
+        // Create Admin modal open/close
+        document.getElementById('openCreateAdminBtn').addEventListener('click', function(){
+          document.getElementById('createAdminModal').style.display = 'flex';
+        });
+        document.getElementById('cancelCreateAdminBtn').addEventListener('click', function(){
+          document.getElementById('createAdminModal').style.display = 'none';
+        });
+
+        // Create admin submit
+        document.getElementById('createAdminForm').addEventListener('submit', async function(e){
+          e.preventDefault();
+          const payload = {
+            firstName: document.getElementById('adminFirstName').value.trim(),
+            lastName: document.getElementById('adminLastName').value.trim(),
+            email: document.getElementById('adminEmail').value.trim(),
+            password: document.getElementById('adminPassword').value,
+            roleName: document.getElementById('adminRole').value,
+            staffIdCode: document.getElementById('adminStaffId').value.trim() || null
+          };
+
+          try{
+            const res = await fetch('/api/admin/users', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const ok = res.ok;
+            const data = await res.json().catch(() => ({}));
+            if(!ok || data.success === false){
+              throw new Error((data && data.message) || 'Failed to create admin user');
+            }
+            // Close modal, refresh lists depending on role
+            document.getElementById('createAdminModal').style.display = 'none';
+            document.getElementById('createAdminForm').reset();
+            loadFleetManagers();
+            loadSystemAdmins();
+            loadOwners();
+            alert('Admin account created successfully');
+          }catch(err){
+            console.error('Create admin failed:', err);
+            alert('Failed to create admin: ' + err.message);
+          }
         });
 
         // Modal event listeners
@@ -1089,8 +1253,8 @@
         // Set user ID on the confirm button
         document.getElementById('confirmChangeRoleBtn').setAttribute('data-user-id', userId);
 
-        // Show the modal
-        document.getElementById('changeRoleModal').style.display = 'block';
+  // Show the modal (centered)
+  document.getElementById('changeRoleModal').style.display = 'flex';
       }
 
       function populateRoleDropdown(selectElement, currentRole) {
@@ -1472,8 +1636,8 @@
         // Store the customer ID in the confirm button's data attribute
         document.getElementById('confirmDeleteBtn').setAttribute('data-customer-id', customerId);
 
-        // Display the modal
-        document.getElementById('deleteModal').style.display = 'block';
+  // Display the modal (centered)
+  document.getElementById('deleteModal').style.display = 'flex';
 
         // Set up the confirm delete button
         document.getElementById('confirmDeleteBtn').onclick = function() {
@@ -1532,8 +1696,9 @@
             document.getElementById('editCity').value = customer.addressCity || '';
             document.getElementById('editPostalCode').value = customer.addressPostalCode || '';
 
-            // Display the edit modal
-            document.getElementById('editModal').style.display = 'block';
+            // Display the edit modal (centered with flex)
+            const editModalEl = document.getElementById('editModal');
+            editModalEl.style.display = 'flex';
 
             // Handle form submission
             const form = document.getElementById('editCustomerForm');
@@ -1605,8 +1770,8 @@
         // Set user ID on the confirm button
         document.getElementById('confirmDeleteUserBtn').setAttribute('data-user-id', userId);
 
-        // Show the modal
-        document.getElementById('deleteUserModal').style.display = 'block';
+  // Show the modal (centered)
+  document.getElementById('deleteUserModal').style.display = 'flex';
       }
 
       function deleteUser(userId) {
@@ -1640,6 +1805,33 @@
           document.getElementById('deleteUserModal').style.display = 'none';
         });
       }
+    </script>
+
+    <script>
+      // Generic UX: close modals on overlay click or ESC key
+      (function(){
+        const modals = ['deleteModal','editModal','changeRoleModal','deleteUserModal','createAdminModal'];
+        modals.forEach(id => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          el.addEventListener('click', (e) => {
+            if (e.target === el) {
+              el.style.display = 'none';
+            }
+          });
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            modals.forEach(id => {
+              const el = document.getElementById(id);
+              if(el && getComputedStyle(el).display !== 'none'){
+                el.style.display = 'none';
+              }
+            });
+          }
+        });
+      })();
     </script>
 
     <!-- Luxury Theme JavaScript -->

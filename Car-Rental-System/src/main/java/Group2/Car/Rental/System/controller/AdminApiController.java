@@ -5,11 +5,19 @@ import Group2.Car.Rental.System.dto.UserDTO;
 import Group2.Car.Rental.System.entity.Customer;
 import Group2.Car.Rental.System.entity.Role;
 import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.entity.Booking;
+import Group2.Car.Rental.System.entity.Payment;
+import Group2.Car.Rental.System.entity.Feedback;
 import Group2.Car.Rental.System.repository.RoleRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
+import Group2.Car.Rental.System.repository.CustomerRepository;
+import Group2.Car.Rental.System.repository.BookingRepository;
+import Group2.Car.Rental.System.repository.PaymentRepository;
+import Group2.Car.Rental.System.repository.FeedbackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +39,21 @@ public class AdminApiController {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+
+    @Autowired
+    private Group2.Car.Rental.System.service.AuthService authService;
+
     @GetMapping("/customers")
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         // Get all users with customer information
@@ -51,6 +74,44 @@ public class AdminApiController {
         logger.info("CustomerDTOs created: {}", customerDTOs.size());
 
         return ResponseEntity.ok(customerDTOs);
+    }
+
+    // Create an admin user (Fleet Manager, System Admin, or Owner)
+    @PostMapping("/users")
+    public ResponseEntity<?> createAdminUser(@RequestBody Group2.Car.Rental.System.dto.CreateAdminUserDTO dto) {
+        try {
+            // Reuse registration flow but skip registration codes by directly calling service with a tailored RegisterDto
+            Group2.Car.Rental.System.dto.RegisterDto reg = new Group2.Car.Rental.System.dto.RegisterDto();
+            reg.setFirstName(dto.getFirstName());
+            reg.setLastName(dto.getLastName());
+            reg.setEmail(dto.getEmail());
+            reg.setPassword(dto.getPassword());
+            reg.setRoleName(dto.getRoleName());
+            // Allow passing optional staffIdCode
+            reg.setStaffIdCode(dto.getStaffIdCode());
+
+            // The AuthService.register enforces registration codes for admin roles.
+            // For admin-created accounts, set valid codes implicitly by role.
+            switch (dto.getRoleName()) {
+                case "ROLE_FLEET_MANAGER":
+                    reg.setRegistrationCode("FLEET_MGR_SECRET");
+                    break;
+                case "ROLE_SYSTEM_ADMIN":
+                    reg.setRegistrationCode("SYS_ADMIN_SECRET");
+                    break;
+                case "ROLE_OWNER":
+                    reg.setRegistrationCode("OWNER_SECRET");
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Invalid role. Use ROLE_FLEET_MANAGER, ROLE_SYSTEM_ADMIN, or ROLE_OWNER");
+            }
+
+            authService.register(reg);
+            return ResponseEntity.ok().body(Map.of("success", true));
+        } catch (Exception ex) {
+            logger.error("Failed to create admin user: {}", ex.getMessage(), ex);
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", ex.getMessage()));
+        }
     }
 
     @GetMapping("/users/fleet-managers")
@@ -128,19 +189,63 @@ public class AdminApiController {
     }
 
     @DeleteMapping("/customers/{id}")
+    @Transactional
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         logger.info("Request to delete customer with ID: {}", id);
         Optional<User> userOptional = userRepository.findById(id);
 
-        if (userOptional.isPresent() && userOptional.get().getCustomer() != null) {
-            User user = userOptional.get();
-            logger.info("Deleting customer with ID: {}", id);
-            userRepository.delete(user);
-            return ResponseEntity.ok().build();
+        if (userOptional.isEmpty()) {
+            logger.warn("Customer not found with ID: {}", id);
+            return ResponseEntity.notFound().build();
         }
 
-        logger.warn("Customer not found with ID: {}", id);
-        return ResponseEntity.notFound().build();
+        User user = userOptional.get();
+        if (user.getCustomer() == null) {
+            logger.warn("User with ID: {} has no customer profile; cannot delete via customer endpoint", id);
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            Customer customer = user.getCustomer();
+
+            // 1) Remove payments for all of this customer's bookings
+            logger.info("Fetching bookings for customer {}", id);
+            java.util.List<Booking> bookings = bookingRepository.findByCustomer(customer);
+            for (Booking b : bookings) {
+                Payment payment = paymentRepository.findByBooking(b);
+                if (payment != null) {
+                    logger.info("Deleting payment {} for booking {}", payment.getPaymentId(), b.getBookingId());
+                    paymentRepository.delete(payment);
+                }
+            }
+
+            // 2) Delete bookings
+            if (!bookings.isEmpty()) {
+                logger.info("Deleting {} bookings for customer {}", bookings.size(), id);
+                bookingRepository.deleteAll(bookings);
+            }
+
+            // 3) Delete feedbacks linked to this user (customer_id references users table)
+            java.util.List<Feedback> feedbacks = feedbackRepository.findByCustomerId(id);
+            if (!feedbacks.isEmpty()) {
+                logger.info("Deleting {} feedback entries for customer {}", feedbacks.size(), id);
+                feedbackRepository.deleteAll(feedbacks);
+            }
+
+            // 4) Delete customer profile explicitly (though cascade exists) before user
+            logger.info("Deleting customer profile for user {}", id);
+            customerRepository.delete(customer);
+
+            // 5) Finally, delete the user record
+            logger.info("Deleting user record {}", id);
+            userRepository.delete(user);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception ex) {
+            logger.error("Failed to delete customer {} due to: {}", id, ex.getMessage(), ex);
+            // Transaction will auto-rollback on RuntimeException
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("/customers/{id}")
