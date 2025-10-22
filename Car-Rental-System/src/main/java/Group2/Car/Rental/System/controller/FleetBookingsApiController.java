@@ -15,7 +15,8 @@ import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/fleet/bookings")
-@PreAuthorize("hasRole('FLEET_MANAGER')")
+// Fleet Manager features are also viewable/controllable by Owners
+@PreAuthorize("hasAnyRole('FLEET_MANAGER','OWNER')")
 public class FleetBookingsApiController {
 
     @Autowired

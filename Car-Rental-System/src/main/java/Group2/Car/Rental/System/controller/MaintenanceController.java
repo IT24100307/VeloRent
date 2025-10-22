@@ -21,7 +21,9 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fleet/maintenance")
-@PreAuthorize("hasRole('ROLE_FLEET_MANAGER')")
+// Allow both Fleet Managers and Owners to access maintenance APIs
+// Note: hasRole/hasAnyRole expect role names WITHOUT the ROLE_ prefix
+@PreAuthorize("hasAnyRole('FLEET_MANAGER','OWNER')")
 public class MaintenanceController {
     
     @Autowired
