@@ -79,6 +79,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/profile/**").permitAll()
 
+                        // Feedback page gated client-side (JWT is stored in localStorage, not sent with page requests)
+                        // Keep server route public and redirect from page script when token missing
+
                         // Allow GET access to packages page; client script will redirect unauthenticated users to login
                         .requestMatchers(HttpMethod.GET, "/packages", "/packages/**").permitAll()
 
@@ -87,22 +90,31 @@ public class SecurityConfig {
             // Allow favicon to avoid 403 on browsers auto-requesting it
             .requestMatchers(HttpMethod.GET, "/favicon.ico").permitAll()
 
-            .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/uploads/**", "/login",
+            .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/uploads/**", "/login", "/logout",
                 "/register", "/forgot-password", "/reset-password",
                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
                                 "/admin/payments", "/admin/login-history",
                                 "/fleet-manager/**",
-                                "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history","/owner/dashboard")
+                                "/feedback", "/profile", "/profile/**", "/payment", "/rental-history","/owner/dashboard")
                         .permitAll() // Allow public access to UI pages
                         .anyRequest().authenticated() // Secure all other requests
                 )
                 // Return JSON for 401/403 to avoid HTML error pages breaking fetch().json()
                 .exceptionHandling(ex -> ex
                     .authenticationEntryPoint((request, response, authException) -> {
-                        response.setStatus(401);
-                        response.setContentType("application/json");
-                        response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\"}");
+                        String uri = request.getRequestURI();
+                        boolean isApi = uri != null && uri.startsWith("/api/");
+
+                        if (!isApi) { // For non-API endpoints, redirect to login
+                            String target = uri != null ? uri : "/";
+                            String redirect = "/login?returnUrl=" + java.net.URLEncoder.encode(target, java.nio.charset.StandardCharsets.UTF_8);
+                            response.sendRedirect(redirect);
+                        } else {
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\"}");
+                        }
                     })
                     .accessDeniedHandler((request, response, accessDeniedException) -> {
                         response.setStatus(403);

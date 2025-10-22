@@ -255,7 +255,7 @@
                 <i class="fas fa-crown mr-2"></i> VeloRent
             </a>
             <div class="ml-auto">
-                <a href="/dashboard" class="btn-luxury btn-luxury-outline">
+                <a id="backBtn" href="/dashboard" class="btn-luxury btn-luxury-outline">
                     <i class="fas fa-arrow-left mr-1"></i> Back
                 </a>
             </div>
@@ -419,6 +419,24 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Dynamic Back button routing based on role
+            try {
+                var role = localStorage.getItem('userRole') || '';
+                var back = document.getElementById('backBtn');
+                if (back) {
+                    if (role.includes('OWNER')) {
+                        back.href = '/owner/dashboard';
+                    } else if (role.includes('ADMIN')) {
+                        back.href = '/admin/dashboard';
+                    } else if (role.includes('FLEET_MANAGER')) {
+                        // Fallback: if fleet dashboard route differs, adjust here
+                        back.href = '/fleet-manager/dashboard';
+                    } else {
+                        back.href = '/dashboard';
+                    }
+                }
+            } catch(e) {}
+
             // Get profile data
             const firstName = document.querySelector('#firstName')?.value || '';
             const lastName = document.querySelector('#lastName')?.value || '';

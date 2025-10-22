@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logging out… | VeloRent</title>
+  <link rel="stylesheet" href="/css/luxury-theme.css" />
+  <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+  <style>
+    body { background: var(--luxury-black); color: var(--text-luxury-light); display:flex; align-items:center; justify-content:center; height:100vh; }
+    .card { background: var(--luxury-charcoal); border: 1px solid rgba(212, 175, 55, 0.25); box-shadow: var(--shadow-luxury); }
+  </style>
+</head>
+<body>
+  <div class="card p-4 text-center">
+    <div class="mb-3"><i class="fas fa-sign-out-alt" style="color: var(--luxury-gold);"></i></div>
+    <h4>Signing you out…</h4>
+    <p>Please wait a moment.</p>
+  </div>
+  <script>
+    (function(){
+      try {
+        // Clear tokens and any cached user data
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('customerId');
+        // Clear flash messages and temp auth data
+        sessionStorage.removeItem('flashMessage');
+        sessionStorage.removeItem('auth_email');
+      } catch (e) {}
+
+      // Optional: if a server logout endpoint exists, call it (ignored if 404)
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).finally(function(){
+        // Redirect to login with a friendly message
+        var msg = encodeURIComponent('You have been logged out successfully.');
+        window.location.replace('/login?type=success&message=' + msg);
+      });
+    })();
+  </script>
+  <script src="/js/fontawesome/js/all.min.js"></script>
+</body>
+</html>
