@@ -249,7 +249,9 @@ function checkAuth() {
         let redirectUrl = '/dashboard';
         if (role.includes('FLEET_MANAGER')) {
             redirectUrl = '/fleet-manager/dashboard';
-        } else if (role.includes('ADMIN') || role.includes('OWNER')) {
+        } else if (role.includes('OWNER')) {
+            redirectUrl = '/owner/dashboard';
+        } else if (role.includes('ADMIN')) {
             redirectUrl = '/admin/dashboard';
         }
         window.location.href = redirectUrl;
