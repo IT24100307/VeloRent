@@ -12,4 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // This method allows you to find users by their role ID
     List<User> findByRoleId(Integer roleId);
+
+    // Recent users by id (proxy for registration time when createdAt not available)
+    List<User> findTop20ByOrderByIdDesc();
 }

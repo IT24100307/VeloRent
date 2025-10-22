@@ -3,9 +3,15 @@ package Group2.Car.Rental.System.service;
 import Group2.Car.Rental.System.dto.NotificationDTO;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.MaintenanceRecord;
+import Group2.Car.Rental.System.entity.Payment;
+import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.entity.Feedback;
 import Group2.Car.Rental.System.entity.Vehicle;
 import Group2.Car.Rental.System.repository.BookingRepository;
 import Group2.Car.Rental.System.repository.MaintenanceRecordRepository;
+import Group2.Car.Rental.System.repository.PaymentRepository;
+import Group2.Car.Rental.System.repository.UserRepository;
+import Group2.Car.Rental.System.repository.FeedbackRepository;
 import Group2.Car.Rental.System.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,14 +28,23 @@ public class NotificationService {
     private final BookingRepository bookingRepository;
     private final MaintenanceRecordRepository maintenanceRecordRepository;
     private final VehicleRepository vehicleRepository;
+    private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
+    private final FeedbackRepository feedbackRepository;
 
     @Autowired
     public NotificationService(BookingRepository bookingRepository,
                                MaintenanceRecordRepository maintenanceRecordRepository,
-                               VehicleRepository vehicleRepository) {
+                               VehicleRepository vehicleRepository,
+                               PaymentRepository paymentRepository,
+                               UserRepository userRepository,
+                               FeedbackRepository feedbackRepository) {
         this.bookingRepository = bookingRepository;
         this.maintenanceRecordRepository = maintenanceRecordRepository;
         this.vehicleRepository = vehicleRepository;
+        this.paymentRepository = paymentRepository;
+        this.userRepository = userRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     public List<NotificationDTO> getRecentNotifications() {
@@ -157,6 +172,68 @@ public class NotificationService {
                 notifications.add(dto);
             }
         } catch (Exception ignored) {}
+
+            // Recent payments (Completed)
+            try {
+                List<Payment> payments = paymentRepository.findTop20ByPaymentStatusOrderByPaymentDateDesc("Completed");
+                for (Payment p : safeList(payments)) {
+                    Booking b = p.getBooking();
+                    String item = (b != null && b.getVehicle() != null) ? formatVehicle(b.getVehicle()) :
+                            (b != null && b.getVehiclePackage() != null ? b.getVehiclePackage().getPackageName() : "Booking");
+                    String title = "Payment Confirmed";
+                    String msg = "Payment received for " + item + ".";
+                    NotificationDTO dto = new NotificationDTO(
+                            "payment_confirmed",
+                            title,
+                            msg,
+                            "fa-credit-card",
+                            "success",
+                            p.getPaymentDate() != null ? p.getPaymentDate() : LocalDateTime.now()
+                    );
+                    try { if (b != null && b.getBookingId() != null) dto.setBookingId(b.getBookingId()); } catch (Exception ignored) {}
+                    dto.setId("payment_" + (p.getPaymentId()!=null ? p.getPaymentId() : msg.hashCode()));
+                    notifications.add(dto);
+                }
+            } catch (Exception ignored) {}
+
+            // New user registrations (approximate by latest ids)
+            try {
+                List<User> users = userRepository.findTop20ByOrderByIdDesc();
+                for (User u : safeList(users)) {
+                    String title = "New User Registered";
+                    String msg = (u.getFirstName() + " " + u.getLastName()).trim() + " (" + u.getEmail() + ") joined.";
+                    NotificationDTO dto = new NotificationDTO(
+                            "user_registered",
+                            title,
+                            msg,
+                            "fa-user-plus",
+                            "info",
+                            LocalDateTime.now()
+                    );
+                    dto.setId("user_" + (u.getId()!=null ? u.getId() : msg.hashCode()));
+                    notifications.add(dto);
+                }
+            } catch (Exception ignored) {}
+
+            // Recent feedback
+            try {
+                List<Feedback> fbs = feedbackRepository.findTop20ByOrderByCreatedAtDesc();
+                for (Feedback f : safeList(fbs)) {
+                    String title = "Feedback Received";
+                    String preview = f.getComments() != null && f.getComments().length() > 60 ? f.getComments().substring(0,57) + "..." : (f.getComments() != null ? f.getComments() : "");
+                    String msg = (f.getCustomerName() != null ? (f.getCustomerName()+": ") : "") + preview;
+                    NotificationDTO dto = new NotificationDTO(
+                            "feedback_received",
+                            title,
+                            msg,
+                            "fa-comments",
+                            "info",
+                            f.getCreatedAt() != null ? f.getCreatedAt() : (f.getFeedbackDate()!=null? f.getFeedbackDate() : LocalDateTime.now())
+                    );
+                    dto.setId("feedback_" + (f.getId()!=null ? f.getId() : msg.hashCode()));
+                    notifications.add(dto);
+                }
+            } catch (Exception ignored) {}
 
         // Sort all notifications by timestamp desc and limit to 30
         notifications.sort(Comparator.comparing(NotificationDTO::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder())).reversed());

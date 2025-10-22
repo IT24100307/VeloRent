@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fleet")
@@ -100,7 +101,11 @@ public class FleetApiController {
     public ResponseEntity<List<NotificationDTO>> getNotifications() {
         try {
             List<NotificationDTO> notifications = notificationService.getRecentNotifications();
-            return ResponseEntity.ok(notifications);
+            // Requirement: Fleet Manager should NOT see "New User Registered" notifications.
+            List<NotificationDTO> filtered = notifications.stream()
+                    .filter(n -> n != null && (n.getType() == null || !"user_registered".equalsIgnoreCase(n.getType())))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(filtered);
         } catch (Exception e) {
             System.err.println("Error building notifications: " + e.getMessage());
             e.printStackTrace();

@@ -19,6 +19,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     @Query("SELECT p FROM Payment p JOIN FETCH p.booking b JOIN FETCH b.customer c JOIN FETCH c.user u ORDER BY p.paymentDate DESC")
     List<Payment> findAllWithBookingCustomerUser();
 
+        // Recent payments (for notifications)
+        List<Payment> findTop20ByPaymentStatusOrderByPaymentDateDesc(String paymentStatus);
+
     // Aggregations
     @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p")
     BigDecimal sumAllAmounts();
