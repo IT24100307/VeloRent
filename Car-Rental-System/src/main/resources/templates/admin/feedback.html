@@ -232,6 +232,70 @@
 
     .star-rating .fas.fa-star { color: var(--luxury-gold); }
     .star-rating .far.fa-star { color: rgba(212, 175, 55, 0.3); }
+
+    /* Quick filters */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(212,175,55,0.35);
+      color: var(--text-luxury-light);
+      background: rgba(212,175,55,0.05);
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-smooth);
+      font-size: 0.85rem;
+    }
+    .filter-chip:hover { background: rgba(212,175,55,0.12); }
+    .filter-chip.active {
+      background: var(--gradient-gold);
+      color: var(--luxury-black);
+      border-color: transparent;
+      box-shadow: var(--shadow-luxury);
+    }
+
+    /* Truncated comments with expand */
+    .comment-text {
+      position: relative;
+      max-width: 640px;
+    }
+    .truncate-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .show-toggle {
+      display: inline-block;
+      margin-top: 6px;
+      color: var(--luxury-gold);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Floating scroll-to-top */
+    .scroll-top {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gradient-gold);
+      color: var(--luxury-black);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-luxury);
+      z-index: 1050;
+    }
+    .scroll-top:hover { transform: translateY(-2px); }
   </style>
 </head>
 <body>
@@ -247,16 +311,6 @@
   <nav class="container">
     <div class="logo">
       <i class="fas fa-crown mr-2"></i>VeloRent Admin
-    </div>
-    <div class="nav-links" id="admin-nav-links">
-      <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
-      <a href="#"><i class="fas fa-car mr-1"></i>Vehicles</a>
-      <a href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a>
-      <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
-      <a href="#"><i class="fas fa-chart-bar mr-1"></i>Reports</a>
-      <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
-    </div>
-  </nav>
 </header>
 
 <main class="container content" id="feedback-management-container">
@@ -268,6 +322,15 @@
       </a>
       <a id="admin-back-dashboard-btn" href="/admin/dashboard" class="btn btn-primary btn-back">Back to Dashboard</a>
     </div>
+  </div>
+
+  <!-- Quick Filters -->
+  <div class="filter-bar" id="feedback-filter-bar">
+    <span class="filter-chip active" data-filter="all"><i class="fas fa-asterisk mr-1"></i>All</span>
+    <span class="filter-chip" data-filter="rating-5"><i class="fas fa-star mr-1"></i>5★</span>
+    <span class="filter-chip" data-filter="rating-4plus"><i class="fas fa-star-half-alt mr-1"></i>4★+</span>
+    <span class="filter-chip" data-filter="needs-reply"><i class="fas fa-inbox mr-1"></i>Needs reply</span>
+    <span class="filter-chip" data-filter="replied"><i class="fas fa-check mr-1"></i>Replied</span>
   </div>
 
   <table id="feedbackTable" class="table table-striped">
@@ -282,9 +345,13 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="feedback : ${feedbacks}">
+    <tr th:each="feedback : ${feedbacks}"
+        th:attr="data-rating=${feedback.rating}, data-replied=${feedback.reply} ? '1' : '0'">
       <td th:text="${feedback.id}"></td>
-      <td th:text="${feedback.comments}"></td>
+      <td>
+        <div class="comment-text truncate-2" th:text="${feedback.comments}"></div>
+        <span class="show-toggle" data-toggle="comment">Show more</span>
+      </td>
       <td>
         <div class="star-rating">
           <span th:each="i : ${#numbers.sequence(1, 5)}">
@@ -310,6 +377,11 @@
             <span th:text="${feedback.reply} ? 'Edit Reply' : 'Reply'"></span>
           </button>
 
+          <button type="button" class="btn btn-secondary mb-2 ml-1 quick-view-btn"
+                  th:attr="data-id=${feedback.id}, data-name=${feedback.customerName}, data-date=${feedback.feedbackDate}, data-rating=${feedback.rating}, data-comments=${feedback.comments}, data-reply=${feedback.reply}">
+            <i class="fas fa-eye"></i> View
+          </button>
+
           <div th:id="'replyForm' + ${feedback.id}" class="collapse mt-2">
             <form th:action="@{/api/admin/feedback/reply/{id}(id=${feedback.id})}" method="post" class="mb-2 feedback-reply-form">
               <div class="form-group">
@@ -327,7 +399,42 @@
     </tr>
     </tbody>
   </table>
+
+  <!-- Quick View Modal -->
+  <div class="modal fade" id="feedbackQuickView" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="background: var(--luxury-charcoal); color: var(--text-luxury-light); border: 1px solid rgba(212,175,55,0.3)">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(212,175,55,0.3)">
+          <h5 class="modal-title"><i class="fas fa-comment-dots mr-2"></i>Feedback Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <strong id="qvName"></strong>
+              <small class="text-muted ml-2" id="qvDate"></small>
+            </div>
+            <div id="qvStars" class="star-rating"></div>
+          </div>
+          <div class="mb-3">
+            <div class="text-muted mb-1">Comments</div>
+            <div id="qvComments" class="p-2 border rounded"></div>
+          </div>
+          <div id="qvReplyWrap" class="mb-2" style="display:none;">
+            <div class="text-muted mb-1">Admin Reply</div>
+            <div id="qvReply" class="p-2 border rounded bg-light"></div>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid rgba(212,175,55,0.3)">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
+
+<!-- Scroll top button -->
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top"><i class="fas fa-arrow-up"></i></button>
 <script>
   // Role-aware UI: when an OWNER opens Admin Feedback from Owner Dashboard,
   // show Owner back button and hide the admin nav/actions.

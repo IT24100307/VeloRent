@@ -1,0 +1,6 @@
+# Editor/IDE metadata
+.idea/
+.vscode/
+
+# Ignore only the repo-root src folder (C:\Users\chand\Desktop\VeloRent\src)
+/src/
