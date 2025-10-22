@@ -108,6 +108,11 @@ public class ViewController {
         return "admin/dashboard"; // Using the existing dashboard template or create a specific one if needed
     }
 
+    @GetMapping("/admin/login-history")
+    public String loginHistory() {
+        return "admin/login-history-simple";
+    }
+
     @GetMapping("/feedback")
     public String listFeedbacks(@RequestParam(defaultValue = "0") int page, 
                               @RequestParam(defaultValue = "10") int size, 

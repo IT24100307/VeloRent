@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login History | VeloRent - Luxury Car Rental</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/css/fontawesome/css/all.min.css" />
+  <!-- Luxury Theme CSS (Main styling) -->
+  <link rel="stylesheet" href="/css/luxury-theme.css" />
+  <!-- Bootstrap CSS (Secondary for grid system) -->
+  <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
+  
+  <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="/css/DataTables/datatables.js"></script>
+
+  <style>
+    /* Login History Dashboard Luxury Theme Overrides */
+    .dt-search{
+      display: flex ;
+      justify-content: end;
+      padding-bottom: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-luxury-secondary);
+    }
+
+    body {
+      background: var(--luxury-black) !important;
+      color: var(--text-luxury-light) !important;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: var(--luxury-charcoal);
+      color: var(--text-luxury-light);
+      padding: 1rem;
+      box-shadow: var(--shadow-luxury);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: var(--text-luxury-light);
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-luxury-small);
+      transition: var(--transition-smooth);
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+
+    .nav-links a:hover {
+      background: var(--luxury-gold);
+      color: var(--luxury-black);
+      border-color: var(--luxury-gold);
+      transform: translateY(-1px);
+    }
+
+    main {
+      margin-top: 30px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .dashboard-title {
+      font-size: 28px;
+      color: var(--luxury-gold);
+      font-family: var(--font-luxury-primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+    
+    .dashboard-title::before {
+      content: '\f544';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      margin-right: 15px;
+      color: var(--luxury-gold);
+      font-size: 1.2em;
+    }
+
+    .dashboard-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      background: var(--gradient-gold);
+      color: var(--luxury-black);
+      border: none;
+      border-radius: var(--radius-luxury-small);
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-luxury);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--luxury-gold);
+      border: 2px solid var(--luxury-gold);
+    }
+
+    .btn-secondary:hover {
+      background: var(--luxury-gold);
+      color: var(--luxury-black);
+    }
+
+    .login-history-table {
+      background: var(--luxury-charcoal);
+      border-radius: var(--radius-luxury-large);
+      box-shadow: var(--shadow-luxury);
+      overflow: hidden;
+      margin-bottom: 30px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .login-history-table table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .login-history-table th,
+    .login-history-table td {
+      padding: 15px 20px;
+      text-align: left;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+      color: var(--text-luxury-light);
+      vertical-align: middle;
+    }
+
+    .login-history-table th {
+      background: linear-gradient(135deg, var(--luxury-black) 0%, var(--luxury-charcoal) 100%);
+      font-weight: 700;
+      color: var(--luxury-gold);
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 1.2px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 2px solid var(--luxury-gold);
+    }
+
+    .login-history-table tbody tr {
+      transition: var(--transition-smooth);
+    }
+
+    .login-history-table tbody tr:hover {
+      background: rgba(212, 175, 55, 0.05);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+    }
+
+    .status-success {
+      color: #2ecc71;
+      font-weight: 600;
+    }
+
+    .status-failed {
+      color: #e74c3c;
+      font-weight: 600;
+    }
+
+    .role-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .role-customer {
+      background: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .role-admin {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    .role-fleet {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    .role-owner {
+      background: rgba(155, 89, 182, 0.2);
+      color: #9b59b6;
+    }
+
+    .user-agent {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.85rem;
+      color: #bdc3c7;
+    }
+
+    .filter-section {
+      background: var(--luxury-charcoal);
+      border-radius: var(--radius-luxury-small);
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .filter-section h4 {
+      color: var(--luxury-gold);
+      margin-bottom: 15px;
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-controls select {
+      background: var(--luxury-black);
+      color: var(--text-luxury-light);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 4px;
+      padding: 8px 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--luxury-gold);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <!-- Test element to verify page is loading -->
+  <div id="test-element" style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999;">
+    Page Loading Test
+  </div>
+
+  <header>
+    <nav>
+      <div class="logo">👑 VeloRent Admin</div>
+      <div class="nav-links">
+        <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/admin/feedback"><i class="fas fa-comments"></i> Feedback</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Login History</h1>
+      <div class="dashboard-actions">
+        <a href="/admin/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+        <button class="btn btn-secondary" id="refreshBtn">Refresh Data</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4><i class="fas fa-filter"></i> Filters</h4>
+      <div class="filter-controls">
+        <label for="dayFilter">Show logins from last:</label>
+        <select id="dayFilter">
+          <option value="1">1 Day</option>
+          <option value="7" selected>7 Days</option>
+          <option value="30">30 Days</option>
+          <option value="90">90 Days</option>
+        </select>
+        
+        <label for="statusFilter">Status:</label>
+        <select id="statusFilter">
+          <option value="all">All</option>
+          <option value="success">Successful Only</option>
+          <option value="failed">Failed Only</option>
+        </select>
+        
+        <label for="roleFilter">Role:</label>
+        <select id="roleFilter">
+          <option value="all">All Roles</option>
+          <option value="ROLE_CUSTOMER">Customer</option>
+          <option value="ROLE_FLEET_MANAGER">Fleet Manager</option>
+          <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
+          <option value="ROLE_OWNER">Owner</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="login-history-table">
+      <div id="loadingIndicator" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Loading login history...
+      </div>
+      
+      <table id="loginHistoryTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>IP Address</th>
+            <th>User Agent</th>
+            <th>Failure Reason</th>
+          </tr>
+        </thead>
+        <tbody id="loginHistoryBody">
+        </tbody>
+      </table>
+      
+      <div id="noDataMessage" class="no-data" style="display: none;">
+        <i class="fas fa-info-circle"></i> No login history found for the selected criteria.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    $(document).ready(function() {
+      console.log('Login history page loaded');
+      // Remove test element once JavaScript loads
+      $('#test-element').remove();
+      let dataTable;
+      
+      function loadLoginHistory() {
+        console.log('Loading login history...');
+        const days = $('#dayFilter').val() || 7;
+        const status = $('#statusFilter').val() || 'all';
+        const role = $('#roleFilter').val() || 'all';
+        
+        $('#loadingIndicator').show();
+        $('#loginHistoryTable').hide();
+        $('#noDataMessage').hide();
+        
+        $.ajax({
+          url: `/api/admin/login-history?days=${days}`,
+          method: 'GET',
+          success: function(data) {
+            console.log('Received data:', data);
+            // Filter data based on status and role filters
+            let filteredData = data || [];
+            
+            if (status !== 'all') {
+              filteredData = filteredData.filter(item => {
+                return status === 'success' ? item.loginSuccess === true : item.loginSuccess === false;
+              });
+            }
+            
+            if (role !== 'all') {
+              filteredData = filteredData.filter(item => item.roleName === role);
+            }
+            
+            displayLoginHistory(filteredData);
+          },
+          error: function(xhr, status, error) {
+            console.error('Error loading login history:', error);
+            $('#loadingIndicator').hide();
+            $('#noDataMessage').text('Error loading login history: ' + error).show();
+          }
+        });
+      }
+      
+      function displayLoginHistory(data) {
+        console.log('Displaying login history:', data.length, 'records');
+        $('#loadingIndicator').hide();
+        
+        if (!data || data.length === 0) {
+          $('#noDataMessage').show();
+          return;
+        }
+        
+        // Destroy existing DataTable if it exists
+        if (dataTable) {
+          dataTable.destroy();
+        }
+        
+        // Build table body
+        const tbody = $('#loginHistoryBody');
+        tbody.empty();
+        
+        data.forEach(function(login, index) {
+          try {
+            const statusClass = login.loginSuccess ? 'status-success' : 'status-failed';
+            const statusText = login.loginSuccess ? 'Success' : 'Failed';
+            const statusIcon = login.loginSuccess ? 'fas fa-check-circle' : 'fas fa-times-circle';
+            
+            let roleClass = 'role-admin';
+            if (login.roleName === 'ROLE_CUSTOMER') roleClass = 'role-customer';
+            else if (login.roleName === 'ROLE_FLEET_MANAGER') roleClass = 'role-fleet';
+            else if (login.roleName === 'ROLE_OWNER') roleClass = 'role-owner';
+            
+            const roleName = (login.roleName || 'UNKNOWN').replace('ROLE_', '').replace('_', ' ');
+            const loginTime = login.loginTime ? new Date(login.loginTime).toLocaleString() : 'Unknown';
+            const failureReason = login.failureReason || '-';
+            const userAgent = login.userAgent || 'Unknown';
+            const truncatedUserAgent = userAgent.length > 50 ? userAgent.substring(0, 50) + '...' : userAgent;
+            
+            const row = `
+              <tr>
+                <td>${loginTime}</td>
+                <td>${login.userName || 'Unknown'}</td>
+                <td>${login.userEmail || 'Unknown'}</td>
+                <td><span class="role-badge ${roleClass}">${roleName}</span></td>
+                <td class="${statusClass}"><i class="${statusIcon}"></i> ${statusText}</td>
+                <td>${login.ipAddress || 'Unknown'}</td>
+                <td class="user-agent" title="${userAgent}">${truncatedUserAgent}</td>
+                <td>${failureReason}</td>
+              </tr>
+            `;
+            tbody.append(row);
+          } catch (err) {
+            console.error('Error processing login record', index, ':', err);
+          }
+        });
+        
+        $('#loginHistoryTable').show();
+        
+        // Initialize DataTables with error handling
+        try {
+          dataTable = $('#loginHistoryTable').DataTable({
+            order: [[0, 'desc']], // Sort by date desc
+            pageLength: 25,
+            responsive: true,
+            language: {
+              search: "Search login history:"
+            }
+          });
+        } catch (err) {
+          console.error('Error initializing DataTable:', err);
+        }
+      }
+      
+      // Event listeners
+      $('#refreshBtn').click(function() {
+        console.log('Refresh button clicked');
+        loadLoginHistory();
+      });
+      
+      $('#dayFilter, #statusFilter, #roleFilter').change(function() {
+        console.log('Filter changed');
+        loadLoginHistory();
+      });
+      
+      // Initial load
+      console.log('Starting initial load...');
+      loadLoginHistory();
+    });
+  </script>
+</body>
+</html>

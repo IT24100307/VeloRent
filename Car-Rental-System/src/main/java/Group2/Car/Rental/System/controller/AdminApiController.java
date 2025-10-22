@@ -1,13 +1,16 @@
 package Group2.Car.Rental.System.controller;
 
 import Group2.Car.Rental.System.dto.CustomerDTO;
+import Group2.Car.Rental.System.dto.LoginHistoryDTO;
 import Group2.Car.Rental.System.dto.UserDTO;
 import Group2.Car.Rental.System.entity.Customer;
+import Group2.Car.Rental.System.entity.LoginHistory;
 import Group2.Car.Rental.System.entity.Role;
 import Group2.Car.Rental.System.entity.User;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Payment;
 import Group2.Car.Rental.System.entity.Feedback;
+import Group2.Car.Rental.System.repository.LoginHistoryRepository;
 import Group2.Car.Rental.System.repository.RoleRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
 import Group2.Car.Rental.System.repository.CustomerRepository;
@@ -19,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +55,9 @@ public class AdminApiController {
 
     @Autowired
     private FeedbackRepository feedbackRepository;
+    
+    @Autowired
+    private LoginHistoryRepository loginHistoryRepository;
 
     @Autowired
     private Group2.Car.Rental.System.service.AuthService authService;
@@ -408,5 +416,133 @@ public class AdminApiController {
 
         logger.warn("User not found with ID: {}", id);
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/login-history/test")
+    public ResponseEntity<String> testLoginHistoryEndpoint() {
+        try {
+            logger.info("Testing login history endpoint");
+            return ResponseEntity.ok("Login history endpoint is working");
+        } catch (Exception e) {
+            logger.error("Error in test endpoint: ", e);
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/login-history/reset-table")
+    public ResponseEntity<String> resetLoginHistoryTable() {
+        try {
+            logger.info("Resetting login_history table");
+            
+            // Drop the table first (this will handle the schema change)
+            loginHistoryRepository.deleteAll();
+            logger.info("Cleared all login history data");
+            
+            return ResponseEntity.ok("Login history table reset successfully. The table structure will be recreated automatically.");
+        } catch (Exception e) {
+            logger.error("Error resetting table: ", e);
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/login-history/create-test-data")
+    public ResponseEntity<String> createTestLoginHistory() {
+        try {
+            logger.info("Creating test login history data");
+            
+            // Find the first user to create test data
+            List<User> users = userRepository.findAll();
+            if (users.isEmpty()) {
+                return ResponseEntity.ok("No users found to create test data");
+            }
+            
+            User testUser = users.get(0);
+            String accountType = "Test User";
+            if (testUser.getRole() != null) {
+                switch (testUser.getRole().getName()) {
+                    case "ROLE_CUSTOMER":
+                        accountType = "Customer";
+                        break;
+                    case "ROLE_FLEET_MANAGER":
+                        accountType = "Fleet Manager";
+                        break;
+                    case "ROLE_SYSTEM_ADMIN":
+                        accountType = "System Admin";
+                        break;
+                    case "ROLE_OWNER":
+                        accountType = "Owner";
+                        break;
+                }
+            }
+            
+            LoginHistory testLogin = LoginHistory.builder()
+                    .user(testUser)
+                    .username(testUser.getFirstName() + " " + testUser.getLastName())
+                    .accountType(accountType)
+                    .build();
+            
+            loginHistoryRepository.save(testLogin);
+            logger.info("Test login history created for user: {}", testUser.getEmail());
+            
+            return ResponseEntity.ok("Test login history created for user: " + testUser.getEmail());
+        } catch (Exception e) {
+            logger.error("Error creating test data: ", e);
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/login-history")
+    public ResponseEntity<List<LoginHistoryDTO>> getLoginHistory(
+            @RequestParam(value = "days", defaultValue = "7") int days) {
+        try {
+            logger.info("=== LOGIN HISTORY API CALLED ===");
+            logger.info("Fetching login history for last {} days", days);
+            
+            // Check if repository exists
+            if (loginHistoryRepository == null) {
+                logger.error("LoginHistoryRepository is null!");
+                return ResponseEntity.internalServerError().body(Collections.emptyList());
+            }
+            
+            logger.info("Repository is available, querying database...");
+            LocalDateTime sinceDate = LocalDateTime.now().minusDays(days);
+            logger.info("Querying since date: {}", sinceDate);
+            
+            List<LoginHistory> loginHistories = loginHistoryRepository.findRecentLogins(sinceDate);
+            logger.info("Database query completed. Found {} login history records", loginHistories.size());
+            
+            if (loginHistories.isEmpty()) {
+                logger.info("No login history records found, returning empty list");
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+            
+            logger.info("Converting {} records to DTOs...", loginHistories.size());
+            List<LoginHistoryDTO> loginHistoryDTOs = loginHistories.stream()
+                    .map(this::convertToLoginHistoryDTO)
+                    .collect(Collectors.toList());
+            
+            logger.info("Successfully converted to {} DTOs", loginHistoryDTOs.size());
+            logger.info("=== API CALL SUCCESSFUL ===");
+            return ResponseEntity.ok(loginHistoryDTOs);
+        } catch (Exception e) {
+            logger.error("=== ERROR IN LOGIN HISTORY API ===");
+            logger.error("Error type: {}", e.getClass().getSimpleName());
+            logger.error("Error message: {}", e.getMessage());
+            logger.error("Full stack trace: ", e);
+            logger.error("=== END ERROR LOG ===");
+            return ResponseEntity.internalServerError().body(Collections.emptyList());
+        }
+    }
+
+    private LoginHistoryDTO convertToLoginHistoryDTO(LoginHistory loginHistory) {
+        User user = loginHistory.getUser();
+        
+        return new LoginHistoryDTO(
+                loginHistory.getLoginId(),
+                user.getId(),
+                loginHistory.getUsername(),
+                loginHistory.getAccountType(),
+                loginHistory.getLoginTime()
+        );
     }
 }
