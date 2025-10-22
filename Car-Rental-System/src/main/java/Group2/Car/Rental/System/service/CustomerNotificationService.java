@@ -4,9 +4,11 @@ import Group2.Car.Rental.System.dto.NotificationDTO;
 import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.Payment;
 import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.entity.Feedback;
 import Group2.Car.Rental.System.repository.BookingRepository;
 import Group2.Car.Rental.System.repository.PaymentRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
+import Group2.Car.Rental.System.repository.FeedbackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,9 @@ public class CustomerNotificationService {
 
     @Autowired
     private UserRepository userRepository;
+
+        @Autowired
+        private FeedbackRepository feedbackRepository;
 
     /**
      * Build recent notifications for the given user email (customer).
@@ -98,6 +103,28 @@ public class CustomerNotificationService {
             list.add(dto);
         }
 
+                // Admin replied to customer's feedback
+                try {
+                        Long cid = user.getId();
+                        if (cid != null) {
+                                for (Feedback f : safe(feedbackRepository.findByCustomerId(cid))) {
+                                        if (f == null) continue;
+                                        if (f.isDeleted()) continue;
+                                        if (f.getReply() == null || f.getReply().isBlank()) continue;
+                                        NotificationDTO dto = new NotificationDTO(
+                                                        "feedback_reply",
+                                                        "Admin Replied to Your Feedback",
+                                                        buildReplyMessage(f),
+                                                        "fa-reply",
+                                                        "info",
+                                                        f.getReplyDate() != null ? f.getReplyDate() : (f.getCreatedAt() != null ? f.getCreatedAt() : java.time.LocalDateTime.now())
+                                        );
+                                        dto.setId("feedback_reply_" + (f.getId() != null ? f.getId() : Math.abs((f.getComments()!=null?f.getComments():"" ).hashCode())));
+                                        list.add(dto);
+                                }
+                        }
+                } catch (Exception ignored) {}
+
         // Sort by timestamp desc and cap
         list.sort(Comparator.comparing(NotificationDTO::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         if (list.size() > 30) return new ArrayList<>(list.subList(0, 30));
@@ -105,5 +132,17 @@ public class CustomerNotificationService {
     }
 
     private static <T> List<T> safe(List<T> l) { return l == null ? java.util.Collections.emptyList() : l; }
+
+        private String buildReplyMessage(Feedback f) {
+                String adminName = null;
+                try {
+                        if (f.getAdmin() != null) {
+                                adminName = (f.getAdmin().getFirstName() + " " + f.getAdmin().getLastName()).trim();
+                        }
+                } catch (Exception ignored) {}
+                String reply = f.getReply() != null ? f.getReply().trim() : "";
+                String preview = reply.length() > 120 ? reply.substring(0,117) + "..." : reply;
+                return (adminName != null && !adminName.isBlank() ? adminName + " replied: " : "Admin replied: ") + preview;
+        }
 }
 

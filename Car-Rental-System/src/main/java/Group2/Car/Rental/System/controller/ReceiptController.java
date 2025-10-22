@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.xhtmlrenderer.pdf.ITextRenderer;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -49,13 +51,15 @@ public class ReceiptController {
 
             if (!owns(auth, b)) return err("Forbidden", HttpStatus.FORBIDDEN);
 
-            String customerName = safe(() -> b.getCustomer().getUser().getFirstName() + " " + b.getCustomer().getUser().getLastName());
+            // With open-in-view disabled, avoid lazy-loading Customer.user; fetch User explicitly
+            String customerName = resolveUserName(b);
             String item = b.getVehicle()!=null
                     ? safe(() -> b.getVehicle().getMake() + " " + b.getVehicle().getModel())
                     : (b.getVehiclePackage()!=null ? safe(() -> b.getVehiclePackage().getPackageName()) : "");
 
-            String html = "" +
-                    "<html><head><meta charset='UTF-8'><title>Booking Receipt BK-"+b.getBookingId()+"</title>"+
+            String xhtml = "" +
+                    "<!DOCTYPE html><html xmlns='http://www.w3.org/1999/xhtml'><head><meta charset='UTF-8'/>"+
+                    "<title>Booking Receipt BK-"+b.getBookingId()+"</title>"+
                     colorfulStyles() +
                     "</head><body>"+
                     "<div class='receipt-card'>"+
@@ -79,12 +83,19 @@ public class ReceiptController {
                     "</div>"+
                     "</body></html>";
 
-            byte[] data = html.getBytes(StandardCharsets.UTF_8);
+            // Render PDF
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(xhtml);
+            renderer.layout();
+            renderer.createPDF(baos);
+            byte[] pdf = baos.toByteArray();
+
             HttpHeaders h = new HttpHeaders();
-            h.setContentType(MediaType.TEXT_HTML);
-            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"booking-receipt-"+b.getBookingId()+".html\"");
-            h.setContentLength(data.length);
-            return new ResponseEntity<>(data, h, HttpStatus.OK);
+            h.setContentType(MediaType.APPLICATION_PDF);
+            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"booking-receipt-"+b.getBookingId()+".pdf\"");
+            h.setContentLength(pdf.length);
+            return new ResponseEntity<>(pdf, h, HttpStatus.OK);
         } catch (Exception ex){
             return err("Failed to generate receipt", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -105,7 +116,9 @@ public class ReceiptController {
             }
 
         // Gather fields
-        String customerName = safe(() -> b.getCustomer().getUser().getFirstName() + " " + b.getCustomer().getUser().getLastName());
+    // With open-in-view disabled, avoid lazy-loading Customer.user; fetch User explicitly
+    String customerName = resolveUserName(b);
+    String customerEmail = resolveUserEmail(b);
         String customerPhone = safe(() -> b.getCustomer().getContactNumber());
         String customerAddress = (safe(() -> b.getCustomer().getAddressStreet()) + ", " +
             safe(() -> b.getCustomer().getAddressCity()) + " " + safe(() -> b.getCustomer().getAddressPostalCode())).replaceAll(", ", ", ").trim();
@@ -125,75 +138,83 @@ public class ReceiptController {
         String discount = bdDisc.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString();
         String grandTotal = bdPaid.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString();
 
-        String html = "" +
-            "<html><head><meta charset='UTF-8'><title>Payment Receipt PMT-"+p.getPaymentId()+"</title>"+
-            "<style>body{background:#f7f9fb;font-family:Inter,Segoe UI,Arial,sans-serif;color:#222;margin:0;padding:24px}"
-            +".sheet{max-width:820px;margin:0 auto;background:#fff;border:1px solid #e6eef4;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.06);overflow:hidden}"
-            +".hdr{padding:22px 24px;border-bottom:2px solid #2ec4c7;background:#eaffff}"
-            +".title{font-size:28px;font-weight:800;color:#13b0b3;margin:0 0 8px}"
-            +".hdr-grid{display:grid;grid-template-columns:2fr 1fr;gap:10px}"
-            +".company h3{margin:0;color:#222;font-size:18px} .company p{margin:2px 0;color:#555;font-size:13px}"
-            +".receipt-meta{justify-self:end;text-align:right;color:#333;font-size:13px} .receipt-meta div{margin:4px 0}"
-            +".section{padding:18px 24px;border-bottom:1px solid #e9edf2}"
-            +".section h4{margin:0 0 10px;color:#13b0b3;font-size:16px} .kv div{margin:6px 0} .kv label{display:inline-block;width:110px;color:#666}"
-            +"table{width:calc(100% - 48px);margin:0 24px 18px;border-collapse:collapse;font-size:14px}"
-            +"th,td{border:1px solid #dfe7ee;padding:10px 8px;text-align:left} th{background:#2ec4c7;color:#fff;font-weight:700}"
-            +".totals{width:calc(100% - 48px);margin:0 24px 24px} .totals .row{display:flex;justify-content:flex-end;margin:6px 0}"
-            +".totals label{min-width:140px;text-align:right;margin-right:10px;color:#555} .totals span{min-width:120px;text-align:right;font-weight:700}"
-            +".foot{padding:14px 24px;background:#f6fffe;color:#0f6;display:flex;justify-content:space-between;align-items:center}"
-            +".foot .thanks{color:#13b0b3;font-weight:700} .foot .method{color:#333}"
-            +"@media(max-width:640px){.hdr-grid{grid-template-columns:1fr}.receipt-meta{justify-self:start;text-align:left}.kv label{width:90px}}"
-            +"</style></head><body>"+
+        String xhtml = "" +
+            "<!DOCTYPE html><html xmlns='http://www.w3.org/1999/xhtml'><head><meta charset='UTF-8'/>"+
+            "<title>Payment Receipt PMT-"+p.getPaymentId()+"</title>"+
+            "<style>body{background:#fafafa;font-family:Segoe UI,Arial,sans-serif;color:#1f2937;margin:0;padding:24px}"+
+            ".sheet{max-width:860px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.06);overflow:hidden}"+
+            ".header{display:flex;justify-content:space-between;align-items:flex-start;padding:22px 24px;border-bottom:2px solid #0ea5e9;background:#f0f9ff}"+
+            ".brand{font-weight:800;font-size:22px;color:#0f172a} .brand small{display:block;color:#334155;font-weight:600;font-size:12px}"+
+            ".meta{text-align:right;font-size:13px;color:#334155} .meta div{margin:4px 0}"+
+            ".row{display:flex;gap:18px;padding:18px 24px;border-bottom:1px solid #eef2f7}"+
+            ".col{flex:1} .title{font-weight:800;color:#0ea5e9;margin:0 0 6px;font-size:16px} .kv div{margin:6px 0} .kv label{display:inline-block;width:120px;color:#64748b} .kv span{color:#111827}"+
+            "table{width:calc(100% - 48px);margin:0 24px 12px;border-collapse:collapse;font-size:14px}"+
+            "th,td{border:1px solid #e5e7eb;padding:10px 8px;text-align:left} th{background:#0ea5e9;color:#fff;font-weight:700}"+
+            ".totals{width:calc(100% - 48px);margin:8px 24px 20px} .totals .r{display:flex;justify-content:flex-end;margin:6px 0} .totals label{min-width:160px;text-align:right;margin-right:12px;color:#374151} .totals span{min-width:140px;text-align:right;font-weight:800}"+
+            ".footer{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:#f0f9ff;border-top:1px solid #e5e7eb;color:#0f172a}"+
+            "</style></head><body>"+
             "<div class='sheet'>"+
-            " <div class='hdr'>"+
-            "   <div class='title'>Car Rental Receipt</div>"+
-            "   <div class='hdr-grid'>"+
-            "     <div class='company'>"+
-            "       <h3>VeloRent</h3>"+
-            "       <p>3917 Walnut Creek, California 945</p>"+
-            "       <p>Phone: +1 (555) 923-4545</p>"+
-            "     </div>"+
-            "     <div class='receipt-meta'>"+
-            "       <div><b>Receipt No:</b> PMT-"+p.getPaymentId()+"</div>"+
-            "       <div><b>Date:</b> "+(p.getPaymentDate()!=null?p.getPaymentDate().format(DT):"-")+"</div>"+
-            "     </div>"+
-            "   </div>"+
-            " </div>"+
-            " <div class='section'>"+
-            "   <h4>Renter Information</h4>"+
-            "   <div class='kv'>"+
-            "     <div><label>Name:</label><span>"+esc(customerName)+"</span></div>"+
-            "     <div><label>Address:</label><span>"+esc(customerAddress)+"</span></div>"+
-            "     <div><label>Phone No:</label><span>"+esc(customerPhone)+"</span></div>"+
-            "     <div><label>Car Details:</label><span>"+esc(carDetails)+"</span></div>"+
-            "   </div>"+
-            " </div>"+
-            " <div class='section' style='border-bottom:none;padding-bottom:8px'>"+
-            "   <h4>Car Rental Information</h4>"+
-            " </div>"+
-            " <table><thead><tr>"+
-            "   <th>S No</th><th>Car Number</th><th>Kilometers/Hour</th><th>Duration</th><th>Rent/Hour</th><th>Total</th>"+
-            " </tr></thead><tbody>"+
-            "   <tr><td>1</td><td>"+esc(carNumber)+"</td><td>-</td><td>"+esc(durationText)+"</td><td>"+esc(rentPer)+"</td><td>"+esc(subTotal)+"</td></tr>"+
-            " </tbody></table>"+
-            " <div class='totals'>"+
-            "   <div class='row'><label>Sub Total</label><span>"+esc(subTotal)+"</span></div>"+
-            "   <div class='row'><label>Discount</label><span>"+esc(discount)+"</span></div>"+
-            "   <div class='row'><label>GRAND TOTAL</label><span>"+esc(grandTotal)+"</span></div>"+
-            " </div>"+
-            " <div class='foot'>"+
-            "   <div class='thanks'>Thank you for choosing VeloRent</div>"+
-            "   <div class='method'>Payment Method: "+esc(p.getPaymentMethod())+"</div>"+
-            " </div>"+
+            "  <div class='header'>"+
+            "    <div class='brand'>VeloRent<small>Car Rental Services</small><small>3917 Walnut Creek, CA 945</small><small>+1 (555) 923-4545</small></div>"+
+            "    <div class='meta'>"+
+            "      <div><b>Payment Receipt</b></div>"+
+            "      <div>Receipt No: PMT-"+p.getPaymentId()+"</div>"+
+            "      <div>Date: "+(p.getPaymentDate()!=null?p.getPaymentDate().format(DT):"-")+"</div>"+
+            "    </div>"+
+            "  </div>"+
+            "  <div class='row'>"+
+            "    <div class='col'>"+
+            "      <div class='title'>Billed To</div>"+
+            "      <div class='kv'>"+
+            "        <div><label>Name:</label><span>"+esc(customerName)+"</span></div>"+
+            "        <div><label>Email:</label><span>"+esc(customerEmail)+"</span></div>"+
+            "        <div><label>Phone:</label><span>"+esc(customerPhone)+"</span></div>"+
+            "        <div><label>Address:</label><span>"+esc(customerAddress)+"</span></div>"+
+            "      </div>"+
+            "    </div>"+
+            "    <div class='col'>"+
+            "      <div class='title'>Payment Details</div>"+
+            "      <div class='kv'>"+
+            "        <div><label>Booking ID:</label><span>"+b.getBookingId()+"</span></div>"+
+            "        <div><label>Method:</label><span>"+esc(p.getPaymentMethod())+"</span></div>"+
+            "        <div><label>Status:</label><span>"+esc(p.getPaymentStatus())+"</span></div>"+
+            "        <div><label>Paid Amount:</label><span>"+esc(grandTotal)+"</span></div>"+
+            "      </div>"+
+            "    </div>"+
+            "  </div>"+
+            "  <div class='row' style='padding-bottom:10px'>"+
+            "    <div class='col' style='flex:1 1 100%'>"+
+            "      <div class='title'>Rental Summary</div>"+
+            "    </div>"+
+            "  </div>"+
+            "  <table><thead><tr><th>#</th><th>Description</th><th>Duration</th><th>Rate</th><th style='text-align:right'>Amount</th></tr></thead><tbody>"+
+            "    <tr><td>1</td><td>"+esc(carDetails)+" ("+esc(carNumber)+")</td><td>"+esc(durationText)+"</td><td>"+esc(rentPer)+"</td><td style='text-align:right'>"+esc(subTotal)+"</td></tr>"+
+            "  </tbody></table>"+
+            "  <div class='totals'>"+
+            "    <div class='r'><label>Sub Total</label><span>"+esc(subTotal)+"</span></div>"+
+            "    <div class='r'><label>Discount</label><span>"+esc(discount)+"</span></div>"+
+            "    <div class='r'><label>Total Paid</label><span>"+esc(grandTotal)+"</span></div>"+
+            "  </div>"+
+            "  <div class='footer'>"+
+            "    <div>Thank you, <b>"+esc(customerName)+"</b>, for your payment.</div>"+
+            "    <div>VeloRent • www.velorent.example</div>"+
+            "  </div>"+
             "</div>"+
             "</body></html>";
 
-            byte[] data = html.getBytes(StandardCharsets.UTF_8);
+            // Render PDF
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(xhtml);
+            renderer.layout();
+            renderer.createPDF(baos);
+            byte[] pdf = baos.toByteArray();
+
             HttpHeaders h = new HttpHeaders();
-            h.setContentType(MediaType.TEXT_HTML);
-            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"payment-receipt-"+b.getBookingId()+".html\"");
-            h.setContentLength(data.length);
-            return new ResponseEntity<>(data, h, HttpStatus.OK);
+            h.setContentType(MediaType.APPLICATION_PDF);
+            h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"payment-receipt-"+b.getBookingId()+".pdf\"");
+            h.setContentLength(pdf.length);
+            return new ResponseEntity<>(pdf, h, HttpStatus.OK);
         } catch (Exception ex){
             return err("Failed to generate receipt", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -239,5 +260,32 @@ public class ReceiptController {
 
     private static String safe(java.util.concurrent.Callable<String> c){
         try { return c.call(); } catch(Exception e){ return ""; }
+    }
+
+    // --- Helpers to safely resolve User fields without triggering lazy loads ---
+    private String resolveUserName(Booking b){
+        try {
+            if (b==null || b.getCustomer()==null) return "";
+            Long uid = b.getCustomer().getUserId();
+            if (uid == null) return "";
+            Optional<User> u = userRepository.findById(uid);
+            if (u.isPresent()) {
+                String fn = u.get().getFirstName()!=null ? u.get().getFirstName() : "";
+                String ln = u.get().getLastName()!=null ? u.get().getLastName() : "";
+                return (fn + " " + ln).trim();
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
+
+    private String resolveUserEmail(Booking b){
+        try {
+            if (b==null || b.getCustomer()==null) return "";
+            Long uid = b.getCustomer().getUserId();
+            if (uid == null) return "";
+            Optional<User> u = userRepository.findById(uid);
+            return u.map(User::getEmail).orElse("");
+        } catch (Exception ignored) {}
+        return "";
     }
 }

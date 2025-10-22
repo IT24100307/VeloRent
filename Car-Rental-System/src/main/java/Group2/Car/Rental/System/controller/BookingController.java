@@ -50,6 +50,37 @@ public class BookingController {
     }
 
     /**
+     * Get customers ordered by rental count (desc) for gifting UI.
+     */
+    @GetMapping("/customers/top")
+    public ResponseEntity<List<Map<String, Object>>> getTopCustomersByRentals(@RequestParam(name = "minRentals", defaultValue = "5") int minRentals) {
+        List<Map<String, Object>> res = bookingService.getCustomersOrderedByRentals(minRentals);
+        return ResponseEntity.ok(res);
+    }
+
+    /**
+     * Gift a vehicle to a customer (creates a zero-cost booking and sets vehicle to Rented).
+     * Body: { vehicleId, customerId, durationDays? }
+     */
+    @PostMapping("/gift")
+    public ResponseEntity<Map<String, Object>> giftVehicle(@RequestBody Map<String, Object> body) {
+        try {
+            Integer vehicleId = body.get("vehicleId") != null ? Integer.valueOf(body.get("vehicleId").toString()) : null;
+            Integer customerId = body.get("customerId") != null ? Integer.valueOf(body.get("customerId").toString()) : null;
+            Integer durationDays = body.get("durationDays") != null ? Integer.valueOf(body.get("durationDays").toString()) : null;
+            Map<String, Object> res = bookingService.giftVehicleBooking(vehicleId, customerId, durationDays);
+            if (Boolean.TRUE.equals(res.get(SUCCESS_KEY))) return ResponseEntity.ok(res);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        } catch (Exception e) {
+            Map<String, Object> err = Map.of(
+                SUCCESS_KEY, false,
+                "message", "Error gifting vehicle: " + e.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+        }
+    }
+
+    /**
      * Get all bookings for a customer
      * @param customerId the customer's ID
      * @return list of bookings

@@ -137,6 +137,107 @@ public class BookingService {
     private PaymentService paymentService;
 
     /**
+     * Return customers ordered by total rentals (desc).
+     * Output items: { customerId, name, email, rentals }
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getCustomersOrderedByRentals(int minRentals) {
+        List<Map<String, Object>> list = new java.util.ArrayList<>();
+        try {
+            List<Object[]> rows = bookingRepository.findCustomersOrderedByRentalCount(minRentals);
+            for (Object[] r : rows) {
+                Map<String, Object> m = new HashMap<>();
+                // user_id, full_name, email, rentals
+                m.put("customerId", r[0] != null ? Integer.valueOf(r[0].toString()) : null);
+                m.put("name", r[1] != null ? r[1].toString() : "");
+                m.put("email", r[2] != null ? r[2].toString() : "");
+                m.put("rentals", r[3] != null ? Integer.valueOf(r[3].toString()) : 0);
+                list.add(m);
+            }
+        } catch (Exception e) {
+            // return empty list on failure
+        }
+        return list;
+    }
+
+    /**
+     * Gift a vehicle to a customer by creating a zero-cost booking and marking the vehicle as Rented.
+     * Defaults to 1 day duration when not provided.
+     */
+    @Transactional
+    public Map<String, Object> giftVehicleBooking(Integer vehicleId, Integer customerUserId, Integer durationDays) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (vehicleId == null || customerUserId == null) {
+                response.put("success", false);
+                response.put("message", "Vehicle and customer are required");
+                return response;
+            }
+
+            Optional<Vehicle> vOpt = vehicleRepository.findById(vehicleId);
+            if (vOpt.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Vehicle not found");
+                return response;
+            }
+            Vehicle vehicle = vOpt.get();
+
+            if (!"Available".equalsIgnoreCase(String.valueOf(vehicle.getStatus()))) {
+                response.put("success", false);
+                response.put("message", "Vehicle is not available");
+                return response;
+            }
+
+            Optional<Customer> cOpt = customerRepository.findByUserId(customerUserId.longValue());
+            if (cOpt.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Customer not found");
+                return response;
+            }
+            Customer customer = cOpt.get();
+
+            int days = (durationDays != null && durationDays > 0) ? durationDays : 1;
+            LocalDateTime start = LocalDateTime.now();
+            LocalDateTime end = start.plusDays(days);
+
+            Booking booking = new Booking();
+            booking.setStartDate(start);
+            booking.setEndDate(end);
+            booking.setTotalCost(BigDecimal.ZERO);
+            booking.setCustomer(customer);
+            booking.setVehicle(vehicle);
+            booking.setBookingType("VEHICLE");
+            booking.setBookingStatus("Confirmed");
+
+            Booking saved = bookingRepository.save(booking);
+
+            vehicle.setStatus("Rented");
+            vehicleRepository.save(vehicle);
+
+            // Mark packages containing this vehicle as partially reserved as a precaution
+            try { vehiclePackageService.markPackagesAsPartiallyReserved(vehicle.getVehicleId()); } catch (Exception ignored) {}
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("bookingId", saved.getBookingId());
+            payload.put("customerId", customer.getUserId());
+            payload.put("vehicleId", vehicle.getVehicleId());
+            payload.put("startDate", saved.getStartDate());
+            payload.put("endDate", saved.getEndDate());
+            payload.put("totalCost", saved.getTotalCost());
+            payload.put("bookingStatus", saved.getBookingStatus());
+
+            response.put("success", true);
+            response.put("message", "Vehicle gifted successfully");
+            response.put("booking", payload);
+            return response;
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error gifting vehicle: " + e.getMessage());
+            return response;
+        }
+    }
+
+    /**
      * Create a new booking
      * @param bookingRequest the booking request DTO
      * @return a map containing success status and the created booking or error message

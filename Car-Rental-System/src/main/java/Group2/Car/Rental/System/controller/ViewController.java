@@ -122,6 +122,8 @@ public class ViewController {
 
     @GetMapping("/admin/login-history")
     public String loginHistory() {
+        // Use a lightweight, verified-working template to ensure the page renders
+        // and displays data from /api/admin/login-history.
         return "admin/login-history-simple";
     }
 

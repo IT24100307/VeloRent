@@ -116,4 +116,14 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     // NEW: Customer-scoped convenience queries
     List<Booking> findTop20ByCustomer_UserIdAndBookingStatusOrderByCreatedAtDesc(Integer customerId, String status);
+
+    // Customers ordered by total rentals (vehicle or package bookings) - returns rows: userId, name, email, rentals
+    @Query(value = "SELECT u.id AS user_id, CONCAT(COALESCE(u.first_name,''),' ',COALESCE(u.last_name,'')) AS full_name, u.email, COUNT(b.booking_id) AS rentals\n" +
+        "FROM bookings b\n" +
+        "JOIN customers c ON b.customer_id = c.customer_id\n" +
+        "JOIN users u ON c.user_id = u.id\n" +
+        "GROUP BY u.id, u.first_name, u.last_name, u.email\n" +
+        "HAVING COUNT(b.booking_id) >= :minRentals\n" +
+        "ORDER BY rentals DESC, full_name ASC", nativeQuery = true)
+    List<Object[]> findCustomersOrderedByRentalCount(@Param("minRentals") int minRentals);
 }

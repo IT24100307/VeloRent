@@ -206,12 +206,12 @@
       <a class="navbar-brand-luxury" href="/owner/dashboard"><i class="fas fa-crown mr-2"></i> VeloRent Admin</a>
       <div class="collapse navbar-collapse" id="navbarOwner">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link-luxury" href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/owner/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/feedback?from=owner"><i class="fas fa-comments mr-1"></i>Feedback</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/payments"><i class="fas fa-credit-card mr-1"></i>Payments</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/bookings"><i class="fas fa-calendar-check mr-1"></i>Bookings</a></li>
-          <li class="nav-item"><a class="nav-link-luxury" href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" id="owner-logout-link" href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a></li>
         </ul>
         <ul class="navbar-nav" style="align-items:center; gap: 8px;">
           <li class="nav-item notifications-wrapper" style="margin-right:12px;">
@@ -727,6 +727,12 @@
 <!-- Profile wiring: populate and link to Profile page -->
 <script>
   document.addEventListener('DOMContentLoaded', function(){
+    // Intercept logout link and perform client-side logout to avoid server 404/whitelabel
+    var logoutLink = document.getElementById('owner-logout-link');
+    if (logoutLink) {
+      logoutLink.addEventListener('click', handleLogout);
+    }
+
     const userName = localStorage.getItem('userName') || 'Owner';
     const userEmail = localStorage.getItem('userEmail') || 'owner@velorent.com';
 
