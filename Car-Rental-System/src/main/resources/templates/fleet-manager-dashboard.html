@@ -1163,6 +1163,25 @@
             </div>
         </div>
     </nav>
+                <script>
+                    // Reveal the special Owner back button only after the DOM is ready
+                    (function(){
+                        function showOwnerBack(){
+                            try{
+                                var role = localStorage.getItem('userRole') || '';
+                                if(role && role.toUpperCase().includes('OWNER')){
+                                    var btn = document.getElementById('owner-back-dashboard-btn');
+                                    if(btn){ btn.style.display = 'inline-flex'; }
+                                }
+                            }catch(e){ /* no-op */ }
+                        }
+                        if(document.readyState === 'loading'){
+                            document.addEventListener('DOMContentLoaded', showOwnerBack);
+                        } else {
+                            showOwnerBack();
+                        }
+                    })();
+                </script>
 
     <div class="container">
         <main>
@@ -1178,6 +1197,10 @@
                     Welcome to the VeloRent Luxury Fleet Management System
                 </p>
                 <div class="dashboard-actions" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <!-- Special Owner Back button: visible only for owners -->
+                    <a id="owner-back-dashboard-btn" href="/owner/dashboard" class="btn btn-primary" style="display:none; align-items:center; gap:8px; border:2px solid var(--luxury-gold); box-shadow: 0 0 0 2px rgba(212,175,55,.25) inset;">
+                        <i class="fas fa-arrow-left"></i> Owner Dashboard
+                    </a>
                     <a href="/fleet-manager/packages" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-box"></i> Manage Packages</a>
                     <button onclick="showAddVehicleModal()" id="add-vehicle-btn" class="btn btn-success" style="display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-plus"></i> Add New Vehicle</button>
                 </div>
