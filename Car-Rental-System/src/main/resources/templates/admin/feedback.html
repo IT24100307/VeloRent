@@ -248,7 +248,7 @@
     <div class="logo">
       <i class="fas fa-crown mr-2"></i>VeloRent Admin
     </div>
-    <div class="nav-links">
+    <div class="nav-links" id="admin-nav-links">
       <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
       <a href="#"><i class="fas fa-car mr-1"></i>Vehicles</a>
       <a href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a>
@@ -263,7 +263,10 @@
   <div class="dashboard-header">
     <h1 class="dashboard-title">Feedback Dashboard</h1>
     <div class="dashboard-actions">
-      <a href="/dashboard" class="btn btn-primary btn-back">Back to Dashboard</a>
+      <a id="owner-back-dashboard-btn" href="/owner/dashboard" class="btn btn-primary btn-back" style="display:none;">
+        <i class="fas fa-arrow-left mr-1"></i> Owner Dashboard
+      </a>
+      <a id="admin-back-dashboard-btn" href="/admin/dashboard" class="btn btn-primary btn-back">Back to Dashboard</a>
     </div>
   </div>
 
@@ -326,9 +329,39 @@
   </table>
 </main>
 <script>
+  // Role-aware UI: when an OWNER opens Admin Feedback from Owner Dashboard,
+  // show Owner back button and hide the admin nav/actions.
+  (function(){
+    function isFromOwner(){
+      try{ return new URLSearchParams(window.location.search).get('from') === 'owner'; }catch(_){ return false; }
+    }
+    function setupOwnerView(){
+      try{
+        var role = (localStorage.getItem('userRole') || '').toUpperCase();
+        if (role.includes('OWNER') || isFromOwner()){
+          var ownerBtn = document.getElementById('owner-back-dashboard-btn');
+          if (ownerBtn) ownerBtn.style.display = 'inline-flex';
+          var adminBtn = document.getElementById('admin-back-dashboard-btn');
+          if (adminBtn) adminBtn.style.display = 'none';
+          var nav = document.getElementById('admin-nav-links');
+          if (nav){
+            // Ensure nav is visible and retarget the Dashboard link to Owner Dashboard
+            nav.style.display = 'flex';
+            var dash = nav.querySelector('a[href="/admin/dashboard"]');
+            if (dash) dash.setAttribute('href','/owner/dashboard');
+          }
+        }
+      } catch(e){ /* no-op */ }
+    }
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', setupOwnerView);
+    } else {
+      setupOwnerView();
+    }
+  })();
+
   // Any inline scripts specific to feedback page will only run here
   $(document).ready(function() {
-    // This script will only run on the feedback page
     console.log("Feedback dashboard initialized");
   });
 </script>

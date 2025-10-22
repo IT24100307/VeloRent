@@ -243,9 +243,18 @@ function validateForm(form) {
 function checkAuth() {
     const token = localStorage.getItem('token');
     
-    // If we're on a login/register page but user is already logged in
+    // If we're on a login/register page but user is already logged in, send them to the right dashboard by role
     if (token && (window.location.pathname.includes('login') || window.location.pathname.includes('register'))) {
-        window.location.href = '/dashboard'; // Redirect to dashboard
+        const role = localStorage.getItem('userRole') || '';
+        let redirectUrl = '/dashboard';
+        if (role.includes('FLEET_MANAGER')) {
+            redirectUrl = '/fleet-manager/dashboard';
+        } else if (role.includes('OWNER')) {
+            redirectUrl = '/owner/dashboard';
+        } else if (role.includes('ADMIN')) {
+            redirectUrl = '/admin/dashboard';
+        }
+        window.location.href = redirectUrl;
     }
 }
 

@@ -65,6 +65,13 @@
       align-items: center;
     }
 
+    /* Keep the header on one line and prevent wrapping */
+    .navbar-luxury .navbar-collapse { flex-wrap: nowrap; }
+    .navbar-luxury .navbar-nav { flex-wrap: nowrap; align-items: center; }
+    .navbar-luxury .navbar-nav.mr-auto { flex: 1 1 auto; overflow: hidden; white-space: nowrap; }
+    .navbar-luxury .navbar-nav.mr-auto > li { white-space: nowrap; }
+    .navbar-brand-luxury { white-space: nowrap; margin-right: 16px; }
+
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
@@ -200,17 +207,18 @@
       <div class="collapse navbar-collapse" id="navbarOwner">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link-luxury" href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/admin/feedback?from=owner"><i class="fas fa-comments mr-1"></i>Feedback</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/payments"><i class="fas fa-credit-card mr-1"></i>Payments</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/admin/offers"><i class="fas fa-tags mr-1"></i>Offers</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/bookings"><i class="fas fa-calendar-check mr-1"></i>Bookings</a></li>
+          <li class="nav-item"><a class="nav-link-luxury" href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a></li>
         </ul>
         <ul class="navbar-nav" style="align-items:center; gap: 8px;">
           <li class="nav-item notifications-wrapper" style="margin-right:12px;">
             <div class="dropdown" id="owner-notif">
-              <button class="btn-luxury btn-luxury-outline" id="owner-notif-btn" title="Notifications" style="position:relative;margin-left:8px;">
+              <button class="btn-luxury btn-luxury-outline" id="owner-notif-btn" title="Notifications" style="position:relative;margin-left:8px;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;overflow:visible;">
                 <i class="fas fa-bell"></i>
-                <span id="owner-notif-badge" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--luxury-gold);color:#000;border-radius:999px;font-size:11px;padding:1px 6px;font-weight:800">0</span>
+                <span id="owner-notif-badge" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--luxury-gold);color:#000;border-radius:999px;font-size:11px;padding:1px 6px;font-weight:800;z-index:2;">0</span>
               </button>
               <div id="owner-notif-menu" class="dropdown-menu dropdown-menu-right" style="display:none;background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury); min-width: 360px; max-height:420px; overflow:auto; position:absolute; right:0;">
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.06)"><div style="font-weight:700;color:var(--luxury-gold)">Notifications</div><button id="owner-notif-mark" class="btn btn-secondary" style="padding:4px 8px; font-size:.8rem">Mark all read</button></div>
@@ -234,7 +242,7 @@
               </div>
             </div>
           </li>
-          <li class="nav-item"><a class="nav-link-luxury" href="#" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a></li>
+          
         </ul>
       </div>
     </div>
@@ -582,10 +590,45 @@
       else { badge.style.display='none'; badge.textContent = '0'; }
     }
 
+    function isPayment(n){
+      const t=(n.type||'').toLowerCase();
+      const title=(n.title||'').toLowerCase();
+      const msg=(n.message||'').toLowerCase();
+      const icon=(n.icon||'').toLowerCase();
+      return t.includes('payment') || title.includes('payment') || msg.includes('payment') || icon.includes('credit-card');
+    }
+
+    function isNewAdmin(n){
+      const t=(n.type||'').toLowerCase();
+      const title=(n.title||'').toLowerCase();
+      const msg=(n.message||'').toLowerCase();
+      const role=(n.role||n.userRole||'').toString().toUpperCase();
+      // Consider only registration/creation events, never login
+      const isRegistration = t.includes('register') || title.includes('registered') || msg.includes('registered') || title.includes('new user') || msg.includes('new user');
+      const mentionsAdmin = role==='ADMIN' || title.includes('admin') || msg.includes('admin');
+      return isRegistration && mentionsAdmin;
+    }
+
+    function isFeedback(n){
+      const t=(n.type||'').toLowerCase();
+      const title=(n.title||'').toLowerCase();
+      const msg=(n.message||'').toLowerCase();
+      const icon=(n.icon||'').toLowerCase();
+      return t.includes('feedback') || title.includes('feedback') || msg.includes('feedback') || icon.includes('comments');
+    }
+
+    function isOwnerAllowed(n){
+      return isFeedback(n) || isNewAdmin(n) || isPayment(n);
+    }
+
+    function getDeleted(){ try { return new Set(JSON.parse(localStorage.getItem('ownerNotifDeleted')||'[]')); } catch(_) { return new Set(); } }
+    function saveDeleted(s){ localStorage.setItem('ownerNotifDeleted', JSON.stringify(Array.from(s))); }
+
     function render(notifs){
       list.innerHTML = '';
       const read = getRead();
       const pinned = getPinned();
+      const deleted = getDeleted();
       let unread = 0;
       if(!Array.isArray(notifs) || notifs.length===0){
         list.innerHTML = '<div style="padding:.75rem 1rem;color:var(--text-luxury-muted)">No notifications</div>';
@@ -596,6 +639,7 @@
       const otherItems = [];
       notifs.forEach(n=>{
         const id = stableId(n);
+        if(id && deleted.has(id)) return; // skip deleted
         const isRead = id && read.has(id);
         if(!isRead) unread++;
         const entry = { n, id, isRead };
@@ -616,7 +660,8 @@
         const div = document.createElement('div');
         div.style.cssText = 'display:flex;gap:10px;align-items:flex-start;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.1)';
         const pinColor = isPinned ? 'var(--luxury-gold)' : '#aaa';
-        div.innerHTML = `${iconHtml(n)}<div style=\"flex:1\"><div style=\"font-weight:700;color:var(--luxury-gold)\">${n.title||'Notification'}${isPinned?' <span style=\\"font-size:.75rem;color:var(--luxury-gold)\\">(pinned)</span>':''}</div><div style=\"color:var(--text-luxury-light);font-size:.92rem;margin-top:2px\">${n.message||''}</div><div style=\"color:var(--text-luxury-muted);font-size:.8rem;margin-top:4px\">${time}</div></div><span class=\"pin\" data-id=\"${id}\" title=\"${isPinned?'Unpin':'Pin'}\" style=\"color:${pinColor};margin-right:10px\"><i class=\"fas fa-thumbtack\"></i></span><span class=\"tick\" data-id=\"${id}\" title=\"Mark as read\" style=\"color:${isRead?'#4caf50':'#aaa'}\"><i class=\"fas fa-check\"></i></span>`;
+        const actions = isPayment(n) ? `<div style=\"margin-top:6px\"><a href=\"/admin/payments?from=owner\" class=\"btn btn-secondary btn-sm\" style=\"padding:4px 10px;border-radius:8px;\">View details</a></div>` : '';
+        div.innerHTML = `${iconHtml(n)}<div style=\"flex:1\"><div style=\"font-weight:700;color:var(--luxury-gold)\">${n.title||'Notification'}${isPinned?' <span style=\\"font-size:.75rem;color:var(--luxury-gold)\\">(pinned)</span>':''}</div><div style=\"color:var(--text-luxury-light);font-size:.92rem;margin-top:2px\">${n.message||''}</div>${actions}<div style=\"color:var(--text-luxury-muted);font-size:.8rem;margin-top:4px\">${time}</div></div><span class=\"pin\" data-id=\"${id}\" title=\"${isPinned?'Unpin':'Pin'}\" style=\"color:${pinColor};margin-right:10px\"><i class=\"fas fa-thumbtack\"></i></span><span class=\"tick\" data-id=\"${id}\" title=\"Mark as read\" style=\"color:${isRead?'#4caf50':'#aaa'};margin-right:10px\"><i class=\"fas fa-check\"></i></span><span class=\"del\" data-id=\"${id}\" title=\"Delete\" style=\"color:#c0392b\"><i class=\"fas fa-trash\"></i></span>`;
         list.appendChild(div);
       }
 
@@ -637,7 +682,15 @@
         // Reuse admin notifications for owner view
         const res = await fetch('/api/admin/notifications', { headers: { 'Accept': 'application/json' }});
         const data = await res.json();
-        currentNotifs = Array.isArray(data)?data:[];
+        let arr = Array.isArray(data)?data:[];
+        // Filter allowed owner notifications and sort newest first when timestamps exist
+        arr = arr.filter(isOwnerAllowed);
+        arr.sort((a,b)=>{
+          const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+          const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+          return tb - ta;
+        });
+        currentNotifs = arr;
         render(currentNotifs);
       }catch(e){ console.error('Owner notifications failed', e); }
     }
@@ -647,6 +700,14 @@
       if(t){ const id = t.getAttribute('data-id'); if(!id) return; const s = getRead(); s.add(id); saveRead(s); return render(currentNotifs); }
       const p = e.target.closest('.pin');
       if(p){ const id = p.getAttribute('data-id'); if(!id) return; const sp = getPinned(); if(sp.has(id)) sp.delete(id); else sp.add(id); savePinned(sp); return render(currentNotifs); }
+      const d = e.target.closest('.del');
+      if(d){
+        const id = d.getAttribute('data-id'); if(!id) return;
+        const sd = getDeleted(); sd.add(id); saveDeleted(sd);
+        // Optimistic remove from current list
+        currentNotifs = currentNotifs.filter(n => stableId(n) !== id);
+        return render(currentNotifs);
+      }
     });
 
     markBtn && markBtn.addEventListener('click', (e)=>{

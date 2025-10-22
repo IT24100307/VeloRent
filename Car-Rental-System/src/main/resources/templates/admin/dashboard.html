@@ -684,11 +684,14 @@
         <div class="nav-links" style="align-items:center; gap: 12px;">
           <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
           <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
+          <a href="/admin/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
+          <a href="/fleet-manager/bookings"><i class="fas fa-calendar-check mr-1"></i>Bookings</a>
+          <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
           <!-- System Admin Notifications: only user registrations and user logins -->
           <div class="dropdown" id="admin-notif">
-            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" title="Notifications">
+            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" title="Notifications" style="position: relative; overflow: visible; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
               <i class="fas fa-bell"></i>
-              <span id="admin-notif-badge" class="notif-badge" style="display:none;position:absolute;top:-6px;right:-6px;background:#d4af37;color:#000;border-radius:10px;padding:0 6px;font-size:11px;line-height:16px;min-width:18px;text-align:center;">0</span>
+              <span id="admin-notif-badge" class="notif-badge" style="display:none;position:absolute;top:-6px;right:-6px;background:#d4af37;color:#000;border-radius:10px;padding:0 6px;font-size:11px;line-height:16px;min-width:18px;text-align:center;z-index:2;">0</span>
             </button>
             <div class="dropdown-menu dropdown-menu-right" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury); min-width: 360px; max-width: 420px; padding: 0; overflow: hidden;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.2);">
@@ -712,7 +715,6 @@
               </a>
             </div>
           </div>
-          <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
         </div>
       </nav>
     </header>
@@ -725,7 +727,7 @@
           <a href="/owner/dashboard" class="btn back-btn" id="toOwner" style="display: none;">To Owner Dashboard</a>
           <button class="btn btn-secondary" id="refreshBtn">Refresh Data</button>
           <a href="/admin/login-history" class="btn btn-secondary"><i class="fas fa-history mr-1"></i>Login History</a>
-          <button class="btn" id="openCreateAdminBtn"><i class="fas fa-user-plus mr-1"></i>Create Admin</button>
+            <button class="btn" id="openCreateAdminBtn"><i class="fas fa-user-plus mr-1"></i>Create Admin</button>
         </div>
       </div>
 
@@ -1032,6 +1034,35 @@
         const list = document.getElementById('admin-notif-list');
         const markBtn = document.getElementById('admin-mark-all');
         let currentNotifs = [];
+        function ts(n){
+          if(!n) return 0;
+          const candidates = [
+            n.timestamp,
+            n.createdAt,
+            n.createdDate,
+            n.created_at,
+            n.created_date,
+            n.date,
+            n.time,
+            n.eventTime,
+            n.event_time
+          ].filter(Boolean);
+          for(const c of candidates){
+            // numeric epoch
+            if(typeof c==='number' && isFinite(c)) return Number(c);
+            // string epoch
+            if(typeof c==='string' && /^\d{10,13}$/.test(c.trim())){
+              const num = Number(c);
+              if(isFinite(num)) return num.toString().length===10 ? num*1000 : num;
+            }
+            // ISO / date-like string
+            const d = new Date(c);
+            if(!isNaN(d)) return d.getTime();
+          }
+          // last fallback: try id if numeric increasing
+          if(n.id && /^\d+$/.test(String(n.id))) return Number(n.id);
+          return 0;
+        }
 
         function getRead(){ try { return new Set(JSON.parse(localStorage.getItem('adminNotifRead')||'[]')); } catch(_) { return new Set(); } }
         function saveRead(s){ localStorage.setItem('adminNotifRead', JSON.stringify(Array.from(s))); }
@@ -1069,6 +1100,9 @@
           if(!Array.isArray(notifs)||notifs.length===0){ list.innerHTML='<div style="padding:.75rem 1rem;color:var(--text-luxury-muted)">No notifications</div>'; updateBadge(0); return; }
           const pinnedItems=[]; const otherItems=[];
           notifs.forEach(n=>{ const id=stableId(n); const isRead=id&&read.has(id); if(!isRead) unread++; const entry={n,id,isRead}; if(id&&pinned.has(id)) pinnedItems.push(entry); else otherItems.push(entry); });
+          // Ensure each group is sorted newest->oldest as well
+          pinnedItems.sort((a,b)=> ts(b.n)-ts(a.n));
+          otherItems.sort((a,b)=> ts(b.n)-ts(a.n));
           if(pinnedItems.length>0){ const hdr=document.createElement('div'); hdr.style.cssText='padding:.4rem 1rem;color:var(--luxury-gold);font-weight:700;border-bottom:1px solid rgba(212,175,55,.2)'; hdr.textContent='Pinned'; list.appendChild(hdr); }
           function row(entry){ const {n,id,isRead}=entry; const isPinned=id&&pinned.has(id); const time=n.timestamp?new Date(n.timestamp).toLocaleString():''; const div=document.createElement('div'); div.style.cssText='display:flex;gap:10px;align-items:flex-start;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.1)'; const pinColor=isPinned?'var(--luxury-gold)':'#aaa'; div.innerHTML=`${iconHtml(n)}<div style="flex:1"><div style="font-weight:700;color:var(--luxury-gold)">${n.title||'Notification'}${isPinned?' <span style=\"font-size:.75rem;color:var(--luxury-gold)\">(pinned)</span>':''}</div><div style="color:var(--text-luxury-light);font-size:.92rem;margin-top:2px">${n.message||''}</div><div style="color:var(--text-luxury-muted);font-size:.8rem;margin-top:4px">${time}</div></div><span class="pin" data-id="${id}" title="${isPinned?'Unpin':'Pin'}" style="color:${pinColor};margin-right:10px"><i class="fas fa-thumbtack"></i></span><span class="tick" data-id="${id}" title="Mark as read" style="color:${isRead?'#4caf50':'#aaa'}"><i class="fas fa-check"></i></span>`; list.appendChild(div); }
           pinnedItems.forEach(row); if(pinnedItems.length>0&&otherItems.length>0){ const sep=document.createElement('div'); sep.style.cssText='padding:.2rem 1rem;color:var(--text-luxury-muted);font-size:.8rem;border-bottom:1px solid rgba(212,175,55,.1)'; sep.textContent='All notifications'; list.appendChild(sep);} otherItems.forEach(row);
@@ -1082,7 +1116,7 @@
             const filtered = (Array.isArray(data)?data:[]).filter(n => {
               const t = (n.type||'').toLowerCase();
               return t==='user_registered' || t==='user_login' || t.includes('user_login');
-            });
+            }).sort((a,b)=> ts(b)-ts(a)); // newest first
             currentNotifs = filtered;
             render(currentNotifs);
           }catch(e){ console.error('Admin notifications load failed', e); }

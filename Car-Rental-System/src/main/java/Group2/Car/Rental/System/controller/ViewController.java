@@ -63,6 +63,12 @@ public class ViewController {
         return "security-settings";
     }
 
+    // Alias path for admins to reach the same security settings page from the admin area
+    @GetMapping("/admin/security-settings")
+    public String adminSecuritySettings() {
+        return "security-settings";
+    }
+
     @GetMapping("/dashboard")
     public String dashboard() {
         // This is a placeholder. In a real application, you would check if the user is
