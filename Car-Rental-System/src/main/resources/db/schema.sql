@@ -116,3 +116,13 @@ CREATE TABLE IF NOT EXISTS feedback (
     CONSTRAINT FK_feedback_customers FOREIGN KEY (customer_id) REFERENCES users(user_id),
     CONSTRAINT FK_feedback_admin FOREIGN KEY (admin_id) REFERENCES users(user_id)
 );
+
+-- Create login_history table
+CREATE TABLE IF NOT EXISTS login_history (
+    login_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT NOT NULL,
+    username VARCHAR(100) NOT NULL,
+    account_type VARCHAR(50) NOT NULL,
+    login_time DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT FK_login_history_users FOREIGN KEY (user_id) REFERENCES users(user_id)
+);

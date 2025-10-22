@@ -4,14 +4,17 @@ import Group2.Car.Rental.System.dto.LoginDto;
 import Group2.Car.Rental.System.dto.RegisterDto;
 import Group2.Car.Rental.System.dto.ResetPasswordDto;
 import Group2.Car.Rental.System.entity.Customer;
+import Group2.Car.Rental.System.entity.LoginHistory;
 import Group2.Car.Rental.System.entity.Role;
 import Group2.Car.Rental.System.entity.Staff;
 import Group2.Car.Rental.System.entity.User;
 import Group2.Car.Rental.System.repository.CustomerRepository;
+import Group2.Car.Rental.System.repository.LoginHistoryRepository;
 import Group2.Car.Rental.System.repository.RoleRepository;
 import Group2.Car.Rental.System.repository.StaffRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class AuthService {
     @SuppressWarnings("unused")
     private final CustomerRepository customerRepository;
     private final StaffRepository staffRepository;
+    private final LoginHistoryRepository loginHistoryRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -39,12 +43,14 @@ public class AuthService {
 
     public AuthService(UserRepository userRepository, RoleRepository roleRepository,
             CustomerRepository customerRepository, StaffRepository staffRepository,
-            PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-            JwtService jwtService, TwoFactorAuthService twoFactorAuthService) {
+            LoginHistoryRepository loginHistoryRepository, PasswordEncoder passwordEncoder, 
+            AuthenticationManager authenticationManager, JwtService jwtService, 
+            TwoFactorAuthService twoFactorAuthService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.customerRepository = customerRepository;
         this.staffRepository = staffRepository;
+        this.loginHistoryRepository = loginHistoryRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
@@ -159,55 +165,100 @@ public class AuthService {
         }
     }
 
+    private void recordLoginAttempt(User user) {
+        try {
+            String accountType = getAccountTypeFromRole(user.getRole().getName());
+            String username = user.getFirstName() + " " + user.getLastName();
+
+            LoginHistory loginHistory = LoginHistory.builder()
+                    .user(user)
+                    .username(username)
+                    .accountType(accountType)
+                    .build();
+
+            loginHistoryRepository.save(loginHistory);
+        } catch (Exception e) {
+            // Log the error but don't fail the login process
+            System.err.println("Failed to record login attempt: " + e.getMessage());
+        }
+    }
+
+    private String getAccountTypeFromRole(String roleName) {
+        switch (roleName) {
+            case "ROLE_CUSTOMER":
+                return "Customer";
+            case "ROLE_FLEET_MANAGER":
+                return "Fleet Manager";
+            case "ROLE_SYSTEM_ADMIN":
+                return "System Admin";
+            case "ROLE_OWNER":
+                return "Owner";
+            default:
+                return "Unknown";
+        }
+    }
+
     public Map<String, String> login(LoginDto loginDto) {
-        // First check if user exists
-        User user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new RuntimeException("No account found with this email address"));
+        User user = null;
         
-        // Then authenticate - this will throw BadCredentialsException if password is wrong
-        authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+        try {
+            // First check if user exists
+            user = userRepository.findByEmail(loginDto.getEmail())
+                    .orElseThrow(() -> new RuntimeException("No account found with this email address"));
+            
+            // Then authenticate - this will throw BadCredentialsException if password is wrong
+            authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
 
-        Map<String, String> response = new HashMap<>();
+            Map<String, String> response = new HashMap<>();
 
-        if (user.is2faEnabled()) {
-            response.put("status", "2FA required");
-            return response;
-        }
-
-        String token = jwtService.generateToken(user);
-        response.put("token", token);
-
-        // Check user role and add it to the response
-        String roleName = user.getRole().getName();
-        response.put("role", roleName);
-
-        // Add user ID and name to response
-        response.put("userId", user.getId().toString());
-        response.put("userName", user.getFirstName() + " " + user.getLastName());
-        response.put("userEmail", user.getEmail());
-
-        // For customer role, also include customerId if available
-        if (roleName.equals("ROLE_CUSTOMER") && user.getCustomer() != null) {
-            Customer customer = user.getCustomer();
-            if (customer != null && customer.getUserId() != null) {
-                response.put("customerId", customer.getUserId().toString());
+            if (user.is2faEnabled()) {
+                response.put("status", "2FA required");
+                recordLoginAttempt(user); // Record successful authentication
+                return response;
             }
-        }
 
-        // Determine the redirect URL based on role
-        if (roleName.equals("ROLE_CUSTOMER")) {
-            response.put("redirect", "/dashboard");
-        } else if (roleName.equals("ROLE_FLEET_MANAGER")) {
-            response.put("redirect", "/fleet-manager/dashboard");
-        } else if (roleName.equals("ROLE_OWNER")) {
-            response.put("redirect", "/owner/dashboard");
-        } else {
-            // Default for system admins
-            response.put("redirect", "/admin/dashboard");
-        }
+            String token = jwtService.generateToken(user);
+            response.put("token", token);
 
-        return response;
+            // Check user role and add it to the response
+            String roleName = user.getRole().getName();
+            response.put("role", roleName);
+
+            // Add user ID and name to response
+            response.put("userId", user.getId().toString());
+            response.put("userName", user.getFirstName() + " " + user.getLastName());
+            response.put("userEmail", user.getEmail());
+
+            // For customer role, also include customerId if available
+            if (roleName.equals("ROLE_CUSTOMER") && user.getCustomer() != null) {
+                Customer customer = user.getCustomer();
+                if (customer != null && customer.getUserId() != null) {
+                    response.put("customerId", customer.getUserId().toString());
+                }
+            }
+
+            // Determine the redirect URL based on role
+            if (roleName.equals("ROLE_CUSTOMER")) {
+                response.put("redirect", "/dashboard");
+            } else if (roleName.equals("ROLE_FLEET_MANAGER")) {
+                response.put("redirect", "/fleet-manager/dashboard");
+            } else if (roleName.equals("ROLE_OWNER")) {
+                response.put("redirect", "/owner/dashboard");
+            } else {
+                // Default for system admins
+                response.put("redirect", "/admin/dashboard");
+            }
+
+            // Record successful login
+            recordLoginAttempt(user);
+            return response;
+            
+        } catch (BadCredentialsException e) {
+            throw new RuntimeException("Invalid email or password");
+        } catch (RuntimeException e) {
+            throw e;
+        }
     }
 
     public String forgotPassword(String email) {

@@ -91,7 +91,7 @@ public class SecurityConfig {
                 "/register", "/forgot-password", "/reset-password",
                 "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
-                                "/admin/payments",
+                                "/admin/payments", "/admin/login-history",
                                 "/fleet-manager/**",
                                 "/feedback", "/admin/feedback", "/profile", "/profile/**", "/payment", "/rental-history","/owner/dashboard")
                         .permitAll() // Allow public access to UI pages
