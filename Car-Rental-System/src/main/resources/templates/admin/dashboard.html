@@ -685,7 +685,6 @@
           <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
           <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
           <a href="/admin/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
-          <a href="/fleet-manager/bookings"><i class="fas fa-calendar-check mr-1"></i>Bookings</a>
           <a href="/logout"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
           <!-- System Admin Notifications: only user registrations and user logins -->
           <div class="dropdown" id="admin-notif">
@@ -1027,7 +1026,7 @@
       </div>
     </main>
 
-    <!-- System Admin notifications script (filtered to user_registered and user_login) -->
+    <!-- System Admin notifications script (only user_login and feedback_received, with delete) -->
     <script>
       (function(){
         const badge = document.getElementById('admin-notif-badge');
@@ -1068,6 +1067,8 @@
         function saveRead(s){ localStorage.setItem('adminNotifRead', JSON.stringify(Array.from(s))); }
         function getPinned(){ try { return new Set(JSON.parse(localStorage.getItem('adminNotifPinned')||'[]')); } catch(_) { return new Set(); } }
         function savePinned(s){ localStorage.setItem('adminNotifPinned', JSON.stringify(Array.from(s))); }
+        function getDeleted(){ try { return new Set(JSON.parse(localStorage.getItem('adminNotifDeleted')||'[]')); } catch(_) { return new Set(); } }
+        function saveDeleted(s){ localStorage.setItem('adminNotifDeleted', JSON.stringify(Array.from(s))); }
 
         function stableId(n){
           if(n.id) return String(n.id);
@@ -1096,15 +1097,23 @@
           list.innerHTML='';
           const read=getRead();
           const pinned=getPinned();
+          const deleted=getDeleted();
           let unread=0;
           if(!Array.isArray(notifs)||notifs.length===0){ list.innerHTML='<div style="padding:.75rem 1rem;color:var(--text-luxury-muted)">No notifications</div>'; updateBadge(0); return; }
           const pinnedItems=[]; const otherItems=[];
-          notifs.forEach(n=>{ const id=stableId(n); const isRead=id&&read.has(id); if(!isRead) unread++; const entry={n,id,isRead}; if(id&&pinned.has(id)) pinnedItems.push(entry); else otherItems.push(entry); });
+          notifs.forEach(n=>{
+            const id=stableId(n);
+            if(id && deleted.has(id)) return; // skip deleted
+            const isRead=id&&read.has(id);
+            if(!isRead) unread++;
+            const entry={n,id,isRead};
+            if(id&&pinned.has(id)) pinnedItems.push(entry); else otherItems.push(entry);
+          });
           // Ensure each group is sorted newest->oldest as well
           pinnedItems.sort((a,b)=> ts(b.n)-ts(a.n));
           otherItems.sort((a,b)=> ts(b.n)-ts(a.n));
           if(pinnedItems.length>0){ const hdr=document.createElement('div'); hdr.style.cssText='padding:.4rem 1rem;color:var(--luxury-gold);font-weight:700;border-bottom:1px solid rgba(212,175,55,.2)'; hdr.textContent='Pinned'; list.appendChild(hdr); }
-          function row(entry){ const {n,id,isRead}=entry; const isPinned=id&&pinned.has(id); const time=n.timestamp?new Date(n.timestamp).toLocaleString():''; const div=document.createElement('div'); div.style.cssText='display:flex;gap:10px;align-items:flex-start;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.1)'; const pinColor=isPinned?'var(--luxury-gold)':'#aaa'; div.innerHTML=`${iconHtml(n)}<div style="flex:1"><div style="font-weight:700;color:var(--luxury-gold)">${n.title||'Notification'}${isPinned?' <span style=\"font-size:.75rem;color:var(--luxury-gold)\">(pinned)</span>':''}</div><div style="color:var(--text-luxury-light);font-size:.92rem;margin-top:2px">${n.message||''}</div><div style="color:var(--text-luxury-muted);font-size:.8rem;margin-top:4px">${time}</div></div><span class="pin" data-id="${id}" title="${isPinned?'Unpin':'Pin'}" style="color:${pinColor};margin-right:10px"><i class="fas fa-thumbtack"></i></span><span class="tick" data-id="${id}" title="Mark as read" style="color:${isRead?'#4caf50':'#aaa'}"><i class="fas fa-check"></i></span>`; list.appendChild(div); }
+          function row(entry){ const {n,id,isRead}=entry; const isPinned=id&&pinned.has(id); const time=n.timestamp?new Date(n.timestamp).toLocaleString():''; const div=document.createElement('div'); div.style.cssText='display:flex;gap:10px;align-items:flex-start;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.1)'; const pinColor=isPinned?'var(--luxury-gold)':'#aaa'; div.innerHTML=`${iconHtml(n)}<div style="flex:1"><div style="font-weight:700;color:var(--luxury-gold)">${n.title||'Notification'}${isPinned?' <span style=\"font-size:.75rem;color:var(--luxury-gold)\">(pinned)</span>':''}</div><div style="color:var(--text-luxury-light);font-size:.92rem;margin-top:2px">${n.message||''}</div><div style="color:var(--text-luxury-muted);font-size:.8rem;margin-top:4px">${time}</div></div><span class="pin" data-id="${id}" title="${isPinned?'Unpin':'Pin'}" style="color:${pinColor};margin-right:10px"><i class="fas fa-thumbtack"></i></span><span class="tick" data-id="${id}" title="Mark as read" style="color:${isRead?'#4caf50':'#aaa'};margin-right:10px"><i class="fas fa-check"></i></span><span class="del" data-id="${id}" title="Delete" style="color:#c0392b"><i class="fas fa-trash"></i></span>`; list.appendChild(div); }
           pinnedItems.forEach(row); if(pinnedItems.length>0&&otherItems.length>0){ const sep=document.createElement('div'); sep.style.cssText='padding:.2rem 1rem;color:var(--text-luxury-muted);font-size:.8rem;border-bottom:1px solid rgba(212,175,55,.1)'; sep.textContent='All notifications'; list.appendChild(sep);} otherItems.forEach(row);
           updateBadge(unread);
         }
@@ -1115,7 +1124,7 @@
             const data = await res.json();
             const filtered = (Array.isArray(data)?data:[]).filter(n => {
               const t = (n.type||'').toLowerCase();
-              return t==='user_registered' || t==='user_login' || t.includes('user_login');
+              return t==='user_login' || t==='feedback_received' || t.includes('user_login');
             }).sort((a,b)=> ts(b)-ts(a)); // newest first
             currentNotifs = filtered;
             render(currentNotifs);
@@ -1123,8 +1132,12 @@
         }
 
         list.addEventListener('click',(e)=>{
-          const t=e.target.closest('.tick'); if(t){ const id=t.getAttribute('data-id'); if(!id) return; const s=getRead(); s.add(id); saveRead(s); return render(currentNotifs); }
-          const p=e.target.closest('.pin'); if(p){ const id=p.getAttribute('data-id'); if(!id) return; const sp=getPinned(); if(sp.has(id)) sp.delete(id); else sp.add(id); savePinned(sp); return render(currentNotifs); }
+          const t=e.target.closest('.tick');
+          if(t){ const id=t.getAttribute('data-id'); if(!id) return; const s=getRead(); s.add(id); saveRead(s); return render(currentNotifs); }
+          const p=e.target.closest('.pin');
+          if(p){ const id=p.getAttribute('data-id'); if(!id) return; const sp=getPinned(); if(sp.has(id)) sp.delete(id); else sp.add(id); savePinned(sp); return render(currentNotifs); }
+          const d=e.target.closest('.del');
+          if(d){ const id=d.getAttribute('data-id'); if(!id) return; const sd=getDeleted(); sd.add(id); saveDeleted(sd); currentNotifs = currentNotifs.filter(n => stableId(n) !== id); return render(currentNotifs); }
         });
         markBtn && markBtn.addEventListener('click',(e)=>{ e.preventDefault(); const s=getRead(); const ids=Array.from(list.querySelectorAll('.tick')).map(el=>el.getAttribute('data-id')).filter(Boolean); ids.forEach(id=>s.add(id)); saveRead(s); render(currentNotifs); });
 

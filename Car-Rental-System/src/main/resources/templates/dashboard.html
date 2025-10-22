@@ -1467,9 +1467,15 @@
       }
       function saveReadSet(set){ localStorage.setItem('notifReadIds', JSON.stringify(Array.from(set))); }
 
+      function getDeletedSet(){
+        try { return new Set(JSON.parse(localStorage.getItem('notifDeletedIds')||'[]')); } catch(_) { return new Set(); }
+      }
+      function saveDeletedSet(set){ localStorage.setItem('notifDeletedIds', JSON.stringify(Array.from(set))); }
+
       function renderNotifications(notifications){
         notifList.innerHTML = '';
         const readSet = getReadSet();
+        const deletedSet = getDeletedSet();
         let unreadCount = 0;
 
         if (!Array.isArray(notifications) || notifications.length === 0){
@@ -1477,6 +1483,7 @@
         } else {
           notifications.forEach(n => {
             const id = n.id || (n.type + '_' + (n.bookingId || '') + '_' + (n.timestamp || ''));
+            if (id && deletedSet.has(id)) return; // skip deleted items
             const isRead = id && readSet.has(id) ? true : false;
             if (!isRead) unreadCount++;
             const icon = (n.icon || 'fa-bell').replace('fa-', '');
@@ -1515,6 +1522,7 @@
               <div class="notif-actions">
                 ${showDownload ? `<button class="notif-download" data-kind="${receiptKind}" data-bid="${n.bookingId}" title="Download receipt"><i class="fas fa-download"></i> Receipt</button>` : ''}
                 <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
+                <span class="notif-del" data-id="${id}" title="Delete" style="cursor:pointer;color:#c0392b"><i class="fas fa-trash"></i></span>
               </div>`;
             notifList.appendChild(item);
           });
@@ -1561,6 +1569,16 @@
           const id = tick.getAttribute('data-id');
           if (!id) return;
           const set = getReadSet(); set.add(id); saveReadSet(set);
+          updateNotifications();
+        });
+
+        // Delete a single notification (local persistence)
+        notifList.addEventListener('click', (e) => {
+          const del = e.target.closest('.notif-del');
+          if (!del) return;
+          const id = del.getAttribute('data-id');
+          if (!id) return;
+          const ds = getDeletedSet(); ds.add(id); saveDeletedSet(ds);
           updateNotifications();
         });
 
