@@ -44,6 +44,9 @@
     .status-badge[data-status="Cancelled"], .status-badge[data-status="Returned"] { background-color: #6c757d !important; color: #fff !important; }
     .status-badge[data-status="Pending Payment"], .status-badge[data-status="Payment Pending"] { background-color: #ffc107 !important; color: #000 !important; }
     .status-badge:not([data-status="Confirmed"]):not([data-status="Cancelled"]):not([data-status="Returned"]):not([data-status="Pending Payment"]):not([data-status="Payment Pending"]) { background-color: #007bff !important; color: #fff !important; }
+    /* Owner Back button visual so it stands out on dark header */
+    #owner-back-dashboard-btn{ display:none; border:2px solid var(--luxury-gold); color: var(--luxury-gold); background: transparent; font-weight:600; }
+    #owner-back-dashboard-btn:hover{ background: var(--luxury-gold); color: var(--luxury-black); }
   </style>
 </head>
 <body>
@@ -52,7 +55,7 @@
       <a class="navbar-brand-luxury" href="/fleet-manager/dashboard"><i class="fas fa-crown mr-2"></i>VeloRent Fleet Manager</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav mr-auto" id="fm-nav-links">
           <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/dashboard">Main Dashboard</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/packages">Packages</a></li>
           <li class="nav-item"><a class="nav-link-luxury" href="/fleet-manager/vehicle-usage-history">Usage History</a></li>
@@ -64,7 +67,12 @@
 
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="page-title mb-0"><i class="fas fa-clipboard-list mr-2"></i>All Bookings</h2>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap: wrap;">
+        <a id="owner-back-dashboard-btn" href="/owner/dashboard" class="btn btn-outline-info btn-sm">
+          <i class="fas fa-arrow-left mr-1"></i> Owner Dashboard
+        </a>
+        <h2 class="page-title mb-0"><i class="fas fa-clipboard-list mr-2"></i>All Bookings</h2>
+      </div>
       <div class="d-flex align-items-center">
         <button class="btn btn-outline-info btn-sm mr-3" onclick="window.location.reload()" title="Refresh Data">
           <i class="fas fa-sync-alt mr-1"></i>Refresh
@@ -258,6 +266,26 @@
   <script th:inline="javascript">
     let originalRows = [];
     let currentFilter = '';
+
+    // Show Owner back button and hide FM nav links when the viewer is an OWNER
+    (function(){
+      function setupOwnerView(){
+        try {
+          var role = (localStorage.getItem('userRole') || '').toUpperCase();
+          if (role.includes('OWNER')){
+            var backBtn = document.getElementById('owner-back-dashboard-btn');
+            if (backBtn) backBtn.style.display = 'inline-flex';
+            var fmNav = document.getElementById('fm-nav-links');
+            if (fmNav) fmNav.style.display = 'none';
+          }
+        } catch(e) { /* no-op */ }
+      }
+      if (document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', setupOwnerView);
+      } else {
+        setupOwnerView();
+      }
+    })();
 
     function recomputeStats() {
       let confirmed = 0, pending = 0, returned = 0, cancelled = 0;
