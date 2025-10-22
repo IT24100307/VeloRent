@@ -1450,6 +1450,12 @@
       .notif-tick{cursor:pointer;color:var(--luxury-gold);opacity:.8}
       .notif-tick.read{color:#27ae60;opacity:1}
       .notif-empty{padding:12px;text-align:center;color:var(--text-luxury-muted)}
+  .notif-actions{display:flex;gap:8px;align-items:center}
+  .notif-download{cursor:pointer;border:none;background:linear-gradient(135deg,#ffd166,#f6ae2d);color:#000;padding:6px 8px;border-radius:8px;font-weight:700;font-size:.78rem;box-shadow:0 6px 16px rgba(246,174,45,.35);transition:transform .12s ease}
+  .notif-download:hover{transform:translateY(-1px)}
+  .notif-actions{display:flex;gap:8px;align-items:center}
+  .notif-download{cursor:pointer;border:none;background:linear-gradient(135deg,#ffd166,#f6ae2d);color:#000;padding:6px 8px;border-radius:8px;font-weight:700;font-size:.78rem;box-shadow:0 6px 16px rgba(246,174,45,.35);transition:transform .12s ease}
+  .notif-download:hover{transform:translateY(-1px)}
 
       /* Notifications logic */
       const notifList = document.getElementById('notif-list');
@@ -1478,14 +1484,36 @@
             const time = n.timestamp ? new Date(n.timestamp).toLocaleString() : '';
             const item = document.createElement('div');
             item.className = 'notif-item';
+            const hasBid = !!n.bookingId;
+            const typeStr = (n.type || '').toString().toLowerCase();
+            const titleStr = (n.title || '').toString().toLowerCase();
+            // Show receipt for booking confirmations and payment confirmations (never for cancellations)
+            const isBooking = (
+              titleStr.includes('booking confirmed') ||
+              typeStr.includes('booking_confirmed') ||
+              typeStr.includes('booking confirmed') ||
+              typeStr === 'bookingconfirmed'
+            );
+            const isPayment = (
+              titleStr.includes('payment confirmed') ||
+              typeStr.includes('payment_confirmed') ||
+              typeStr.includes('payment confirmed') ||
+              typeStr === 'paymentconfirmed'
+            );
+            const receiptKind = isBooking ? 'booking' : (isPayment ? 'payment' : null);
+            const showDownload = hasBid && !!receiptKind;
+            if (showDownload) { try { console.debug('Notif receipt button enabled', { bookingId: n.bookingId, kind: receiptKind, type: n.type, title: n.title }); } catch(_){} }
+            const linkHtml = showDownload ? `<div><a href="#" class="notif-receipt-link" data-kind="${receiptKind}" data-bid="${n.bookingId}" style="color:#ffd166;font-weight:700;text-decoration:underline;font-size:.85rem">Download receipt</a></div>` : '';
             item.innerHTML = `
               <div class="notif-icon ${sev}"><i class="fas ${n.icon ? n.icon : 'fa-bell'}"></i></div>
               <div class="notif-content">
                 <div class="notif-title">${n.title || 'Notification'}</div>
                 <div style="font-size:0.9rem;color:var(--text-luxury-muted);margin-top:4px;">${n.message || ''}</div>
                 <div class="notif-time">${time}</div>
+                ${linkHtml}
               </div>
               <div class="notif-actions">
+                ${showDownload ? `<button class="notif-download" data-kind="${receiptKind}" data-bid="${n.bookingId}" title="Download receipt"><i class="fas fa-download"></i> Receipt</button>` : ''}
                 <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
               </div>`;
             notifList.appendChild(item);
@@ -1534,6 +1562,30 @@
           if (!id) return;
           const set = getReadSet(); set.add(id); saveReadSet(set);
           updateNotifications();
+        });
+
+        // Download receipt (booking or payment)
+        notifList.addEventListener('click', async (e) => {
+          const btn = e.target.closest('.notif-download');
+          if (!btn) return;
+          const bid = btn.getAttribute('data-bid');
+          if (!bid) return;
+          const kind = btn.getAttribute('data-kind') || 'booking';
+          try {
+            const token = localStorage.getItem('token');
+            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+            const res = await fetch(`/api/receipts/${kind}/${bid}`, { headers });
+            if (!res.ok) throw new Error('Download failed');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const fname = kind === 'payment' ? `payment-receipt-${bid}.html` : `booking-receipt-${bid}.html`;
+            a.href = url; a.download = fname;
+            document.body.appendChild(a); a.click(); a.remove();
+            window.URL.revokeObjectURL(url);
+          } catch(err) {
+            console.error(err); alert('Could not download receipt.');
+          }
         });
       }
 
@@ -2525,7 +2577,8 @@
                   <small>Temporarily unavailable - Some vehicles are currently rented individually</small>
                 </div>` : '';
 
-              slide.innerHTML = `
+              const linkHtml2 = showDownload ? `<div><a href="#" class="notif-receipt-link" data-bid="${n.bookingId}" style="color:#ffd166;font-weight:700;text-decoration:underline;font-size:.85rem">Download receipt</a></div>` : '';
+              item.innerHTML = `
                 <div class="package-content">
                   <div class="package-info">
                     <h4>${p.packageName || 'Luxury Package'}</h4>
@@ -3108,6 +3161,25 @@
               const time = n.timestamp ? new Date(n.timestamp).toLocaleString() : '';
               const item = document.createElement('div');
               item.className = 'notif-item';
+              const hasBid2 = !!n.bookingId;
+              const typeStr2 = (n.type || '').toString().toLowerCase();
+              const titleStr2 = (n.title || '').toString().toLowerCase();
+              // Show receipt for booking confirmations and payment confirmations (never for cancellations)
+              const isBooking2 = (
+                titleStr2.includes('booking confirmed') ||
+                typeStr2.includes('booking_confirmed') ||
+                typeStr2.includes('booking confirmed') ||
+                typeStr2 === 'bookingconfirmed'
+              );
+              const isPayment2 = (
+                titleStr2.includes('payment confirmed') ||
+                typeStr2.includes('payment_confirmed') ||
+                typeStr2.includes('payment confirmed') ||
+                typeStr2 === 'paymentconfirmed'
+              );
+              const receiptKind2 = isBooking2 ? 'booking' : (isPayment2 ? 'payment' : null);
+              const showDownload = hasBid2 && !!receiptKind2;
+              if (showDownload) { try { console.debug('Notif receipt button enabled (footer block)', { bookingId: n.bookingId, kind: receiptKind2, type: n.type, title: n.title }); } catch(_){} }
               item.innerHTML = `
                 <div class="notif-icon ${sev}"><i class="fas ${n.icon ? n.icon : 'fa-bell'}"></i></div>
                 <div class="notif-content">
@@ -3116,6 +3188,7 @@
                   <div class="notif-time">${time}</div>
                 </div>
                 <div class="notif-actions">
+                  ${showDownload ? `<button class="notif-download" data-kind="${receiptKind2}" data-bid="${n.bookingId}" title="Download receipt"><i class=\"fas fa-download\"></i> Receipt</button>` : ''}
                   <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
                 </div>`;
               notifList.appendChild(item);
@@ -3164,6 +3237,51 @@
             if (!id) return;
             const set = getReadSet(); set.add(id); saveReadSet(set);
             updateNotifications();
+          });
+
+          // Download colourful booking receipt
+          notifList.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.notif-download');
+            if (!btn) return;
+            const bid = btn.getAttribute('data-bid');
+            if (!bid) return;
+            try {
+              const token = localStorage.getItem('token');
+              const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+              const res = await fetch(`/api/receipts/booking/${bid}`, { headers });
+              if (!res.ok) throw new Error('Download failed');
+              const blob = await res.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url; a.download = `booking-receipt-${bid}.html`;
+              document.body.appendChild(a); a.click(); a.remove();
+              window.URL.revokeObjectURL(url);
+            } catch(err) {
+              console.error(err); alert('Could not download receipt.');
+            }
+          });
+
+          // Link version of receipt download
+          notifList.addEventListener('click', async (e) => {
+            const link = e.target.closest('.notif-receipt-link');
+            if (!link) return;
+            e.preventDefault();
+            const bid = link.getAttribute('data-bid');
+            if (!bid) return;
+            const kind = link.getAttribute('data-kind') || 'booking';
+            try {
+              const token = localStorage.getItem('token');
+              const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+              const res = await fetch(`/api/receipts/${kind}/${bid}`, { headers });
+              if (!res.ok) throw new Error('Download failed');
+              const blob = await res.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              const fname = kind === 'payment' ? `payment-receipt-${bid}.html` : `booking-receipt-${bid}.html`;
+              a.href = url; a.download = fname;
+              document.body.appendChild(a); a.click(); a.remove();
+              window.URL.revokeObjectURL(url);
+            } catch(err) { console.error(err); alert('Could not download receipt.'); }
           });
         }
 

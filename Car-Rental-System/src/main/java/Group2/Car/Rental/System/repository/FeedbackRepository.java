@@ -10,4 +10,7 @@ import java.util.List;
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     @Query("SELECT f FROM Feedback f WHERE f.customer.id = ?1")
     List<Feedback> findByCustomerId(Long customerId);
+
+    // Recent feedback entries
+    List<Feedback> findTop20ByOrderByCreatedAtDesc();
 }
