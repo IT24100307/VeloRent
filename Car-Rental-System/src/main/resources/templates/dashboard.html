@@ -1456,160 +1456,6 @@
   .notif-actions{display:flex;gap:8px;align-items:center}
   .notif-download{cursor:pointer;border:none;background:linear-gradient(135deg,#ffd166,#f6ae2d);color:#000;padding:6px 8px;border-radius:8px;font-weight:700;font-size:.78rem;box-shadow:0 6px 16px rgba(246,174,45,.35);transition:transform .12s ease}
   .notif-download:hover{transform:translateY(-1px)}
-
-      /* Notifications logic */
-      const notifList = document.getElementById('notif-list');
-      const notifBadge = document.getElementById('notif-badge');
-      const notifMarkAllBtn = document.getElementById('notif-mark-all');
-
-      function getReadSet(){
-        try { return new Set(JSON.parse(localStorage.getItem('notifReadIds')||'[]')); } catch(_) { return new Set(); }
-      }
-      function saveReadSet(set){ localStorage.setItem('notifReadIds', JSON.stringify(Array.from(set))); }
-
-      function getDeletedSet(){
-        try { return new Set(JSON.parse(localStorage.getItem('notifDeletedIds')||'[]')); } catch(_) { return new Set(); }
-      }
-      function saveDeletedSet(set){ localStorage.setItem('notifDeletedIds', JSON.stringify(Array.from(set))); }
-
-      function renderNotifications(notifications){
-        notifList.innerHTML = '';
-        const readSet = getReadSet();
-        const deletedSet = getDeletedSet();
-        let unreadCount = 0;
-
-        if (!Array.isArray(notifications) || notifications.length === 0){
-          notifList.innerHTML = '<div class="notif-empty">No notifications yet</div>';
-        } else {
-          notifications.forEach(n => {
-            const id = n.id || (n.type + '_' + (n.bookingId || '') + '_' + (n.timestamp || ''));
-            if (id && deletedSet.has(id)) return; // skip deleted items
-            const isRead = id && readSet.has(id) ? true : false;
-            if (!isRead) unreadCount++;
-            const icon = (n.icon || 'fa-bell').replace('fa-', '');
-            const sev = (n.severity || 'info').toLowerCase();
-            const time = n.timestamp ? new Date(n.timestamp).toLocaleString() : '';
-            const item = document.createElement('div');
-            item.className = 'notif-item';
-            const hasBid = !!n.bookingId;
-            const typeStr = (n.type || '').toString().toLowerCase();
-            const titleStr = (n.title || '').toString().toLowerCase();
-            // Show receipt for booking confirmations and payment confirmations (never for cancellations)
-            const isBooking = (
-              titleStr.includes('booking confirmed') ||
-              typeStr.includes('booking_confirmed') ||
-              typeStr.includes('booking confirmed') ||
-              typeStr === 'bookingconfirmed'
-            );
-            const isPayment = (
-              titleStr.includes('payment confirmed') ||
-              typeStr.includes('payment_confirmed') ||
-              typeStr.includes('payment confirmed') ||
-              typeStr === 'paymentconfirmed'
-            );
-            const receiptKind = isBooking ? 'booking' : (isPayment ? 'payment' : null);
-            const showDownload = hasBid && !!receiptKind;
-            if (showDownload) { try { console.debug('Notif receipt button enabled', { bookingId: n.bookingId, kind: receiptKind, type: n.type, title: n.title }); } catch(_){} }
-            const linkHtml = showDownload ? `<div><a href="#" class="notif-receipt-link" data-kind="${receiptKind}" data-bid="${n.bookingId}" style="color:#ffd166;font-weight:700;text-decoration:underline;font-size:.85rem">Download receipt</a></div>` : '';
-            item.innerHTML = `
-              <div class="notif-icon ${sev}"><i class="fas ${n.icon ? n.icon : 'fa-bell'}"></i></div>
-              <div class="notif-content">
-                <div class="notif-title">${n.title || 'Notification'}</div>
-                <div style="font-size:0.9rem;color:var(--text-luxury-muted);margin-top:4px;">${n.message || ''}</div>
-                <div class="notif-time">${time}</div>
-                ${linkHtml}
-              </div>
-              <div class="notif-actions">
-                ${showDownload ? `<button class="notif-download" data-kind="${receiptKind}" data-bid="${n.bookingId}" title="Download receipt"><i class="fas fa-download"></i> Receipt</button>` : ''}
-                <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
-                <span class="notif-del" data-id="${id}" title="Delete" style="cursor:pointer;color:#c0392b"><i class="fas fa-trash"></i></span>
-              </div>`;
-            notifList.appendChild(item);
-          });
-        }
-
-        // Update badge
-        if (unreadCount > 0){
-          notifBadge.style.display = 'inline-block';
-          notifBadge.textContent = unreadCount;
-        } else {
-          notifBadge.style.display = 'none';
-        }
-      }
-
-      async function updateNotifications(){
-        try {
-          const token = localStorage.getItem('token');
-          const headers = { 'Accept': 'application/json' };
-          if (token) headers['Authorization'] = `Bearer ${token}`;
-          const res = await fetch('/api/customer/notifications', { headers });
-          const list = await res.json();
-          renderNotifications(Array.isArray(list) ? list : []);
-        } catch (e) {
-          console.error('Failed to load notifications', e);
-        }
-      }
-
-      // Mark all read
-      if (notifMarkAllBtn){
-        notifMarkAllBtn.addEventListener('click', () => {
-          try {
-            const ids = Array.from(notifList.querySelectorAll('.notif-tick')).map(el => el.getAttribute('data-id')).filter(Boolean);
-            const set = getReadSet(); ids.forEach(id => set.add(id)); saveReadSet(set);
-            updateNotifications();
-          } catch(e){ console.error('Failed to mark all read', e); }
-        });
-      }
-
-      // Tick one notification
-      if (notifList){
-        notifList.addEventListener('click', (e) => {
-          const tick = e.target.closest('.notif-tick');
-          if (!tick) return;
-          const id = tick.getAttribute('data-id');
-          if (!id) return;
-          const set = getReadSet(); set.add(id); saveReadSet(set);
-          updateNotifications();
-        });
-
-        // Delete a single notification (local persistence)
-        notifList.addEventListener('click', (e) => {
-          const del = e.target.closest('.notif-del');
-          if (!del) return;
-          const id = del.getAttribute('data-id');
-          if (!id) return;
-          const ds = getDeletedSet(); ds.add(id); saveDeletedSet(ds);
-          updateNotifications();
-        });
-
-        // Download receipt (booking or payment)
-        notifList.addEventListener('click', async (e) => {
-          const btn = e.target.closest('.notif-download');
-          if (!btn) return;
-          const bid = btn.getAttribute('data-bid');
-          if (!bid) return;
-          const kind = btn.getAttribute('data-kind') || 'booking';
-          try {
-            const token = localStorage.getItem('token');
-            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-            const res = await fetch(`/api/receipts/${kind}/${bid}`, { headers });
-            if (!res.ok) throw new Error('Download failed');
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const fname = kind === 'payment' ? `payment-receipt-${bid}.html` : `booking-receipt-${bid}.html`;
-            a.href = url; a.download = fname;
-            document.body.appendChild(a); a.click(); a.remove();
-            window.URL.revokeObjectURL(url);
-          } catch(err) {
-            console.error(err); alert('Could not download receipt.');
-          }
-        });
-      }
-
-      // Initial load + polling
-      updateNotifications();
-      setInterval(updateNotifications, 30000);
     </style>
   </head>
   <body>
@@ -3164,16 +3010,28 @@
         }
         function saveReadSet(set){ localStorage.setItem('notifReadIds', JSON.stringify(Array.from(set))); }
 
+        // Deleted notifications (persist across page loads, client-side only)
+        function getDeletedSet(){
+          try { return new Set(JSON.parse(localStorage.getItem('notifDeletedIds')||'[]')); } catch(_) { return new Set(); }
+        }
+        function saveDeletedSet(set){ localStorage.setItem('notifDeletedIds', JSON.stringify(Array.from(set))); }
+
         function renderNotifications(notifications){
           notifList.innerHTML = '';
           const readSet = getReadSet();
+          const deletedSet = getDeletedSet();
           let unreadCount = 0;
 
           if (!Array.isArray(notifications) || notifications.length === 0){
             notifList.innerHTML = '<div class="notif-empty">No notifications yet</div>';
           } else {
             notifications.forEach(n => {
-              const id = n.id || (n.type + '_' + (n.bookingId || '') + '_' + (n.timestamp || ''));
+              // Use a stable id that doesn't change between polls (avoid timestamp)
+              const id = (n.id && String(n.id).length)
+                ? n.id
+                : ((n.type || 'notif') + '_' + ((n.bookingId !== undefined && n.bookingId !== null) ? n.bookingId : 'na'));
+              // Skip deleted items
+              if (id && deletedSet.has(id)) return;
               const isRead = id && readSet.has(id) ? true : false;
               if (!isRead) unreadCount++;
               const icon = (n.icon || 'fa-bell').replace('fa-', '');
@@ -3184,6 +3042,10 @@
               const hasBid2 = !!n.bookingId;
               const typeStr2 = (n.type || '').toString().toLowerCase();
               const titleStr2 = (n.title || '').toString().toLowerCase();
+              // Remove booking confirmation notifications from customer list
+              if (titleStr2.includes('booking confirm') || typeStr2.includes('booking_confirm')) {
+                return;
+              }
               // Show receipt for booking confirmations and payment confirmations (never for cancellations)
               const isBooking2 = (
                 titleStr2.includes('booking confirmed') ||
@@ -3208,8 +3070,9 @@
                   <div class="notif-time">${time}</div>
                 </div>
                 <div class="notif-actions">
-                  ${showDownload ? `<button class="notif-download" data-kind="${receiptKind2}" data-bid="${n.bookingId}" title="Download receipt"><i class=\"fas fa-download\"></i> Receipt</button>` : ''}
+                  ${showDownload ? `<button class="notif-download" data-kind="${receiptKind2}" data-bid="${n.bookingId}" title="Download receipt"><i class="fas fa-download"></i> Receipt</button>` : ''}
                   <span class="notif-tick ${isRead ? 'read' : ''}" data-id="${id}" title="Mark as read"><i class="fas fa-check"></i></span>
+                  <span class="notif-del" data-id="${id}" title="Delete" style="cursor:pointer;color:#c0392b"><i class="fas fa-trash"></i></span>
                 </div>`;
               notifList.appendChild(item);
             });
@@ -3259,36 +3122,23 @@
             updateNotifications();
           });
 
-          // Download colourful booking receipt
+          // Delete a single notification (local persistence)
+          notifList.addEventListener('click', (e) => {
+            const del = e.target.closest('.notif-del');
+            if (!del) return;
+            const id = del.getAttribute('data-id');
+            if (!id) return;
+            const set = getDeletedSet(); set.add(id); saveDeletedSet(set);
+            updateNotifications();
+          });
+
+          // Download receipt as PDF (booking or payment)
           notifList.addEventListener('click', async (e) => {
             const btn = e.target.closest('.notif-download');
             if (!btn) return;
             const bid = btn.getAttribute('data-bid');
             if (!bid) return;
-            try {
-              const token = localStorage.getItem('token');
-              const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-              const res = await fetch(`/api/receipts/booking/${bid}`, { headers });
-              if (!res.ok) throw new Error('Download failed');
-              const blob = await res.blob();
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url; a.download = `booking-receipt-${bid}.html`;
-              document.body.appendChild(a); a.click(); a.remove();
-              window.URL.revokeObjectURL(url);
-            } catch(err) {
-              console.error(err); alert('Could not download receipt.');
-            }
-          });
-
-          // Link version of receipt download
-          notifList.addEventListener('click', async (e) => {
-            const link = e.target.closest('.notif-receipt-link');
-            if (!link) return;
-            e.preventDefault();
-            const bid = link.getAttribute('data-bid');
-            if (!bid) return;
-            const kind = link.getAttribute('data-kind') || 'booking';
+            const kind = btn.getAttribute('data-kind') || 'booking';
             try {
               const token = localStorage.getItem('token');
               const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -3297,11 +3147,13 @@
               const blob = await res.blob();
               const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
-              const fname = kind === 'payment' ? `payment-receipt-${bid}.html` : `booking-receipt-${bid}.html`;
+              const fname = kind === 'payment' ? `payment-receipt-${bid}.pdf` : `booking-receipt-${bid}.pdf`;
               a.href = url; a.download = fname;
               document.body.appendChild(a); a.click(); a.remove();
               window.URL.revokeObjectURL(url);
-            } catch(err) { console.error(err); alert('Could not download receipt.'); }
+            } catch(err) {
+              console.error(err); alert('Could not download receipt.');
+            }
           });
         }
 
