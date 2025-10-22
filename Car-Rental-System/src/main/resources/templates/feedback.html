@@ -315,6 +315,22 @@
     </style>
 </head>
 <body>
+    <script>
+        // Client-side gate: if there's no JWT token in localStorage, redirect to login
+        (function(){
+            try {
+                var token = localStorage.getItem('token');
+                if (!token) {
+                    var target = encodeURIComponent(window.location.pathname + window.location.search);
+                    window.location.replace('/login?returnUrl=' + target);
+                }
+            } catch (e) {
+                // On any error, be safe and redirect to login
+                var target = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.replace('/login?returnUrl=' + target);
+            }
+        })();
+    </script>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-luxury fixed-top">
         <div class="container">

@@ -137,20 +137,26 @@ async function handleRegistration(event) {
 
         // Handle the response
         if (response.data.success) {
-            showMessage(response.data.message || 'Registration successful! You can now login.', 'success');
+            const successMsg = response.data.message || 'Registration successful! You can now login.';
+            showMessage(successMsg, 'success');
 
             // Clear form
             form.reset();
 
-            // Redirect to login after a short delay
+            // Notify page scripts to remove loading state
+            window.dispatchEvent(new CustomEvent('registerResult', { detail: { success: true } }));
+
+            // Also show the message on the login page after redirect
             setTimeout(() => {
-                window.location.href = '/login';
+                window.location.href = '/login?type=success&message=' + encodeURIComponent(successMsg);
             }, 2000);
         } else {
             showMessage(response.data.message || 'Registration failed. Please try again.', 'error');
+            window.dispatchEvent(new CustomEvent('registerResult', { detail: { success: false } }));
         }
     } catch (error) {
         showMessage('Network error. Please try again.', 'error');
+        window.dispatchEvent(new CustomEvent('registerResult', { detail: { success: false } }));
         console.error('Registration error:', error);
     } finally {
         // Reset button state

@@ -52,6 +52,12 @@ public class ViewController {
         return "verify-2fa";
     }
 
+    @GetMapping("/logout")
+    public String logoutPage() {
+        // Renders a tiny page that clears client auth and redirects to login
+        return "logout";
+    }
+
     @GetMapping("/security-settings")
     public String securitySettings() {
         return "security-settings";
