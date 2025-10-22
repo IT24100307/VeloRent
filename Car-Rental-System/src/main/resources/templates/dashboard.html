@@ -2566,19 +2566,18 @@
               const isPartiallyReserved = (p.status || '').toLowerCase() === 'partially reserved';
               slide.className = `package-slide ${isPartiallyReserved ? 'partially-reserved' : ''}`;
               const imgSrc = p.imageUrl || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
+              // Set background image on slide
+              slide.style.backgroundImage = `url('${imgSrc}')`;
 
-              // Set background image
-              slide.style.backgroundImage = `url(${imgSrc})`;
-
-              // Add availability message for partially reserved packages
+              // Availability message for partially reserved packages
               const availabilityMessage = isPartiallyReserved ?
                 `<div class="availability-notice">
                   <i class="fas fa-clock"></i>
                   <small>Temporarily unavailable - Some vehicles are currently rented individually</small>
                 </div>` : '';
 
-              const linkHtml2 = showDownload ? `<div><a href="#" class="notif-receipt-link" data-bid="${n.bookingId}" style="color:#ffd166;font-weight:700;text-decoration:underline;font-size:.85rem">Download receipt</a></div>` : '';
-              item.innerHTML = `
+              // Slide overlay content
+              slide.innerHTML = `
                 <div class="package-content">
                   <div class="package-info">
                     <h4>${p.packageName || 'Luxury Package'}</h4>
@@ -2590,6 +2589,7 @@
                     <button class="btn view-details-btn" data-pkg-idx="${idx}">View Details</button>
                   </div>
                 </div>`;
+
               track.appendChild(slide);
 
               // Create indicator
@@ -2599,8 +2599,10 @@
               indicators.appendChild(indicator);
             });
 
-            // Add indicators to slider
+            // Add indicators to slider (remove existing first to avoid duplicates on reload)
             const packageSlider = document.querySelector('.packages-slider');
+            const existingIndicators = packageSlider.querySelector('.packages-indicators');
+            if (existingIndicators) existingIndicators.remove();
             packageSlider.appendChild(indicators);
 
             // Enhanced Controls with Indicators

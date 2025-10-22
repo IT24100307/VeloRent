@@ -5,6 +5,7 @@ import Group2.Car.Rental.System.entity.Booking;
 import Group2.Car.Rental.System.entity.MaintenanceRecord;
 import Group2.Car.Rental.System.entity.Payment;
 import Group2.Car.Rental.System.entity.User;
+import Group2.Car.Rental.System.entity.LoginHistory;
 import Group2.Car.Rental.System.entity.Feedback;
 import Group2.Car.Rental.System.entity.Vehicle;
 import Group2.Car.Rental.System.repository.BookingRepository;
@@ -13,6 +14,7 @@ import Group2.Car.Rental.System.repository.PaymentRepository;
 import Group2.Car.Rental.System.repository.UserRepository;
 import Group2.Car.Rental.System.repository.FeedbackRepository;
 import Group2.Car.Rental.System.repository.VehicleRepository;
+import Group2.Car.Rental.System.repository.LoginHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,7 @@ public class NotificationService {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final FeedbackRepository feedbackRepository;
+    private final LoginHistoryRepository loginHistoryRepository;
 
     @Autowired
     public NotificationService(BookingRepository bookingRepository,
@@ -38,13 +41,15 @@ public class NotificationService {
                                VehicleRepository vehicleRepository,
                                PaymentRepository paymentRepository,
                                UserRepository userRepository,
-                               FeedbackRepository feedbackRepository) {
+                               FeedbackRepository feedbackRepository,
+                               LoginHistoryRepository loginHistoryRepository) {
         this.bookingRepository = bookingRepository;
         this.maintenanceRecordRepository = maintenanceRecordRepository;
         this.vehicleRepository = vehicleRepository;
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
         this.feedbackRepository = feedbackRepository;
+        this.loginHistoryRepository = loginHistoryRepository;
     }
 
     public List<NotificationDTO> getRecentNotifications() {
@@ -211,6 +216,38 @@ public class NotificationService {
                             LocalDateTime.now()
                     );
                     dto.setId("user_" + (u.getId()!=null ? u.getId() : msg.hashCode()));
+                    notifications.add(dto);
+                }
+            } catch (Exception ignored) {}
+
+            // Recent user logins (last 7 days)
+            try {
+                LocalDateTime since = LocalDateTime.now().minusDays(7);
+                List<LoginHistory> logins = loginHistoryRepository.findRecentLogins(since);
+                for (LoginHistory lh : safeList(logins)) {
+                    User u = lh.getUser();
+                    String name = null;
+                    String email = null;
+                    try {
+                        if (u != null) {
+                            name = (u.getFirstName() + " " + u.getLastName()).trim();
+                            email = u.getEmail();
+                        }
+                    } catch (Exception ignored2) {}
+                    if (name == null || name.isBlank()) name = lh.getUsername();
+                    String role = lh.getAccountType();
+                    String msg = (name != null ? name : "User") +
+                            (email != null ? " (" + email + ")" : "") +
+                            (role != null ? " logged in as " + role + "." : " logged in.");
+                    NotificationDTO dto = new NotificationDTO(
+                            "user_login",
+                            "User Login",
+                            msg,
+                            "fa-sign-in-alt",
+                            "info",
+                            lh.getLoginTime() != null ? lh.getLoginTime() : LocalDateTime.now()
+                    );
+                    dto.setId("login_" + (lh.getLoginId() != null ? lh.getLoginId() : msg.hashCode()));
                     notifications.add(dto);
                 }
             } catch (Exception ignored) {}
