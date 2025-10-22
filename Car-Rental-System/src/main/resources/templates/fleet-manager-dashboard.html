@@ -123,6 +123,9 @@
         top: 0; left: 0; right: 0;
         isolation: isolate; /* prevent pseudo elements from blending in */
     }
+        /* Keep nav items centered vertically and on one line */
+        .navbar-luxury .navbar-nav { align-items: center; flex-wrap: nowrap; }
+        .navbar-luxury .navbar-nav > li { display: flex; align-items: center; }
         .navbar-brand-luxury {
             font-size: 1.8rem !important;
             font-weight: 700 !important;
@@ -987,6 +990,8 @@
             background: transparent;
             color: var(--luxury-gold);
             border: 2px solid var(--luxury-gold);
+            height: 44px; /* align with nav links */
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px;
         }
 
         .btn-luxury:hover, .btn-luxury-outline:hover {
@@ -1014,7 +1019,10 @@
             color: var(--text-luxury-light);
             border: 2px solid var(--luxury-gold);
             border-radius: var(--radius-luxury-small);
-            padding: 8px 12px;
+            padding: 12px 16px; /* match nav-link height */
+            height: 44px; /* visually align with nav links */
+            display: inline-flex; align-items: center; justify-content: center;
+            line-height: 1; box-sizing: border-box; overflow: visible;
             cursor: pointer;
             transition: var(--transition-smooth);
         }
@@ -1071,6 +1079,9 @@
         .pin-btn { background: transparent; border: 1px solid rgba(212,175,55,0.25); color: var(--text-luxury-light); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.75rem; line-height: 1; display: inline-flex; align-items: center; gap: 6px; }
         .pin-btn:hover { background: rgba(212,175,55,0.12); color: var(--luxury-gold); }
         .pin-btn.pin-active { color: var(--luxury-gold); border-color: var(--luxury-gold); }
+        /* Delete button */
+        .del-btn { background: transparent; border: 1px solid rgba(231,76,60,0.25); color: var(--text-luxury-light); border-radius: 6px; padding: 2px 6px; cursor: pointer; font-size: 0.75rem; line-height: 1; display: inline-flex; align-items: center; gap: 6px; }
+        .del-btn:hover { background: rgba(231,76,60,0.12); color: #e74c3c; border-color: rgba(231,76,60,0.45); }
         @media (max-width: 576px) {
             .notifications-dropdown { width: 92vw; right: -10px; }
         }
@@ -1100,7 +1111,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav mr-auto" style="gap: 8px; align-items: center;">
                     <li class="nav-item">
                         <a class="nav-link-luxury" href="/dashboard"><i class="fas fa-home mr-1"></i>Main Dashboard</a></li>
                     
@@ -1117,9 +1128,14 @@
                         <a class="nav-link-luxury" href="/security-settings"><i class="fas fa-shield-alt mr-1"></i>Security</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav right-actions" style="display: flex; align-items: center; gap: 14px;">
+                    <li class="nav-item">
+                        <a class="nav-link-luxury" href="#" onclick="handleLogout(event)" style="color: var(--text-luxury-light) !important; transition: var(--transition-smooth);" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </a>
+                    </li>
                     <!-- Notifications Bell -->
-                    <li class="nav-item notifications-wrapper" style="margin-right: 12px;">
+                    <li class="nav-item notifications-wrapper">
                         <button id="notif-bell" class="notification-bell" aria-label="Notifications">
                             <i class="fas fa-bell"></i>
                             <span id="notif-count" class="notification-count" style="display:none;">0</span>
@@ -1137,14 +1153,10 @@
                              </ul>
                          </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link-luxury" href="#" onclick="handleLogout(event)" style="color: var(--text-luxury-light) !important; transition: var(--transition-smooth);" onmouseover="this.style.background='rgba(212, 175, 55, 0.2)'; this.style.color='var(--luxury-gold)'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-luxury-light)'">
-                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
-                        </a>
-                    </li>
+
                     <li class="nav-item">
                         <div class="dropdown">
-                            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" style="margin-left: 15px;">
+                            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown">
                                 <i class="fas fa-user-circle mr-1"></i>
                                 <span id="user-initials">FM</span>
                             </button>
@@ -2194,12 +2206,75 @@
         const READ_STORAGE_KEY = 'fm_notif_read_keys';
         let notifReadSet = loadReadSet();
         // NEW: pinned notifications local storage
-        const PIN_STORAGE_KEY = 'fm_notif_pinned_keys';
-        let notifPinnedSet = loadPinnedSet();
+    const PIN_STORAGE_KEY = 'fm_notif_pinned_keys';
+    let notifPinnedSet = loadPinnedSet();
+    // Deleted notifications set (persisted) to suppress reappearance
+    const DEL_STORAGE_KEY = 'fm_notif_deleted_keys';
+    let notifDeletedSet = loadDeletedSet();
         // Auto-refresh controls
         let notifAutoTimer = null;
         let notifFetchInFlight = false;
         const NOTIF_POLL_MS = 15000; // 15s polling
+
+        // Helper: robust timestamp extraction (supports multiple backends/fields)
+        function notifTs(n){
+            if (!n) return 0;
+            const tryVals = [n.timestamp, n.time, n.date, n.createdAt, n.created_at, n.eventTime, n.updatedAt, n.updated_at];
+            for (let v of tryVals){
+                if (typeof v === 'number'){
+                    const t = new Date(v).getTime();
+                    if (!isNaN(t)) return t;
+                } else if (v){
+                    const t = new Date(v).getTime();
+                    if (!isNaN(t)) return t;
+                }
+            }
+            const epoch = (n.epoch != null ? n.epoch : (n.ts != null ? n.ts : null));
+            if (epoch != null){
+                const t = Number(epoch);
+                if (!isNaN(t)) return t;
+            }
+            return 0;
+        }
+
+        // Allowed FM notification categories/types
+        const ALLOWED_TYPES = new Set([
+            'vehicle_upload','vehicle_uploaded','vehicle_created','new_vehicle',
+            'rental_created','rental','booking_created','booking',
+            'package_purchase','package_bought','package_order',
+            'maintenance_soon','maintenance_due','service_due','vehicle_maintenance'
+        ]);
+
+        function isAllowedNotification(n){
+            if (!n) return false;
+            const type = (n.type || n.eventType || n.category || '').toString().toLowerCase();
+            if (type && ALLOWED_TYPES.has(type)) return true;
+            // Fallback to keyword heuristics if type is missing or unknown
+            const title = (n.title || '').toLowerCase();
+            const msg = (n.message || '').toLowerCase();
+            const text = title + ' ' + msg;
+            // vehicle upload/add
+            if (/(vehicle|car)\s*(image|details)?\s*(upload|add(ed)?|create(d)?)/.test(text)) return true;
+            if (/new\s+(vehicle|car)\b/.test(text)) return true;
+            // customer rents vehicle or package
+            if (/(customer|user)?.*\b(rent|book|reserve|hire)(ed|s|ing)?\b/.test(text)) return true;
+            if (/\b(rental|booking)\b\s*(created|confirmed|placed)/.test(text)) return true;
+            if (/\bpackage\b\s*(purchase|bought|order|subscribed)/.test(text)) return true;
+            // maintenance soon/due
+            if (/(mainten|service)\w*\s*(soon|due|upcoming)/.test(text)) return true;
+            if (/\bdue\s+for\s+maintenance\b/.test(text)) return true;
+            return false;
+        }
+
+        function filterAndSortNotifications(items){
+            const arr = Array.isArray(items) ? items.slice() : [];
+            const filtered = arr
+                .filter(isAllowedNotification)
+                .filter(n => !notifDeletedSet.has(getNotifKey(n)));
+            // Newest first using robust timestamp
+            filtered.sort((a,b) => notifTs(b) - notifTs(a));
+            return filtered;
+        }
 
         function getNotifKey(n){
             return (n && (n.id || n.key || `${n.title||''}|${n.message||''}|${n.timestamp||''}`)).toString();
@@ -2219,10 +2294,37 @@
         function savePinnedSet(){
             try { localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(Array.from(notifPinnedSet))); } catch(e){}
         }
+        // Deleted helpers
+        function loadDeletedSet(){
+            try { return new Set(JSON.parse(localStorage.getItem(DEL_STORAGE_KEY) || '[]')); }
+            catch(e){ return new Set(); }
+        }
+        function saveDeletedSet(){
+            try { localStorage.setItem(DEL_STORAGE_KEY, JSON.stringify(Array.from(notifDeletedSet))); } catch(e){}
+        }
         function togglePin(key){
             if (!key) return;
             if (notifPinnedSet.has(key)) notifPinnedSet.delete(key); else notifPinnedSet.add(key);
             savePinnedSet();
+            renderNotifications();
+        }
+        async function deleteNotificationByKey(key, id){
+            try{
+                // Try backend delete if we have an ID; otherwise do a local remove
+                if (id != null && id !== ''){
+                    const token = localStorage.getItem('token');
+                    const res = await fetch(`/api/fleet/notifications/${encodeURIComponent(id)}`, {
+                        method: 'DELETE',
+                        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                    });
+                    // If server rejects, still fall back to local removal for UX
+                }
+            }catch(e){ /* ignore and fall back */ }
+            // Local removal from current state and sets
+            notifDeletedSet.add(key); saveDeletedSet();
+            notifState.items = (notifState.items || []).filter(n => getNotifKey(n) !== key);
+            if (notifPinnedSet.has(key)) { notifPinnedSet.delete(key); savePinnedSet(); }
+            if (notifReadSet.has(key)) { notifReadSet.delete(key); saveReadSet(); }
             renderNotifications();
         }
         function markAllAsRead(){
@@ -2276,7 +2378,8 @@
             })
             .then(r => r.ok ? r.json() : [])
             .then(items => {
-                notifState.items = Array.isArray(items) ? items : [];
+                // Apply FM-specific filtering and newest-first ordering
+                notifState.items = filterAndSortNotifications(items);
                 notifState.lastFetch = Date.now();
                 renderNotifications();
             })
@@ -2321,7 +2424,8 @@
             ordered.forEach(({n, key, pinned}) => {
                 const iconClass = n.icon ? n.icon : 'fa-info-circle';
                 const sevClass = n.severity === 'success' ? 'notif-success' : n.severity === 'danger' ? 'notif-danger' : n.severity === 'warning' ? 'notif-warning' : '';
-                const time = n.timestamp ? new Date(n.timestamp) : null;
+                const ts = notifTs(n);
+                const time = ts ? new Date(ts) : null;
                 const timeText = time ? time.toLocaleString() : '';
                 const li = document.createElement('li');
                 const isUnread = !notifReadSet.has(key);
@@ -2339,9 +2443,14 @@
                     <div class="notif-content">
                         <div class="notif-title-row">
                             <div class="notif-title">${escapeHtml(n.title || 'Notification')}</div>
-                            <button class="pin-btn ${pinClass}" title="${pinned ? 'Unpin' : 'Pin'}" aria-pressed="${pinned}" data-pin-key="${escapeAttr(key)}">
-                                <i class="fas fa-thumbtack"></i>
-                            </button>
+                            <div class="notif-actions" style="display:flex; gap:6px; align-items:center;">
+                                <button class="pin-btn ${pinClass}" title="${pinned ? 'Unpin' : 'Pin'}" aria-pressed="${pinned}" data-pin-key="${escapeAttr(key)}">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                                <button class="del-btn" title="Delete" data-del-key="${escapeAttr(key)}" data-del-id="${escapeAttr(n.id != null ? n.id : '')}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="notif-message">${escapeHtml(n.message || '')}</div>
                         ${countdownHtml}
@@ -2362,6 +2471,15 @@
                 const btn = li.querySelector('[data-pin-key]');
                 if (btn) {
                     btn.addEventListener('click', function(e){ e.stopPropagation(); togglePin(key); });
+                }
+                const delBtn = li.querySelector('[data-del-key]');
+                if (delBtn){
+                    delBtn.addEventListener('click', function(e){
+                        e.stopPropagation();
+                        const k = this.getAttribute('data-del-key');
+                        const idAttr = this.getAttribute('data-del-id');
+                        deleteNotificationByKey(k, idAttr);
+                    });
                 }
 
                 if (hasCountdown) {
