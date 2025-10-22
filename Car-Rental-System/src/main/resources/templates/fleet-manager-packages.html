@@ -1019,7 +1019,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     // simple role gate (client-side)
     const userRole = localStorage.getItem('userRole') || '';
-    if (!(userRole.includes('FLEET_MANAGER') || userRole.includes('FLEETMANAGER'))) {
+    // Permit both Fleet Managers and Owners
+    if (!(userRole.includes('FLEET_MANAGER') || userRole.includes('FLEETMANAGER') || userRole.includes('OWNER'))) {
       window.location.href = '/dashboard?message=' + encodeURIComponent('You do not have permission to access this page') + '&type=error';
       return;
     }
