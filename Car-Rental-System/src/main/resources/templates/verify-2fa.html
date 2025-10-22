@@ -187,6 +187,9 @@
               ${message}
             </div>
           `;
+          // Ensure container is visible in case it was hidden by clearMessage()
+          messageContainer.style.display = 'block';
+          messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           
           // Auto-hide success messages
           if (type === 'success') {

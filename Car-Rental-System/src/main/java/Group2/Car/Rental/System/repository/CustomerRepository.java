@@ -8,4 +8,9 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByUserId(Long userId);
+
+    // Fetch all customers with their linked User eagerly to avoid LazyInitialization
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"user"})
+    @org.springframework.data.jpa.repository.Query("select c from Customer c")
+    java.util.List<Customer> findAllWithUser();
 }

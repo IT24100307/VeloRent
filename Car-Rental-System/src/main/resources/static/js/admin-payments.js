@@ -4,7 +4,12 @@
 
   function fmtCurrency(n){
     if(n===null||n===undefined) return '-';
-    try{ return new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(Number(n)); }catch(e){ return '$'+Number(n).toFixed(2); }
+    try{
+      // Format in Sri Lankan Rupees
+      return new Intl.NumberFormat('en-LK',{style:'currency',currency:'LKR', maximumFractionDigits: 2}).format(Number(n));
+    }catch(e){
+      return 'Rs. '+Number(n).toFixed(2);
+    }
   }
   function fmtDate(d){
     if(!d) return '-';

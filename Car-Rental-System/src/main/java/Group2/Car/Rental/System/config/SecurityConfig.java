@@ -64,6 +64,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/vehicles/**").permitAll() // Allow access to vehicle endpoints
                         // Require auth specifically for fleet bookings API
                         .requestMatchers("/api/fleet/bookings/**").authenticated()
+                        // Allow read-only access for customer ranking used in Gift modal
+                        .requestMatchers(HttpMethod.GET, "/api/bookings/customers/top").permitAll()
+                        // Allow customer list for Gift modal
+                        .requestMatchers(HttpMethod.GET, "/api/customers/**").permitAll()
                         // Keep other fleet endpoints publicly accessible as before
                         .requestMatchers("/api/fleet/**").permitAll() // Allow access to fleet manager package APIs
             // Allow public GET access to images so <img> tags can load without Authorization header

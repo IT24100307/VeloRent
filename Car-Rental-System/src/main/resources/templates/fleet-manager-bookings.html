@@ -20,6 +20,9 @@
     .navbar-luxury{background:linear-gradient(135deg,var(--luxury-black),var(--luxury-charcoal),var(--luxury-black))!important;border-bottom:2px solid var(--luxury-gold)}
     .page-title{color:var(--luxury-gold);font-family:var(--font-luxury-primary);font-weight:700}
     .lux-card{background:linear-gradient(135deg,var(--luxury-charcoal),var(--luxury-black));border:1px solid rgba(212,175,55,.25);border-radius:12px;box-shadow:var(--shadow-luxury)}
+    /* Lux large button variant for top actions */
+    .btn-lux-large{padding:10px 16px;font-size:0.98rem;line-height:1.25;border-width:2px}
+    .btn-lux-large i{margin-right:6px}
     .btn-danger{background:linear-gradient(135deg,#e74c3c,#c0392b);border:none}
     table.dataTable tbody tr:hover{background:rgba(212,175,55,0.06)}
     .badge{padding:4px 8px;border-radius:12px;font-size:0.75rem;font-weight:500}
@@ -68,13 +71,16 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div style="display:flex; align-items:center; gap:12px; flex-wrap: wrap;">
-        <a id="owner-back-dashboard-btn" href="/owner/dashboard" class="btn btn-outline-info btn-sm">
+        <a id="owner-back-dashboard-btn" href="/owner/dashboard" class="btn btn-outline-info btn-lux-large">
           <i class="fas fa-arrow-left mr-1"></i> Owner Dashboard
         </a>
         <h2 class="page-title mb-0"><i class="fas fa-clipboard-list mr-2"></i>All Bookings</h2>
       </div>
       <div class="d-flex align-items-center">
-        <button class="btn btn-outline-info btn-sm mr-3" onclick="window.location.reload()" title="Refresh Data">
+        <button id="giftBtn" class="btn btn-outline-info btn-lux-large mr-3" title="Gift a vehicle to a customer" style="display:none;">
+          <i class="fas fa-gift mr-1"></i>Gift Vehicle
+        </button>
+        <button class="btn btn-outline-info btn-lux-large mr-3" onclick="window.location.reload()" title="Refresh Data">
           <i class="fas fa-sync-alt mr-1"></i>Refresh
         </button>
   <span class="badge badge-info mr-3" th:text="'Total: ' + ${(bookingsCount != null) ? bookingsCount : (bookings != null ? bookings.size() : 0)}">Total: 0</span>
@@ -261,6 +267,40 @@
     </div>
   </div>
 
+  <!-- Gift Vehicle Modal -->
+  <div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="background:linear-gradient(145deg,#2d2d2d,#3a3a3a);border:2px solid var(--luxury-gold)">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-gift mr-2"></i>Gift a Vehicle</h5>
+          <button id="giftCloseX" type="button" class="close btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="text-warning">Select Vehicle</label>
+            <select id="giftVehicleSelect" class="form-control" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.3); color: var(--text-luxury-light);"></select>
+            <small class="text-muted">Only vehicles with status Available are listed.</small>
+          </div>
+          <div class="form-group">
+            <label class="text-warning">Select Customer (most rentals first)</label>
+            <select id="giftCustomerSelect" class="form-control" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.3); color: var(--text-luxury-light);"></select>
+          </div>
+          <div class="form-group">
+            <label class="text-warning">Duration (days)</label>
+            <input id="giftDuration" type="number" min="1" value="1" class="form-control" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.3); color: var(--text-luxury-light);">
+            <small class="text-muted">Defaults to 1 day if left unchanged.</small>
+          </div>
+          <div id="giftError" class="text-danger small" style="display:none;"></div>
+          <div id="giftSuccess" class="text-success small" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="giftCloseBtn" type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">Close</button>
+          <button id="giftConfirmBtn" type="button" class="btn btn-outline-info"><i class="fas fa-check mr-1"></i>Gift Vehicle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/jQuery/jquery.min.js"></script>
   <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script th:inline="javascript">
@@ -277,6 +317,11 @@
             if (backBtn) backBtn.style.display = 'inline-flex';
             var fmNav = document.getElementById('fm-nav-links');
             if (fmNav) fmNav.style.display = 'none';
+            var giftBtn = document.getElementById('giftBtn');
+            if (giftBtn) giftBtn.style.display = 'inline-flex';
+          } else {
+            var giftBtn2 = document.getElementById('giftBtn');
+            if (giftBtn2) giftBtn2.style.display = 'none';
           }
         } catch(e) { /* no-op */ }
       }
@@ -284,6 +329,26 @@
         document.addEventListener('DOMContentLoaded', setupOwnerView);
       } else {
         setupOwnerView();
+
+      function hideModal(){
+        try {
+          if (window.jQuery && jQuery.fn && jQuery.fn.modal) {
+            jQuery('#giftModal').modal('hide');
+            return;
+          }
+        } catch(e) {}
+        try {
+          if (window.bootstrap && window.bootstrap.Modal) {
+            let inst = bootstrap.Modal.getInstance(modalNode);
+            if (!inst) inst = new bootstrap.Modal(modalNode);
+            inst.hide();
+            return;
+          }
+        } catch(e) {}
+        // Fallback
+        modalNode.classList.remove('show');
+        modalNode.style.display = 'none';
+      }
       }
     })();
 
@@ -473,6 +538,138 @@
     }
 
     document.addEventListener('DOMContentLoaded', initializeBookingsTable);
+
+    // Gift Vehicle UI
+    (function(){
+      const btn = document.getElementById('giftBtn');
+      const modalNode = document.getElementById('giftModal');
+      const vehicleSel = document.getElementById('giftVehicleSelect');
+      const customerSel = document.getElementById('giftCustomerSelect');
+      const durationInp = document.getElementById('giftDuration');
+      const errEl = document.getElementById('giftError');
+      const okEl = document.getElementById('giftSuccess');
+      const confirmBtn = document.getElementById('giftConfirmBtn');
+      const closeBtn = document.getElementById('giftCloseBtn');
+      const closeX = document.getElementById('giftCloseX');
+
+      function authHeader(){
+        try{
+          const t = localStorage.getItem('token');
+          return t ? { 'Authorization': 'Bearer ' + t } : {};
+        }catch(e){ return {}; }
+      }
+
+      function option(label, value){
+        const o = document.createElement('option'); o.value = value; o.textContent = label; return o;
+      }
+
+      async function loadVehicles(){
+        vehicleSel.innerHTML = '';
+        try{
+          const res = await fetch('/api/vehicles/available');
+          const list = await res.json();
+          if(Array.isArray(list) && list.length){
+            list.forEach(v => {
+              const label = `${v.make || ''} ${v.model || ''} (${v.registrationNumber || 'N/A'})`;
+              vehicleSel.appendChild(option(label.trim(), v.vehicleId));
+            });
+          } else {
+            vehicleSel.appendChild(option('No available vehicles', ''));
+          }
+        }catch(e){ vehicleSel.appendChild(option('Failed to load vehicles', '')); }
+      }
+
+      async function loadCustomers(){
+        customerSel.innerHTML = '';
+        try{
+          // Load all customers directly from customer table (public GET permitted)
+          const res = await fetch('/api/customers', { headers: { 'Content-Type':'application/json' }});
+          const list = await res.json();
+          if(Array.isArray(list) && list.length){
+            list.forEach(c => {
+              const label = `${c.name || 'Customer'} (${c.email || ''})`;
+              customerSel.appendChild(option(label, c.customerId));
+            });
+          } else {
+            customerSel.appendChild(option('No customers found', ''));
+          }
+        }catch(e){ customerSel.appendChild(option('Failed to load customers', '')); }
+      }
+
+      function showModal(){
+        try {
+          if (window.jQuery && jQuery.fn && jQuery.fn.modal) {
+            jQuery('#giftModal').modal('show');
+            return;
+          }
+        } catch(e) {}
+        try {
+          if (window.bootstrap && window.bootstrap.Modal) {
+            const m = new bootstrap.Modal(modalNode);
+            m.show();
+            return;
+          }
+        } catch(e) {}
+        // Fallback: minimal display if no Bootstrap JS available
+        modalNode.style.display = 'block';
+        modalNode.classList.add('show');
+      }
+
+      function hideGiftModal(){
+        try {
+          if (window.jQuery && jQuery.fn && jQuery.fn.modal) {
+            jQuery('#giftModal').modal('hide');
+            return;
+          }
+        } catch(e) {}
+        try {
+          if (window.bootstrap && window.bootstrap.Modal) {
+            let inst = bootstrap.Modal.getInstance(modalNode);
+            if (!inst) inst = new bootstrap.Modal(modalNode);
+            inst.hide();
+            return;
+          }
+        } catch(e) {}
+        modalNode.classList.remove('show');
+        modalNode.style.display = 'none';
+      }
+
+      async function openModal(){
+        errEl.style.display='none'; okEl.style.display='none'; okEl.textContent=''; errEl.textContent='';
+        await Promise.all([loadVehicles(), loadCustomers()]);
+        showModal();
+      }
+
+      async function doGift(){
+        errEl.style.display='none'; okEl.style.display='none';
+        const vehicleId = parseInt(vehicleSel.value || '0', 10);
+        const customerId = parseInt(customerSel.value || '0', 10);
+        const durationDays = parseInt(durationInp.value || '1', 10);
+        if(!vehicleId || !customerId){ errEl.textContent='Please select both vehicle and customer.'; errEl.style.display='block'; return; }
+        confirmBtn.disabled = true; confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Processing';
+        try{
+          const res = await fetch('/api/bookings/gift', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', ...authHeader() },
+            body: JSON.stringify({ vehicleId, customerId, durationDays })
+          });
+          const data = await res.json();
+          if(res.ok && data && data.success){
+            okEl.textContent = 'Vehicle gifted successfully. Reloading…'; okEl.style.display='block';
+            setTimeout(()=>window.location.reload(), 800);
+          } else {
+            errEl.textContent = (data && data.message) ? data.message : 'Failed to gift vehicle';
+            errEl.style.display='block';
+          }
+        }catch(e){ errEl.textContent='Server error while gifting vehicle'; errEl.style.display='block'; }
+        finally{ confirmBtn.disabled=false; confirmBtn.innerHTML='<i class="fas fa-check mr-1"></i>Gift Vehicle'; }
+      }
+
+      if(btn){ btn.addEventListener('click', openModal); }
+      if(confirmBtn){ confirmBtn.addEventListener('click', doGift); }
+      if(closeBtn){ closeBtn.addEventListener('click', hideGiftModal); }
+      if(closeX){ closeX.addEventListener('click', hideGiftModal); }
+    })();
   </script>
 </body>
 </html>

@@ -40,21 +40,40 @@ async function handleForgotPassword(event) {
         });
         
         // Handle the response
-        if (response.data.success) {
+        if (response.data && response.data.success) {
             showMessage(response.data.message || 'Please use your authenticator app to reset your password.', 'success');
-            
+
             // Store the email in session storage for the reset page
             sessionStorage.setItem('reset_email', email);
-            
+
             // Redirect to reset password page after a short delay
             setTimeout(() => {
                 window.location.href = '/reset-password';
             }, 2000);
+            // Notify page listeners to clear loading states
+            window.dispatchEvent(new CustomEvent('forgotPasswordResult', { detail: { success: true } }));
         } else {
-            showMessage(response.data.message || 'Failed to continue with 2FA. Please ensure 2FA is enabled for your account.', 'error');
+            // Map backend messages to subtle, user-friendly hints
+            const rawMsg = (response && response.data && response.data.message) ? response.data.message : '';
+            let friendly = 'We couldn\'t continue with 2FA for this email.';
+            let level = 'error';
+
+            if (rawMsg.toLowerCase().includes('user not found')) {
+                friendly = 'No account was found for this email. Please check the address and try again.';
+                level = 'warning';
+            } else if (rawMsg.toLowerCase().includes('two-factor authentication is not enabled')) {
+                friendly = 'Two‑factor authentication isn\'t enabled for this account. Enable 2FA in Security Settings, then try again.';
+                level = 'warning';
+            }
+
+            showMessage(friendly, level);
+            // Notify page listeners to clear loading states
+            window.dispatchEvent(new CustomEvent('forgotPasswordResult', { detail: { success: false } }));
         }
     } catch (error) {
-        showMessage('An error occurred. Please try again later.', 'error');
+        // Network/unknown errors
+        showMessage('We couldn\'t process your request right now. Please try again in a moment.', 'error');
+        window.dispatchEvent(new CustomEvent('forgotPasswordResult', { detail: { success: false } }));
         console.error('Forgot password error:', error);
     } finally {
         // Reset button state

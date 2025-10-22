@@ -392,7 +392,7 @@
                   <span class="package-status ${pkg.status === 'Activated' ? 'status-activated' : 'status-partially-reserved'}">${pkg.status || 'Unknown'}</span>
                 </div>
                 <div class="package-content">
-                  <div class="package-description">${pkg.description || 'Package description not provided.'}</div>
+                  <div class="package-description">${pkg.description ? pkg.description : ''}</div>
                 </div>
                 <div class="package-actions mt-3">
                   <button class="btn btn-details mr-2" onclick="viewPackageDetails(${pkg.packageId}, '${(pkg.packageName||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><i class="fas fa-info-circle mr-1"></i>Details</button>
