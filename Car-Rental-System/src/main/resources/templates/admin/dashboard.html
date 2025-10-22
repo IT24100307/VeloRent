@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css" />
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="/css/DataTables/datatables.min.css" />
-    <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+  <script src="/js/jQuery/jquery-3.7.1.min.js"></script>
+  <script src="/css/bootstrap/js/bootstrap.bundle.min.js"></script>
     <style>
       /* Admin Dashboard Luxury Theme Overrides */
 
@@ -683,7 +684,20 @@
         <div class="nav-links" style="align-items:center; gap: 12px;">
           <a href="/admin/dashboard"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
           <a href="/admin/feedback"><i class="fas fa-comments mr-1"></i>Feedback</a>
-          <!-- Admin notifications removed -->
+          <!-- System Admin Notifications: only user registrations and user logins -->
+          <div class="dropdown" id="admin-notif">
+            <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" title="Notifications">
+              <i class="fas fa-bell"></i>
+              <span id="admin-notif-badge" class="notif-badge" style="display:none;position:absolute;top:-6px;right:-6px;background:#d4af37;color:#000;border-radius:10px;padding:0 6px;font-size:11px;line-height:16px;min-width:18px;text-align:center;">0</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" style="background: var(--luxury-dark); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: var(--radius-luxury); min-width: 360px; max-width: 420px; padding: 0; overflow: hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.2);">
+                <div style="color:var(--luxury-gold);font-weight:700">Notifications</div>
+                <a href="#" id="admin-mark-all" style="color:var(--luxury-gold);font-size:.85rem;text-decoration:none">Mark all read</a>
+              </div>
+              <div id="admin-notif-list" style="max-height:420px;overflow:auto;"></div>
+            </div>
+          </div>
           <div class="dropdown">
             <button class="btn-luxury btn-luxury-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" title="Account">
               <span id="admin-user-initials">AD</span>
@@ -1011,7 +1025,78 @@
       </div>
     </main>
 
-    <!-- Admin notifications removed -->
+    <!-- System Admin notifications script (filtered to user_registered and user_login) -->
+    <script>
+      (function(){
+        const badge = document.getElementById('admin-notif-badge');
+        const list = document.getElementById('admin-notif-list');
+        const markBtn = document.getElementById('admin-mark-all');
+        let currentNotifs = [];
+
+        function getRead(){ try { return new Set(JSON.parse(localStorage.getItem('adminNotifRead')||'[]')); } catch(_) { return new Set(); } }
+        function saveRead(s){ localStorage.setItem('adminNotifRead', JSON.stringify(Array.from(s))); }
+        function getPinned(){ try { return new Set(JSON.parse(localStorage.getItem('adminNotifPinned')||'[]')); } catch(_) { return new Set(); } }
+        function savePinned(s){ localStorage.setItem('adminNotifPinned', JSON.stringify(Array.from(s))); }
+
+        function stableId(n){
+          if(n.id) return String(n.id);
+          if(n.userId) return `usr_${n.userId}_${n.type||''}`;
+          const raw = [n.type||'', n.title||'', n.message||'', n.icon||''].join('|');
+          let h = 0; for(let i=0;i<raw.length;i++){ h=((h<<5)-h)+raw.charCodeAt(i); h|=0; }
+          return `h_${Math.abs(h).toString(16)}`;
+        }
+
+        function iconColor(n){
+          const t=(n.type||'').toLowerCase();
+          if(t.includes('user_login')) return '#4caf50';
+          if(t.includes('user')||t.includes('register')) return '#2196f3';
+          const ic=(n.icon||'');
+          if(ic.includes('sign-in')) return '#4caf50';
+          if(ic.includes('user')) return '#2196f3';
+          return 'var(--luxury-gold)';
+        }
+        function iconHtml(n){
+          const color=iconColor(n);
+          return `<i class="fas ${n.icon||'fa-bell'}" style="width:18px;text-align:center;color:${color};filter: drop-shadow(0 0 2px ${color}55);"></i>`;
+        }
+        function updateBadge(unread){ if(unread>0){ badge.style.display='inline-block'; badge.textContent=unread; } else { badge.style.display='none'; badge.textContent='0'; } }
+
+        function render(notifs){
+          list.innerHTML='';
+          const read=getRead();
+          const pinned=getPinned();
+          let unread=0;
+          if(!Array.isArray(notifs)||notifs.length===0){ list.innerHTML='<div style="padding:.75rem 1rem;color:var(--text-luxury-muted)">No notifications</div>'; updateBadge(0); return; }
+          const pinnedItems=[]; const otherItems=[];
+          notifs.forEach(n=>{ const id=stableId(n); const isRead=id&&read.has(id); if(!isRead) unread++; const entry={n,id,isRead}; if(id&&pinned.has(id)) pinnedItems.push(entry); else otherItems.push(entry); });
+          if(pinnedItems.length>0){ const hdr=document.createElement('div'); hdr.style.cssText='padding:.4rem 1rem;color:var(--luxury-gold);font-weight:700;border-bottom:1px solid rgba(212,175,55,.2)'; hdr.textContent='Pinned'; list.appendChild(hdr); }
+          function row(entry){ const {n,id,isRead}=entry; const isPinned=id&&pinned.has(id); const time=n.timestamp?new Date(n.timestamp).toLocaleString():''; const div=document.createElement('div'); div.style.cssText='display:flex;gap:10px;align-items:flex-start;padding:.6rem 1rem;border-bottom:1px solid rgba(212,175,55,.1)'; const pinColor=isPinned?'var(--luxury-gold)':'#aaa'; div.innerHTML=`${iconHtml(n)}<div style="flex:1"><div style="font-weight:700;color:var(--luxury-gold)">${n.title||'Notification'}${isPinned?' <span style=\"font-size:.75rem;color:var(--luxury-gold)\">(pinned)</span>':''}</div><div style="color:var(--text-luxury-light);font-size:.92rem;margin-top:2px">${n.message||''}</div><div style="color:var(--text-luxury-muted);font-size:.8rem;margin-top:4px">${time}</div></div><span class="pin" data-id="${id}" title="${isPinned?'Unpin':'Pin'}" style="color:${pinColor};margin-right:10px"><i class="fas fa-thumbtack"></i></span><span class="tick" data-id="${id}" title="Mark as read" style="color:${isRead?'#4caf50':'#aaa'}"><i class="fas fa-check"></i></span>`; list.appendChild(div); }
+          pinnedItems.forEach(row); if(pinnedItems.length>0&&otherItems.length>0){ const sep=document.createElement('div'); sep.style.cssText='padding:.2rem 1rem;color:var(--text-luxury-muted);font-size:.8rem;border-bottom:1px solid rgba(212,175,55,.1)'; sep.textContent='All notifications'; list.appendChild(sep);} otherItems.forEach(row);
+          updateBadge(unread);
+        }
+
+        async function load(){
+          try{
+            const res = await fetch('/api/admin/notifications',{headers:{'Accept':'application/json'}});
+            const data = await res.json();
+            const filtered = (Array.isArray(data)?data:[]).filter(n => {
+              const t = (n.type||'').toLowerCase();
+              return t==='user_registered' || t==='user_login' || t.includes('user_login');
+            });
+            currentNotifs = filtered;
+            render(currentNotifs);
+          }catch(e){ console.error('Admin notifications load failed', e); }
+        }
+
+        list.addEventListener('click',(e)=>{
+          const t=e.target.closest('.tick'); if(t){ const id=t.getAttribute('data-id'); if(!id) return; const s=getRead(); s.add(id); saveRead(s); return render(currentNotifs); }
+          const p=e.target.closest('.pin'); if(p){ const id=p.getAttribute('data-id'); if(!id) return; const sp=getPinned(); if(sp.has(id)) sp.delete(id); else sp.add(id); savePinned(sp); return render(currentNotifs); }
+        });
+        markBtn && markBtn.addEventListener('click',(e)=>{ e.preventDefault(); const s=getRead(); const ids=Array.from(list.querySelectorAll('.tick')).map(el=>el.getAttribute('data-id')).filter(Boolean); ids.forEach(id=>s.add(id)); saveRead(s); render(currentNotifs); });
+
+        load(); setInterval(load, 30000);
+      })();
+    </script>
 
     <script>
 
