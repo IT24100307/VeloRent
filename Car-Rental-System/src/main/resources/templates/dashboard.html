@@ -1623,13 +1623,13 @@
             <li class="nav-item">
               <a class="nav-link-luxury" href="/security-settings">Security</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link-luxury" id="admin-dashboard-btn" style="display: none;">
-                <i class="fas fa-shield-alt mr-1"></i>Admin Panel
-              </a>
-            </li>
           </ul>
           <div class="auth-buttons">
+            <!-- Admin Panel button (shown for admin roles only) -->
+            <a id="admin-dashboard-btn" class="btn-luxury btn-luxury-outline mr-2" style="display:none; text-decoration:none;"
+               href="javascript:void(0)" title="Admin Panel">
+              <i class="fas fa-shield-alt mr-1"></i>Admin Panel
+            </a>
             <!-- Notifications Dropdown (inserted) -->
             <div class="dropdown mr-2">
               <button class="btn notifications-toggle dropdown-toggle" type="button" id="notifDropdownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Notifications">

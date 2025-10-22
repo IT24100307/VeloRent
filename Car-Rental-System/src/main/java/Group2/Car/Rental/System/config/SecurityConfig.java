@@ -92,7 +92,7 @@ public class SecurityConfig {
 
             .requestMatchers("/", "/test", "/css/**", "/js/**", "/images/**", "/uploads/**", "/login", "/logout",
                 "/register", "/forgot-password", "/reset-password",
-                "/verify-2fa", "/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
+                "/verify-2fa", "/security-settings", "/admin/security-settings", "/dashboard", "/admin/dashboard", "/admin/offers",
                                 "/admin/system-dashboard", "/admin/owner-dashboard", "/admin/fleet-dashboard",
                                 "/admin/payments", "/admin/login-history",
                                 "/fleet-manager/**",
