@@ -8,10 +8,6 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-/**
- * Creational Pattern: Singleton
- * Central pricing engine used across services to compute totals consistently.
- */
 public final class PricingEngine {
     private static volatile PricingEngine INSTANCE;
 
@@ -28,14 +24,6 @@ public final class PricingEngine {
         return INSTANCE;
     }
 
-    /**
-     * Calculate total cost for a package booking.
-     * - Uses the package base price for its configured duration.
-     * - If the booking exceeds the duration, charges pro-rated daily rate for extra days.
-     * - Rounds to 2 decimal places.
-     */
-
-     //line 405
     
     public BigDecimal calculatePackageTotalCost(VehiclePackage vehiclePackage,
                                                 LocalDateTime start,
@@ -61,13 +49,7 @@ public final class PricingEngine {
         return base.setScale(2, RoundingMode.HALF_UP);
     }
 
-    /**
-     * Calculate total cost for an individual vehicle booking.
-     * - Uses discountedRatePerDay if present; otherwise rentalRatePerDay.
-     * - Multiplies by number of days (minimum 1).
-     * - Rounds to 2 decimals.
-     */
-    //line 191
+
     public BigDecimal calculateVehicleTotalCost(Vehicle vehicle,
                                                 LocalDateTime start,
                                                 LocalDateTime end) {
